@@ -24,6 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Web app tests
+        run: node --test pet-studio/pet-engine.test.mjs
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

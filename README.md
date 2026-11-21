@@ -11,6 +11,15 @@ Mã nguồn chức năng **Pets** — thú cưng trạng thái — của [dsh-go
 
 > Đây **không phải** một package độc lập. Tệp giữ nguyên đường dẫn gốc (`app/lib/...`, `app/android/...`) để dễ đối chiếu với upstream, nhưng thiếu phần còn lại của app nên không thể `flutter build` một mình. Danh sách đầy đủ và cách trích xuất ở [EXTRACT.md](EXTRACT.md).
 
+## Ứng dụng Android (APK)
+
+**[Tải PetStudio.apk](https://github.com/vukiengiang2025-sys/dsh-go-pets/releases/download/android-latest/PetStudio.apk)** — Android 7.0+, chạy offline, không xin quyền nào.
+
+- Mở APK để cài (máy có thể hỏi "Cài từ nguồn không xác định" — bật cho trình quản lý tệp).
+- 2 pet (**Mây**, **DSH Bot**), 9 trạng thái, poke/cù/nhấc, bong bóng "Chờ bạn" có nút **Đã xử lý**, nhớ pack/cỡ/im lặng, nhấn giữ icon có shortcut mở thẳng từng pet.
+- APK được GitHub Actions build lại mỗi khi `android/`, `pet-studio/` hoặc pet pack thay đổi; xem [android/README.md](android/README.md).
+- Bản phát hành ký bằng khoá debug để cài trực tiếp; phát hành store thì thay keystore.
+
 ## Pets làm gì
 
 Pet là **bộ chỉ báo trạng thái**, không phải game nuôi: nó chỉ kể agent đang làm gì và có gì đang chờ bạn. Một vòng chạy xong, gặp lỗi, hoặc đang chờ bạn xác nhận/trả lời thì pet diễn hoạt ảnh và bắn bong bóng. Pet đứng trên ô nhập trong app; bật **hiển thị ngoài app** thì thành cửa sổ nổi trên Android (kéo, bám cạnh, nửa bánh xe tiện ích, hỏi nhanh, chụp màn hình hỏi).
@@ -38,7 +47,9 @@ Pet pack = một zip + `pack.json` + các ảnh PNG dạng lưới khung hình. 
 | Tài liệu thiết kế, hướng dẫn, kiểm thử | `docs/` | 9 |
 | **Pet mẫu "Mây"** (nhân vật tự vẽ, CC BY 4.0) | `app/assets/pets/may/`, `art/may/` | 13 + 18 |
 | **Pet "DSH Bot"** (tách từ sheet của bạn, CC BY 4.0) | `app/assets/pets/dsh-bot/`, `art/dsh-bot/` | 11 + 20 |
-| **Pet Studio** — web app chơi thử pack | `pet-studio/` | 6 |
+| **Pet Studio** — web app chơi thử pack | `pet-studio/` | 7 |
+| **App Android** — WebView + asset loader, icon, shortcut | `android/` | 20 |
+| **CI build APK** | `.github/workflows/android.yml` | 1 |
 
 ## Pet mẫu: Mây
 

@@ -79,6 +79,7 @@ export class PetModel {
 
   clearNotification() {
     this.notification = false;
+    this.lastActivity = this.now;
     if (this.state === 'notification') this.setState('idle');
   }
 
@@ -122,6 +123,7 @@ export class PetModel {
     if (this.state === 'sleeping' && this.notification) this.setState('notification');
     if (this.oneShotUntil && now >= this.oneShotUntil) {
       this.oneShotUntil = 0;
+      this.lastActivity = now;
       this.state = this.notification ? 'notification' : (this.returnState || 'idle');
       this.animName = null;
       this.emit('state', { state: this.state });
