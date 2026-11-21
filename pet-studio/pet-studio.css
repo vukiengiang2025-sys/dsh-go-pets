@@ -88,10 +88,11 @@ canvas { display: block; }
 }
 @keyframes pop { from { opacity: 0; transform: translate(-50%, -3px) scale(.97); } }
 .panel { padding-top: 12px; }
-.states { display: flex; flex-wrap: wrap; gap: 8px; }
+.states { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 560px) { .states { grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); } }
 .states button {
   background: var(--panel); color: var(--text); border: 1px solid var(--line);
-  border-radius: 10px; padding: 9px 12px; font: inherit; font-size: 13.5px;
+  border-radius: 10px; padding: 9px 6px; font: inherit; font-size: 13px;
   cursor: pointer; min-width: 44px;
 }
 .states button:active { transform: scale(.97); }

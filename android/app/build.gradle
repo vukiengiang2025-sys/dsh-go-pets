@@ -13,13 +13,25 @@ android {
         resConfigs 'vi', 'en'
     }
 
+    signingConfigs {
+        // Khoá công khai của app (PKCS12, mật khẩu 'petstudio'). Có chủ đích
+        // commit để mọi bản build ra cùng một chữ ký, nhờ vậy cài đè mà không
+        // phải gỡ app. Đừng dùng khoá này để phát hành lên CH Play — hãy tạo
+        // keystore riêng và đưa vào GitHub Secrets.
+        release {
+            storeFile file('petstudio-release.p12')
+            storeType 'PKCS12'
+            storePassword 'petstudio'
+            keyAlias 'petstudio'
+            keyPassword 'petstudio'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             shrinkResources false
-            // Bản phát hành ký bằng khoá debug để cài trực tiếp; đổi signingConfig
-            // sang keystore riêng nếu bạn phát hành lên store.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
     }
 

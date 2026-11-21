@@ -34,7 +34,8 @@ jobs:
           emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
           script: |
             set -e
-            adb install -r PetStudio.apk
+            adb uninstall io.github.vukiengiang.petstudio || true
+            adb install PetStudio.apk
             adb shell am start -W -n io.github.vukiengiang.petstudio/.MainActivity
             sleep 14
             adb exec-out screencap -p > app.png
