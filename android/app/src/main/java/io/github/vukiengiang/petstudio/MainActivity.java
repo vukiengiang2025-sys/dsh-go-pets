@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.Window;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -19,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.webkit.WebResourceErrorCompat;
 import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewClientCompat;
 
@@ -94,7 +94,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onReceivedError(@NonNull WebView view, @NonNull WebResourceRequest request,
-                                        @NonNull WebResourceError error) {
+                                        @NonNull WebResourceErrorCompat error) {
                 if (request.isForMainFrame()) {
                     Log.e(TAG, "load error " + error.getErrorCode() + ": " + error.getDescription());
                     view.loadUrl(ERROR_URL);

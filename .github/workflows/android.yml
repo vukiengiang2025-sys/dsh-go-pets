@@ -58,8 +58,11 @@ jobs:
 
       - name: Verify and name APK
         run: |
+          set -e
           APK=android/app/build/outputs/apk/release/app-release.apk
           ls -l "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "$APK" | head -6
+          unzip -l "$APK" | grep -E 'assets/www/(pet-studio/index.html|app/assets/pets/dsh-bot/pack.json)'
           cp "$APK" PetStudio.apk
           sha256sum PetStudio.apk
 
