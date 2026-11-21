@@ -171,6 +171,9 @@ export function normalizePack(json) {
   if (!json.animations || !Object.keys(json.animations).length) throw new Error('pack không có animation');
   json.canvas = json.canvas || { w: 144, h: 144 };
   json.contentBox = json.contentBox || { x: 0, y: 0, w: json.canvas.w, h: json.canvas.h };
+  for (const [key, anim] of Object.entries(json.animations)) {
+    if (anim && !anim.name) anim.name = key;
+  }
   json.states = json.states || {};
   if (!json.states.idle) {
     const first = Object.keys(json.animations)[0];
