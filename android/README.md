@@ -51,10 +51,17 @@ gradle -p android :app:assembleRelease
 
 ## Ký APK
 
-Bản phát hành hiện ký bằng khoá **debug** để cài trực tiếp. Nếu phát hành lên
-CH Play, tạo keystore riêng và thay `signingConfig` trong `app/build.gradle`
-(bốn biến `storeFile/storePassword/keyAlias/keyPassword`, nên để trong GitHub
-Secrets).
+APK ký bằng `app/petstudio-release.p12` (PKCS12, mật khẩu `petstudio`), cố ý
+commit vào repo để **mọi bản build có cùng chữ ký** — cài đè bản mới không phải
+gỡ app. Khoá này công khai, chỉ dùng cho bản cài tay; **không** dùng để phát
+hành CH Play. Muốn phát hành store: tạo keystore riêng, đưa vào GitHub Secrets
+và sửa `signingConfigs.release` trong `app/build.gradle`.
+
+## Kiểm thử trên máy ảo
+
+Workflow `android-smoke.yml` (chạy tay) tải APK mới nhất, bật emulator API 30,
+cài, mở app, chụp 2 ảnh (mặc định và shortcut `dsh-bot`) rồi lưu artifact
+`emulator-screenshot`. Đây là bằng chứng app chạy thật, không chỉ build xong.
 
 ## Sửa giao diện
 
