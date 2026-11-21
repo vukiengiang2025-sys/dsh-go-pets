@@ -1,61 +1,108 @@
 import { PetModel, normalizePack } from './pet-engine.js';
 
-const PACKS = {
-  'may': '../app/assets/pets/may/pack.json',
-  'dsh-bot': '../app/assets/pets/dsh-bot/pack.json',
-};
+const FALLBACK_PACKS = [
+  { id: 'may', name: 'Mây', url: '../app/assets/pets/may/pack.json' },
+  { id: 'dsh-bot', name: 'DSH Bot', url: '../app/assets/pets/dsh-bot/pack.json' },
+];
 
 const BUBBLES = {
-  attention: 'Xong rồi! Nghỉ chút nhé.',
-  error: 'Có gì đó hỏng rồi…',
-  notification: 'Có việc đang chờ bạn.',
+  attention: { text: 'Xong rồi! Nghỉ chút nhé.' },
+  error: { text: 'Có gì đó hỏng rồi…' },
+  notification: { text: 'Có việc đang chờ bạn.', action: 'Đã xử lý' },
 };
+
+const STORE_KEY = 'pet-studio/v1';
 
 const el = {
   canvas: document.getElementById('canvas'),
   stage: document.getElementById('stage'),
   bubble: document.getElementById('bubble'),
+  bubbleText: document.getElementById('bubbleText'),
+  bubbleAction: document.getElementById('bubbleAction'),
   status: document.getElementById('status'),
+  packInfo: document.getElementById('packInfo'),
   pack: document.getElementById('pack'),
   size: document.getElementById('size'),
   quiet: document.getElementById('quiet'),
   demo: document.getElementById('demo'),
   states: document.getElementById('states'),
+  version: document.getElementById('version'),
 };
 const ctx = el.canvas.getContext('2d');
 
+let packs = FALLBACK_PACKS;
 let pack = null;
 let model = null;
 let images = {};
 let scale = 1;
 let bubbleTimer = 0;
+let rafId = 0;
+let running = true;
+let demoSeq = 0;
+let demoTimer = 0;
 
-function packUrl(id) { return PACKS[id] || PACKS.may; }
+function readStore() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+  catch { return {}; }
+}
+function writeStore(patch) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify({ ...readStore(), ...patch })); } catch {}
+}
+
+function setStatus(text) { el.status.textContent = text; }
+
+function showBubble(state) {
+  const conf = BUBBLES[state];
+  if (!conf || el.quiet.checked) { hideBubble(); return; }
+  el.bubbleText.textContent = conf.text;
+  el.bubbleAction.hidden = !conf.action;
+  el.bubbleAction.textContent = conf.action || '';
+  el.bubble.hidden = false;
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(hideBubble, 5000);
+}
+function hideBubble() { el.bubble.hidden = true; }
+
+function haptic(ms = 8) {
+  if (navigator.vibrate) navigator.vibrate(ms);
+}
+
+async function loadPacks() {
+  try {
+    const res = await fetch('./packs.json', { cache: 'no-cache' });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.packs) && data.packs.length) packs = data.packs;
+    }
+  } catch { /* dùng danh sách mặc định */ }
+}
 
 async function loadPack(id) {
-  const url = packUrl(id);
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Không tải được ' + url);
+  const entry = packs.find(p => p.id === id) || packs[0];
+  const res = await fetch(entry.url);
+  if (!res.ok) throw new Error('không tải được ' + entry.url);
   pack = normalizePack(await res.json());
-  const base = new URL(url, location.href);
+  const base = new URL(entry.url, location.href);
   images = {};
   const sheets = [...new Set(Object.values(pack.animations).map(a => a.sheet))];
   await Promise.all(sheets.map(name => new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => { images[name] = img; resolve(); };
-    img.onerror = () => reject(new Error('Thiếu ảnh ' + name));
+    img.onerror = () => reject(new Error('thiếu ảnh ' + name));
     img.src = new URL(name, base).href;
   })));
-  model = new PetModel(pack, { quiet: el.quiet.checked });
+  const saved = readStore();
+  model = new PetModel(pack, { quiet: saved.quiet ?? false });
   model.on(onState);
+  el.packInfo.textContent = (pack.name || pack.id) + ' · ' + pack.canvas.w + '×' + pack.canvas.h
+    + ' · ' + Object.keys(pack.animations).length + ' animation';
   layout();
-  setStatus('sẵn sàng · ' + (pack.name || pack.id));
 }
 
 function layout() {
   const dp = Number(el.size.value) || 30;
   scale = dp / Math.max(1, pack.contentBox.h);
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
   const w = Math.max(1, Math.round(pack.canvas.w * scale));
   const h = Math.max(1, Math.round(pack.canvas.h * scale));
   el.canvas.style.width = w + 'px';
@@ -64,11 +111,11 @@ function layout() {
   el.canvas.height = Math.round(h * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.imageSmoothingEnabled = !pack.pixelArt;
-  if (pack.pixelArt) ctx.imageSmoothingQuality = 'low';
-  else ctx.imageSmoothingQuality = 'high';
+  ctx.imageSmoothingQuality = pack.pixelArt ? 'low' : 'high';
 }
 
 function draw(now) {
+  if (!running) return;
   const out = model.tick(now);
   ctx.clearRect(0, 0, el.canvas.width, el.canvas.height);
   if (out) {
@@ -81,29 +128,17 @@ function draw(now) {
       ctx.drawImage(img, sx, sy, anim.frameW, anim.frameH,
         anim.box.x * scale, anim.box.y * scale, anim.box.w * scale, anim.box.h * scale);
     }
-    if (Math.random() < 0.08) {
-      setStatus(model.state + ' · ' + out.name + ' · frame ' + frame);
-    }
+    if (Math.random() < 0.06) setStatus(model.state + ' · ' + out.name + ' · frame ' + frame);
   }
-  requestAnimationFrame(draw);
+  rafId = requestAnimationFrame(draw);
 }
-
-function setStatus(text) { el.status.textContent = text; }
 
 function onState() {
   document.querySelectorAll('.states button').forEach(b => {
     b.classList.toggle('active', b.dataset.state === model.state);
   });
-  if (el.quiet.checked) return;
-  const text = BUBBLES[model.state];
-  if (!text) { hideBubble(); return; }
-  el.bubble.textContent = text;
-  el.bubble.hidden = false;
-  clearTimeout(bubbleTimer);
-  bubbleTimer = setTimeout(hideBubble, 4000);
+  showBubble(model.state);
 }
-
-function hideBubble() { el.bubble.hidden = true; }
 
 function bindStage() {
   let down = null;
@@ -123,6 +158,7 @@ function bindStage() {
     if (!down.dragging && Math.hypot(p.x - down.x, p.y - down.y) > 8) {
       down.dragging = true;
       model.drag();
+      haptic(6);
     }
   });
   el.stage.addEventListener('pointerup', ev => {
@@ -134,57 +170,98 @@ function bindStage() {
     const now = performance.now();
     clicks = clicks.filter(t => now - t < 1100);
     clicks.push(now);
+    haptic(8);
     if (clicks.length >= 3) { clicks = []; model.tickle(); return; }
     model.poke(p.x - p.w / 2);
   });
   el.stage.addEventListener('pointercancel', () => { down = null; });
+  el.stage.addEventListener('contextmenu', ev => ev.preventDefault());
 }
 
 function bindControls() {
+  const saved = readStore();
+  if (saved.size) el.size.value = saved.size;
+  el.quiet.checked = !!saved.quiet;
+  el.demo.checked = false;
+
   el.states.addEventListener('click', ev => {
     const b = ev.target.closest('button[data-state]');
     if (!b) return;
-    model.setState(b.dataset.state);
+    stopDemo();
+    el.demo.checked = false;
     if (b.dataset.state !== 'notification') model.clearNotification();
+    model.setState(b.dataset.state);
+    haptic(8);
   });
-  el.size.addEventListener('change', layout);
+  el.size.addEventListener('change', () => { layout(); writeStore({ size: el.size.value }); });
   el.quiet.addEventListener('change', () => {
     model.quiet = el.quiet.checked;
+    writeStore({ quiet: el.quiet.checked });
     if (model.quiet) hideBubble();
   });
   el.pack.addEventListener('change', () => {
+    writeStore({ pack: el.pack.value });
     const url = new URL(location.href);
     url.searchParams.set('pack', el.pack.value);
     location.href = url.toString();
   });
   el.demo.addEventListener('change', () => el.demo.checked ? startDemo() : stopDemo());
+  el.bubbleAction.addEventListener('click', () => {
+    model.clearNotification();
+    model.setState('idle');
+    hideBubble();
+  });
 }
 
-let demoTimer = 0;
 function startDemo() {
   const seq = ['thinking', 'working', 'working', 'attention', 'idle', 'error',
     'notification', 'idle', 'roam', 'sleeping', 'waking', 'idle'];
-  let i = 0;
+  demoSeq = 0;
   demoTimer = setInterval(() => {
-    model.setState(seq[i % seq.length]);
-    i++;
+    model.setState(seq[demoSeq % seq.length]);
+    demoSeq++;
   }, 3200);
 }
 function stopDemo() { clearInterval(demoTimer); }
 
+function bindLifecycle() {
+  document.addEventListener('visibilitychange', () => {
+    running = !document.hidden;
+    if (running) {
+      model.lastActivity = performance.now();
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(draw);
+    } else {
+      cancelAnimationFrame(rafId);
+    }
+  });
+  window.addEventListener('resize', layout);
+}
+
 async function main() {
-  const ids = Object.keys(PACKS);
-  el.pack.innerHTML = ids.map(id => '<option value="' + id + '">' + id + '</option>').join('');
+  await loadPacks();
+  el.pack.innerHTML = packs.map(p =>
+    '<option value="' + p.id + '">' + p.name + '</option>').join('');
+
+  const saved = readStore();
   const param = new URLSearchParams(location.search).get('pack');
-  const id = PACKS[param] ? param : ids[0];
+  const id = packs.some(p => p.id === param) ? param : (saved.pack || packs[0].id);
   el.pack.value = id;
+
   bindStage();
   bindControls();
+  bindLifecycle();
+
   try {
     await loadPack(id);
+    el.version.textContent = 'v' + (pack.version || '1.0.0');
     requestAnimationFrame(draw);
+    setStatus('sẵn sàng');
   } catch (err) {
-    setStatus('lỗi: ' + err.message + ' — hãy chạy trang qua http://, không mở file://');
+    setStatus('lỗi: ' + err.message);
+    el.bubbleText.textContent = 'Không tải được pet pack: ' + err.message;
+    el.bubbleAction.hidden = true;
+    el.bubble.hidden = false;
     console.error(err);
   }
 }

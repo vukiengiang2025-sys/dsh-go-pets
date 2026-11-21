@@ -1,0 +1,6 @@
+{
+  "packs": [
+    { "id": "may", "name": "Mây", "url": "../app/assets/pets/may/pack.json" },
+    { "id": "dsh-bot", "name": "DSH Bot", "url": "../app/assets/pets/dsh-bot/pack.json" }
+  ]
+}

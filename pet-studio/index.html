@@ -3,25 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Pet Studio · dsh-go pets</title>
+<meta name="theme-color" content="#10141C">
+<meta name="color-scheme" content="dark">
+<title>Pet Studio</title>
 <link rel="stylesheet" href="pet-studio.css">
 </head>
 <body>
 <header class="bar">
   <div class="brand">
     <strong>Pet Studio</strong>
-    <span>chơi thử pet pack của dsh-go</span>
+    <span id="packInfo">đang tải…</span>
   </div>
   <div class="controls">
     <label>Pack
-      <select id="pack"></select>
+      <select id="pack" aria-label="Chọn pet pack"></select>
     </label>
     <label>Cỡ
-      <select id="size">
-        <option value="22">Nhỏ · 22</option>
-        <option value="30" selected>Chuẩn · 30</option>
-        <option value="40">Lớn · 40</option>
-        <option value="64">Rất lớn · 64</option>
+      <select id="size" aria-label="Kích thước pet">
+        <option value="22">Nhỏ</option>
+        <option value="30" selected>Chuẩn</option>
+        <option value="40">Lớn</option>
+        <option value="64">Rất lớn</option>
       </select>
     </label>
     <label class="check"><input type="checkbox" id="quiet"> Im lặng</label>
@@ -30,14 +32,17 @@
 </header>
 
 <main>
-  <section class="stage" id="stage">
-    <div class="bubble" id="bubble" hidden></div>
-    <div class="pet" id="pet"><canvas id="canvas"></canvas></div>
+  <section class="stage" id="stage" aria-label="Sân khấu pet">
+    <div class="bubble" id="bubble" hidden>
+      <span id="bubbleText"></span>
+      <button id="bubbleAction" hidden>Đã xử lý</button>
+    </div>
+    <div class="pet" id="pet"><canvas id="canvas" aria-label="Pet"></canvas></div>
     <div class="ground"></div>
   </section>
 
   <section class="panel">
-    <div class="states" id="states">
+    <div class="states" id="states" role="group" aria-label="Trạng thái">
       <button data-state="idle">Idle</button>
       <button data-state="thinking">Thinking</button>
       <button data-state="working">Working</button>
@@ -52,6 +57,12 @@
     <p class="status" id="status">đang tải pack…</p>
   </section>
 </main>
+
+<footer class="foot">
+  <span>dsh-go pets · <a href="https://github.com/vukiengiang2025-sys/dsh-go-pets">mã nguồn</a></span>
+  <span id="version">v1.0.0</span>
+</footer>
+
 <script type="module" src="pet-studio.js"></script>
 </body>
 </html>
