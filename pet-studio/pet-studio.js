@@ -123,11 +123,12 @@ function layout() {
 }
 
 let lastFrameKey = '';
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function draw(now) {
   if (!running) return;
   const out = model.tick(now);
-  const key = out ? out.name + ':' + out.frame : '';
+  const key = out ? out.name + ':' + (reduceMotion ? 0 : out.frame) : '';
   if (key === lastFrameKey) {
     rafId = requestAnimationFrame(draw);
     return;
@@ -135,7 +136,8 @@ function draw(now) {
   lastFrameKey = key;
   ctx.clearRect(0, 0, el.canvas.width, el.canvas.height);
   if (out) {
-    const { anim, frame } = out;
+    const { anim } = out;
+    const frame = reduceMotion ? 0 : out.frame;
     const f = anim.frames[frame];
     const img = images[anim.sheet];
     if (img && f) {

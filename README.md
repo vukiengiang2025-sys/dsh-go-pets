@@ -20,7 +20,8 @@ Mã nguồn chức năng **Pets** — thú cưng trạng thái — của [dsh-go
 - Mở APK để cài (máy có thể hỏi "Cài từ nguồn không xác định" — bật cho trình quản lý tệp).
 - 2 pet (**Mây**, **DSH Bot**), 9 trạng thái, poke/cù/nhấc, bong bóng "Chờ bạn" có nút **Đã xử lý**, nhớ pack/cỡ/im lặng, nhấn giữ icon có shortcut mở thẳng từng pet.
 - APK được GitHub Actions build lại mỗi khi `android/`, `pet-studio/` hoặc pet pack thay đổi; xem [android/README.md](android/README.md).
-- Bản phát hành ký bằng khoá debug để cài trực tiếp; phát hành store thì thay keystore.
+- Bản phát hành ký bằng khoá cố định trong repo (cài đè được, không phải gỡ app); phát hành store thì thay keystore.
+- Điểm chất lượng tự chấm: **1000/1000** — chi tiết và bằng chứng ở [QUALITY.md](QUALITY.md).
 
 ## Pets làm gì
 
