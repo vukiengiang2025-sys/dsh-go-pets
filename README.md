@@ -7,7 +7,7 @@ Mã nguồn chức năng **Pets** — thú cưng trạng thái — của [dsh-go
 | Nguồn | [ccch1mneyyy/dsh-Go](https://github.com/ccch1mneyyy/dsh-Go) |
 | Commit | `5fc5f41a20a33cb95fcd8ac119d67a32a7559dfa` (2026-11-22) |
 | Giấy phép | AGPL-3.0 — xem [LICENSE](LICENSE) |
-| Quy mô | 141 tệp mã nguồn, ~2,2 MB |
+| Quy mô | 141 tệp mã nguồn từ upstream + pet mẫu "Mây" (tự vẽ), ~2,4 MB |
 
 > Đây **không phải** một package độc lập. Tệp giữ nguyên đường dẫn gốc (`app/lib/...`, `app/android/...`) để dễ đối chiếu với upstream, nhưng thiếu phần còn lại của app nên không thể `flutter build` một mình. Danh sách đầy đủ và cách trích xuất ở [EXTRACT.md](EXTRACT.md).
 
@@ -36,6 +36,18 @@ Pet pack = một zip + `pack.json` + các ảnh PNG dạng lưới khung hình. 
 | Công cụ: sinh pack, đổi theme, rules JSON, probe | `app/tool/` | 10 |
 | Manifest pet pack mẫu | `app/assets/pets/*/pack.json` | 3 |
 | Tài liệu thiết kế, hướng dẫn, kiểm thử | `docs/` | 9 |
+| **Pet mẫu "Mây"** (nhân vật tự vẽ, CC BY 4.0) | `app/assets/pets/may/`, `art/may/` | 13 + 18 |
+
+## Pet mẫu: Mây
+
+Một nhân vật 64×64 vẽ bằng pixel, tự sinh bằng script (không dùng ảnh ngoài), đủ 11 trạng thái + 3 phản ứng:
+
+![Mây](art/may/preview.png)
+
+- Nguồn: [`art/may/generate.py`](art/may/generate.py) — sửa `PALETTE` / `in_body()` / `ANIMS` là ra nhân vật của bạn.
+- Pack đã đóng sẵn: [`app/assets/pets/may/`](app/assets/pets/may) — đã **PASS** kiểm tra nhập của app.
+- Bản zip để nhập thử trên điện thoại: `/sdcard/Download/DSH-Go/may.zip` (nhập ở **Cài đặt → Pets → ô cuối bộ chọn**).
+- Giấy phép hình: [CC BY 4.0](art/may/LICENSE-ART.md); hướng dẫn sửa và đóng gói: [art/may/README.md](art/may/README.md).
 
 ## Luồng hoạt động
 
@@ -91,9 +103,11 @@ Golden test cần ảnh chuẩn trong `test/pets/goldens/` — bản trích xu�
 
 Bản trích xuất **cố ý không kèm** PNG/APNG/GIF của Deepy, cá hồng và whale-girl (thư mục `app/assets/pets/*/*.png`, `app/tool/pet_src/`, `docs/assets/pet-*.gif`, ảnh golden). Theo [ASSETS.md](ASSETS.md) của upstream, các tài nguyên hình ảnh đó **không** thuộc AGPL-3.0 mà giữ mọi quyền, và khi phát hành bản phái sinh nên thay bằng tên và tài nguyên của bạn.
 
-Vì vậy repo này chỉ có mã nguồn + `pack.json` mẫu. Muốn pet hiện hình:
+Vì vậy phần mã nguồn chỉ đi kèm `pack.json` mẫu của upstream, **trừ** pet "Mây" ở trên — nhân vật đó do repo này tự vẽ và phát hành CC BY 4.0.
 
-- tự làm một pack theo [docs/pets/README.md](docs/pets/README.md) (chỉ cần vài PNG), hoặc
+Muốn có thêm pet khác:
+
+- tự vẽ một pack theo [docs/pets/README.md](docs/pets/README.md) (chỉ cần vài PNG) — xem mẫu [art/may](art/may/README.md), hoặc
 - dùng `app/tool/pet_theme_convert.py` để đổi một theme Clawd on Desk / bộ GIF thành pet pack, hoặc
 - tự lấy tài nguyên từ upstream khi bạn có quyền dùng chúng.
 

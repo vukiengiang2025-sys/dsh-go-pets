@@ -42,7 +42,7 @@ Sau đó chép nguyên văn (giữ đường dẫn gốc), thêm README/EXTRACT 
 | `docs/` | 9 | đặc tả `design/pets.md`, hướng dẫn làm pack, guide 06-pets (zh/en/harmony), kiểm thử |
 | `LICENSE`, `ASSETS.md` | 2 | giấy phép + ghi công tài nguyên |
 
-Tổng: **141 tệp**, ~2,2 MB (143 tệp nếu tính cả README và EXTRACT).
+Tổng phần trích xuất: **141 tệp**, ~2,2 MB. Cộng phần tự làm (art + pack + 2 tệp mô tả) repo có **173 tệp**, ~2,4 MB.
 
 ## Đã bỏ (và vì sao)
 
@@ -55,7 +55,15 @@ Tổng: **141 tệp**, ~2,2 MB (143 tệp nếu tính cả README và EXTRACT).
 
 ## Khác biệt so với upstream
 
-Không sửa một dòng mã nào. Chỉ thêm `README.md` và `EXTRACT.md`; mọi đường dẫn khác giữ nguyên để có thể `diff` trực tiếp với upstream khi cập nhật.
+Phần trích xuất: **không sửa một dòng mã nào**, mọi đường dẫn giữ nguyên để có thể `diff` trực tiếp với upstream.
+
+Phần thêm vào (không lấy từ upstream):
+
+| Thêm | Nội dung |
+|---|---|
+| `README.md`, `EXTRACT.md` | mô tả bản trích xuất |
+| `art/may/` | script vẽ + đóng gói pet mẫu "Mây", khung APNG, preview, giấy phép CC BY 4.0 |
+| `app/assets/pets/may/` | pack "Mây" đã đóng (13 tệp), PASS `pet_pack_check.py --compat-reactions` |
 
 ## Danh sách tệp
 
