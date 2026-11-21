@@ -31,7 +31,7 @@ import androidx.webkit.WebViewClientCompat;
 public class MainActivity extends Activity {
     private static final String TAG = "PetStudio";
     private static final String DOMAIN = "appassets.androidplatform.net";
-    private static final String START_URL = "https://" + DOMAIN + "/pet-studio/index.html?v=" + BuildConfig.VERSION_NAME;
+    private static final String START_URL = "https://" + DOMAIN + "/www/pet-studio/index.html?v=" + BuildConfig.VERSION_NAME;
     private static final String ERROR_URL = "https://" + DOMAIN + "/error.html";
 
     private WebView webView;
