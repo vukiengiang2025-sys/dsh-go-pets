@@ -49,6 +49,11 @@ main {
   position: relative; flex: 1 1 auto; min-height: 240px; max-height: 460px; width: 100%;
   border: 1px solid var(--line); border-radius: 18px;
   background:
+    radial-gradient(1.4px 1.4px at 18% 26%, rgba(160,200,255,.35), transparent 60%),
+    radial-gradient(1.4px 1.4px at 74% 18%, rgba(160,200,255,.28), transparent 60%),
+    radial-gradient(1.6px 1.6px at 58% 42%, rgba(160,200,255,.20), transparent 60%),
+    radial-gradient(1.2px 1.2px at 86% 62%, rgba(160,200,255,.18), transparent 60%),
+    radial-gradient(1.2px 1.2px at 28% 70%, rgba(160,200,255,.16), transparent 60%),
     radial-gradient(50% 60% at 50% 78%, rgba(99,179,255,.10), transparent 70%),
     linear-gradient(180deg, #131a26, #0d1118);
   overflow: hidden; display: grid; place-items: end center;

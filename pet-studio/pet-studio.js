@@ -1,4 +1,4 @@
-import { PetModel, normalizePack } from './pet-engine.js';
+import { PetModel, normalizePack, STATES } from './pet-engine.js';
 
 const FALLBACK_PACKS = [
   { id: 'may', name: 'Mây', url: '../app/assets/pets/may/pack.json' },
@@ -263,6 +263,8 @@ async function main() {
     await loadPack(id);
     const v = new URLSearchParams(location.search).get('v') || '1.0.0';
     el.version.textContent = 'v' + v;
+    const initial = new URLSearchParams(location.search).get('state');
+    if (initial && STATES.includes(initial)) model.setState(initial);
     requestAnimationFrame(draw);
     setStatus('sẵn sàng');
   } catch (err) {
