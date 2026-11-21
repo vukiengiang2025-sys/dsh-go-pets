@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pet Studio · dsh-go pets</title>
+<link rel="stylesheet" href="pet-studio.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <strong>Pet Studio</strong>
+    <span>chơi thử pet pack của dsh-go</span>
+  </div>
+  <div class="controls">
+    <label>Pack
+      <select id="pack"></select>
+    </label>
+    <label>Cỡ
+      <select id="size">
+        <option value="22">Nhỏ · 22</option>
+        <option value="30" selected>Chuẩn · 30</option>
+        <option value="40">Lớn · 40</option>
+        <option value="64">Rất lớn · 64</option>
+      </select>
+    </label>
+    <label class="check"><input type="checkbox" id="quiet"> Im lặng</label>
+    <label class="check"><input type="checkbox" id="demo"> Tự diễn</label>
+  </div>
+</header>
+
+<main>
+  <section class="stage" id="stage">
+    <div class="bubble" id="bubble" hidden></div>
+    <div class="pet" id="pet"><canvas id="canvas"></canvas></div>
+    <div class="ground"></div>
+  </section>
+
+  <section class="panel">
+    <div class="states" id="states">
+      <button data-state="idle">Idle</button>
+      <button data-state="thinking">Thinking</button>
+      <button data-state="working">Working</button>
+      <button data-state="attention">Done</button>
+      <button data-state="error">Error</button>
+      <button data-state="notification">Chờ bạn</button>
+      <button data-state="sleeping">Ngủ</button>
+      <button data-state="waking">Thức</button>
+      <button data-state="roam">Đi dạo</button>
+    </div>
+    <p class="hint">Chạm trái/phải để chọc, chạm 3 lần để cù, kéo để nhấc. Đứng yên 60 giây pet sẽ ngủ.</p>
+    <p class="status" id="status">đang tải pack…</p>
+  </section>
+</main>
+<script type="module" src="pet-studio.js"></script>
+</body>
+</html>

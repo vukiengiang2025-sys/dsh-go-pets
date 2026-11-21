@@ -42,7 +42,7 @@ Sau đó chép nguyên văn (giữ đường dẫn gốc), thêm README/EXTRACT 
 | `docs/` | 9 | đặc tả `design/pets.md`, hướng dẫn làm pack, guide 06-pets (zh/en/harmony), kiểm thử |
 | `LICENSE`, `ASSETS.md` | 2 | giấy phép + ghi công tài nguyên |
 
-Tổng phần trích xuất: **141 tệp**, ~2,2 MB. Cộng phần tự làm (art + pack + 2 tệp mô tả) repo có **173 tệp**, ~2,4 MB.
+Tổng phần trích xuất: **141 tệp**, ~2,2 MB. Cộng phần tự làm (2 pet + web app + tệp mô tả) repo có **202 tệp**, ~5 MB.
 
 ## Đã bỏ (và vì sao)
 
@@ -64,6 +64,8 @@ Phần thêm vào (không lấy từ upstream):
 | `README.md`, `EXTRACT.md` | mô tả bản trích xuất |
 | `art/may/` | script vẽ + đóng gói pet mẫu "Mây", khung APNG, preview, giấy phép CC BY 4.0 |
 | `app/assets/pets/may/` | pack "Mây" đã đóng (13 tệp), PASS `pet_pack_check.py --compat-reactions` |
+| `art/dsh-bot/`, `app/assets/pets/dsh-bot/` | frame tách từ bộ sheet của chủ repo, pack "DSH Bot" (11 tệp) PASS kiểm tra |
+| `pet-studio/` | web app chơi pet pack (HTML/CSS/JS thuần), engine test được bằng Node |
 
 ## Danh sách tệp
 

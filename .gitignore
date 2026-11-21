@@ -1,0 +1,4 @@
+# Dọn đồ nghề không commit
+__pycache__/
+*.pyc
+.DS_Store

@@ -7,7 +7,7 @@ Mã nguồn chức năng **Pets** — thú cưng trạng thái — của [dsh-go
 | Nguồn | [ccch1mneyyy/dsh-Go](https://github.com/ccch1mneyyy/dsh-Go) |
 | Commit | `5fc5f41a20a33cb95fcd8ac119d67a32a7559dfa` (2026-11-22) |
 | Giấy phép | AGPL-3.0 — xem [LICENSE](LICENSE) |
-| Quy mô | 141 tệp mã nguồn từ upstream + pet mẫu "Mây" (tự vẽ), ~2,4 MB |
+| Quy mô | 141 tệp mã nguồn từ upstream + 2 pet tự làm + web app, ~4 MB |
 
 > Đây **không phải** một package độc lập. Tệp giữ nguyên đường dẫn gốc (`app/lib/...`, `app/android/...`) để dễ đối chiếu với upstream, nhưng thiếu phần còn lại của app nên không thể `flutter build` một mình. Danh sách đầy đủ và cách trích xuất ở [EXTRACT.md](EXTRACT.md).
 
@@ -37,6 +37,8 @@ Pet pack = một zip + `pack.json` + các ảnh PNG dạng lưới khung hình. 
 | Manifest pet pack mẫu | `app/assets/pets/*/pack.json` | 3 |
 | Tài liệu thiết kế, hướng dẫn, kiểm thử | `docs/` | 9 |
 | **Pet mẫu "Mây"** (nhân vật tự vẽ, CC BY 4.0) | `app/assets/pets/may/`, `art/may/` | 13 + 18 |
+| **Pet "DSH Bot"** (tách từ sheet của bạn, CC BY 4.0) | `app/assets/pets/dsh-bot/`, `art/dsh-bot/` | 11 + 20 |
+| **Pet Studio** — web app chơi thử pack | `pet-studio/` | 6 |
 
 ## Pet mẫu: Mây
 
@@ -48,6 +50,28 @@ Một nhân vật 64×64 vẽ bằng pixel, tự sinh bằng script (không dùn
 - Pack đã đóng sẵn: [`app/assets/pets/may/`](app/assets/pets/may) — đã **PASS** kiểm tra nhập của app.
 - Bản zip để nhập thử trên điện thoại: `/sdcard/Download/DSH-Go/may.zip` (nhập ở **Cài đặt → Pets → ô cuối bộ chọn**).
 - Giấy phép hình: [CC BY 4.0](art/may/LICENSE-ART.md); hướng dẫn sửa và đóng gói: [art/may/README.md](art/may/README.md).
+
+## Pet Studio: biến pets thành ứng dụng
+
+`pet-studio/` là một web app tĩnh (không build, không thư viện) để dùng pet ngoài app:
+
+```sh
+cd dsh-go-pets && python3 -m http.server 8099
+# mở http://127.0.0.1:8099/pet-studio/
+```
+
+- Đổi pack (Mây / DSH Bot), đổi cỡ 22–64 dp, bật "Im lặng" hoặc "Tự diễn".
+- Đủ 9 trạng thái; chạm trái/phải để poke, chạm 3 lần để cù, kéo để nhấc, đứng yên 60 giây thì ngủ.
+- `pet-engine.js` là bộ máy trạng thái thuần (không DOM) — test được bằng Node; `pet-studio.js` chỉ lo canvas.
+- Chi tiết và cách thêm pack: [pet-studio/README.md](pet-studio/README.md).
+
+```text
+pet pack (pack.json + lưới PNG)
+        │
+   PetModel (pet-engine.js): chọn animation theo trạng thái, one-shot, reaction,
+        │                     auto-sleep, giữ notification
+   Renderer (pet-studio.js): cắt ô lưới, vẽ theo contentBox, DPR, pixel/smooth
+```
 
 ## Luồng hoạt động
 
