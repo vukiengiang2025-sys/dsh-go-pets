@@ -116,14 +116,23 @@ function layout() {
   el.canvas.style.height = h + 'px';
   el.canvas.width = Math.round(w * dpr);
   el.canvas.height = Math.round(h * dpr);
+  lastFrameKey = '';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.imageSmoothingEnabled = !pack.pixelArt;
   ctx.imageSmoothingQuality = pack.pixelArt ? 'low' : 'high';
 }
 
+let lastFrameKey = '';
+
 function draw(now) {
   if (!running) return;
   const out = model.tick(now);
+  const key = out ? out.name + ':' + out.frame : '';
+  if (key === lastFrameKey) {
+    rafId = requestAnimationFrame(draw);
+    return;
+  }
+  lastFrameKey = key;
   ctx.clearRect(0, 0, el.canvas.width, el.canvas.height);
   if (out) {
     const { anim, frame } = out;
