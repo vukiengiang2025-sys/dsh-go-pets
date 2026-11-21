@@ -1,0 +1,38 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'io.github.vukiengiang.petstudio'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'io.github.vukiengiang.petstudio'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '1.0.0'
+        resConfigs 'vi', 'en'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            // Bản phát hành ký bằng khoá debug để cài trực tiếp; đổi signingConfig
+            // sang keystore riêng nếu bạn phát hành lên store.
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    packaging {
+        resources.excludes += ['META-INF/*.kotlin_module']
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.11.0'
+}

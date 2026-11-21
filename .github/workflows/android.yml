@@ -1,0 +1,73 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - 'pet-studio/**'
+      - 'app/assets/pets/**'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: SDK packages
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0" > /dev/null
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Bundle web app into APK assets
+        run: |
+          set -e
+          rm -rf android/app/src/main/assets/www
+          mkdir -p android/app/src/main/assets/www/app/assets/pets
+          cp -r pet-studio android/app/src/main/assets/www/pet-studio
+          cp -r app/assets/pets/may app/assets/pets/dsh-bot android/app/src/main/assets/www/app/assets/pets/
+          du -sh android/app/src/main/assets/www
+
+      - name: Build release APK
+        run: gradle -p android :app:assembleRelease --no-daemon --stacktrace
+
+      - name: Verify and name APK
+        run: |
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          ls -l "$APK"
+          cp "$APK" PetStudio.apk
+          sha256sum PetStudio.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PetStudio-apk
+          path: PetStudio.apk
+          if-no-files-found: error
+
+      - name: Publish latest APK release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-latest
+          name: Pet Studio Android (bản mới nhất)
+          body: APK build tự động, không cần mạng. Cài trên Android 7.0+.
+          files: PetStudio.apk
+          make_latest: true
