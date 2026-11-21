@@ -2,6 +2,7 @@ package io.github.vukiengiang.petstudio;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -111,14 +112,30 @@ public class MainActivity extends Activity {
         });
 
         if (savedInstanceState == null) {
-            String pack = getIntent() != null ? getIntent().getStringExtra("pack") : null;
-            String url = START_URL;
-            if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
-                url += "&pack=" + pack;
-            }
-            webView.loadUrl(url);
+            webView.loadUrl(startUrl(packOf(getIntent())));
         } else {
             webView.restoreState(savedInstanceState);
+        }
+    }
+
+    private static String packOf(@Nullable Intent intent) {
+        return intent != null ? intent.getStringExtra("pack") : null;
+    }
+
+    private static String startUrl(@Nullable String pack) {
+        String url = START_URL;
+        if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
+            url += "&pack=" + pack;
+        }
+        return url;
+    }
+
+    @Override
+    protected void onNewIntent(@NonNull Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (webView != null) {
+            webView.loadUrl(startUrl(packOf(intent)));
         }
     }
 

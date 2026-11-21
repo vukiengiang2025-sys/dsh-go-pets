@@ -13,6 +13,8 @@ Mã nguồn chức năng **Pets** — thú cưng trạng thái — của [dsh-go
 
 ## Ứng dụng Android (APK)
 
+![Pet Studio trên Android](docs/assets/android-phone.png)
+
 **[Tải PetStudio.apk](https://github.com/vukiengiang2025-sys/dsh-go-pets/releases/download/android-latest/PetStudio.apk)** — Android 7.0+, chạy offline, không xin quyền nào.
 
 - Mở APK để cài (máy có thể hỏi "Cài từ nguồn không xác định" — bật cho trình quản lý tệp).
