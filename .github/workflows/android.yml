@@ -32,7 +32,8 @@ jobs:
       - name: Android SDK packages
         run: |
           set -e
-          SDK="\${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDK=/usr/local/lib/android/sdk
+          if [ ! -d "$SDK" ]; then SDK="$ANDROID_HOME"; fi
           echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
           SDKMGR="$(find "$SDK/cmdline-tools" -name sdkmanager -type f | head -1)"
           echo "SDKMANAGER=$SDKMGR"
