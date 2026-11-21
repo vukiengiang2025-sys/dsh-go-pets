@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="may"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_may"
+        android:shortcutLongLabel="@string/shortcut_may_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="io.github.vukiengiang.petstudio"
+            android:targetClass="io.github.vukiengiang.petstudio.MainActivity">
+            <extra android:name="pack" android:value="may" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="dsh-bot"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_bot"
+        android:shortcutLongLabel="@string/shortcut_bot_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="io.github.vukiengiang.petstudio"
+            android:targetClass="io.github.vukiengiang.petstudio.MainActivity">
+            <extra android:name="pack" android:value="dsh-bot" />
+        </intent>
+    </shortcut>
+</shortcuts>

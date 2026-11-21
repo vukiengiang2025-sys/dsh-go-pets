@@ -20,10 +20,10 @@
     </label>
     <label>Cỡ
       <select id="size" aria-label="Kích thước pet">
-        <option value="22">Nhỏ</option>
-        <option value="30" selected>Chuẩn</option>
-        <option value="40">Lớn</option>
-        <option value="64">Rất lớn</option>
+        <option value="30">Nhỏ · 30</option>
+        <option value="40">Vừa · 40</option>
+        <option value="64" selected>Lớn · 64</option>
+        <option value="96">Khổng lồ · 96</option>
       </select>
     </label>
     <label class="check"><input type="checkbox" id="quiet"> Im lặng</label>
@@ -54,7 +54,7 @@
       <button data-state="roam">Đi dạo</button>
     </div>
     <p class="hint">Chạm trái/phải để chọc, chạm 3 lần để cù, kéo để nhấc. Đứng yên 60 giây pet sẽ ngủ.</p>
-    <p class="status" id="status">đang tải pack…</p>
+    <p class="status" id="status" aria-live="polite">đang tải pack…</p>
   </section>
 </main>
 

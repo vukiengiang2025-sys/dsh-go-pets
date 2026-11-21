@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Pet Studio</string>
+    <string name="shortcut_may">Mây</string>
+    <string name="shortcut_may_long">Mở pet Mây</string>
+    <string name="shortcut_bot">DSH Bot</string>
+    <string name="shortcut_bot_long">Mở pet DSH Bot</string>
+    <string name="shortcut_disabled">Pet này đang tắt</string>
 </resources>

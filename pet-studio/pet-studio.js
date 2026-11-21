@@ -5,6 +5,12 @@ const FALLBACK_PACKS = [
   { id: 'dsh-bot', name: 'DSH Bot', url: '../app/assets/pets/dsh-bot/pack.json' },
 ];
 
+const STATE_LABEL = {
+  idle: 'đứng chờ', thinking: 'đang nghĩ', working: 'đang làm',
+  attention: 'vừa xong', error: 'gặp lỗi', notification: 'chờ bạn',
+  sleeping: 'đang ngủ', waking: 'vừa thức', roam: 'đi dạo',
+};
+
 const BUBBLES = {
   attention: { text: 'Xong rồi! Nghỉ chút nhé.' },
   error: { text: 'Có gì đó hỏng rồi…' },
@@ -100,11 +106,12 @@ async function loadPack(id) {
 }
 
 function layout() {
-  const dp = Number(el.size.value) || 30;
+  const dp = Number(el.size.value) || 64;
   scale = dp / Math.max(1, pack.contentBox.h);
   const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
   const w = Math.max(1, Math.round(pack.canvas.w * scale));
   const h = Math.max(1, Math.round(pack.canvas.h * scale));
+  el.stage.style.setProperty('--pet-w', w + 'px');
   el.canvas.style.width = w + 'px';
   el.canvas.style.height = h + 'px';
   el.canvas.width = Math.round(w * dpr);
@@ -128,7 +135,7 @@ function draw(now) {
       ctx.drawImage(img, sx, sy, anim.frameW, anim.frameH,
         anim.box.x * scale, anim.box.y * scale, anim.box.w * scale, anim.box.h * scale);
     }
-    if (Math.random() < 0.06) setStatus(model.state + ' · ' + out.name + ' · frame ' + frame);
+    if (Math.random() < 0.06) setStatus((STATE_LABEL[model.state] || model.state) + ' · ' + out.name + ' · frame ' + frame);
   }
   rafId = requestAnimationFrame(draw);
 }
@@ -254,7 +261,8 @@ async function main() {
 
   try {
     await loadPack(id);
-    el.version.textContent = 'v' + (pack.version || '1.0.0');
+    const v = new URLSearchParams(location.search).get('v') || '1.0.0';
+    el.version.textContent = 'v' + v;
     requestAnimationFrame(draw);
     setStatus('sẵn sàng');
   } catch (err) {

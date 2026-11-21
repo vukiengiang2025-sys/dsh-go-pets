@@ -30,7 +30,7 @@ import androidx.webkit.WebViewClientCompat;
 public class MainActivity extends Activity {
     private static final String TAG = "PetStudio";
     private static final String DOMAIN = "appassets.androidplatform.net";
-    private static final String START_URL = "https://" + DOMAIN + "/pet-studio/index.html";
+    private static final String START_URL = "https://" + DOMAIN + "/pet-studio/index.html?v=" + BuildConfig.VERSION_NAME;
     private static final String ERROR_URL = "https://" + DOMAIN + "/error.html";
 
     private WebView webView;
@@ -111,7 +111,12 @@ public class MainActivity extends Activity {
         });
 
         if (savedInstanceState == null) {
-            webView.loadUrl(START_URL);
+            String pack = getIntent() != null ? getIntent().getStringExtra("pack") : null;
+            String url = START_URL;
+            if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
+                url += "&pack=" + pack;
+            }
+            webView.loadUrl(url);
         } else {
             webView.restoreState(savedInstanceState);
         }

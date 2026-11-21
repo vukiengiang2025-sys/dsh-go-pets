@@ -46,7 +46,7 @@ main {
   min-height: 0;
 }
 .stage {
-  position: relative; flex: 1 1 auto; min-height: 240px; max-height: 560px; width: 100%;
+  position: relative; flex: 1 1 auto; min-height: 240px; max-height: 460px; width: 100%;
   border: 1px solid var(--line); border-radius: 18px;
   background:
     radial-gradient(50% 60% at 50% 78%, rgba(99,179,255,.10), transparent 70%),
@@ -54,10 +54,11 @@ main {
   overflow: hidden; display: grid; place-items: end center;
   touch-action: none; user-select: none;
 }
-.pet { position: relative; transform: translateY(-20px); }
+.pet { position: relative; transform: translateY(-26px); }
 canvas { display: block; }
 .ground {
-  position: absolute; left: 50%; bottom: 26px; width: 46%; height: 12px;
+  position: absolute; left: 50%; bottom: 24px;
+  width: min(46%, calc(var(--pet-w, 120px) * 0.95)); height: 12px;
   transform: translateX(-50%); border-radius: 50%;
   background: radial-gradient(50% 50% at 50% 50%, rgba(99,179,255,.20), transparent 70%);
   pointer-events: none;
