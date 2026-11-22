@@ -81,6 +81,7 @@ export async function askAI(config, messages, fetchImpl = null) {
     endpoint: config.endpoint,
     model: config.model,
     messages,
+    maxTokens: config.maxTokens || 120,
   });
   let target = url;
   const headers = { ...init.headers };

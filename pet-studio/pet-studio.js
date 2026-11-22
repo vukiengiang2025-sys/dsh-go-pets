@@ -58,7 +58,7 @@ const DEFAULT_STORE = {
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
   ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi', agentHosts: [], overlayFloat: true,
-  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai', aiPersona: 'gentle', aiGreet: false, lastOpen: 0, userName: '', aiCalls: 0, aiTokens: 0, installId: '',
+  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai', aiPersona: 'gentle', aiGreet: false, aiShort: true, lastOpen: 0, userName: '', aiCalls: 0, aiTokens: 0, installId: '',
 };
 
 const el = {
@@ -145,6 +145,7 @@ const el = {
   aiKey: document.getElementById('aiKey'),
   aiOn: document.getElementById('aiOn'),
   aiGreet: document.getElementById('aiGreet'),
+  aiShort: document.getElementById('aiShort'),
   aiTest: document.getElementById('aiTest'),
   aiRetest: document.getElementById('aiRetest'),
   aiClearKey: document.getElementById('aiClearKey'),
@@ -463,7 +464,13 @@ function updateAiChip() {
 }
 
 function aiConfig(s) {
-  return { provider: s.aiProvider || 'openai', endpoint: s.aiEndpoint || '', model: s.aiModel || '', key: s.aiKey || '' };
+  return {
+    provider: s.aiProvider || 'openai',
+    endpoint: s.aiEndpoint || '',
+    model: s.aiModel || '',
+    key: s.aiKey || '',
+    maxTokens: s.aiShort === false ? 160 : 70,
+  };
 }
 
 function aiSystemPrompt(s) {
@@ -1833,6 +1840,9 @@ function bindSheet() {
   el.aiGreet.addEventListener('change', () => {
     writeStore({ aiGreet: el.aiGreet.checked });
   });
+  el.aiShort.addEventListener('change', () => {
+    writeStore({ aiShort: el.aiShort.checked });
+  });
   el.aiOn.addEventListener('change', () => {
     writeStore({ aiOn: el.aiOn.checked });
     updateAiChip();
@@ -2313,6 +2323,7 @@ async function main() {
     el.aiOn.checked = !!savedSettings.aiOn;
     updateAiChip();
     el.aiGreet.checked = !!savedSettings.aiGreet;
+    el.aiShort.checked = savedSettings.aiShort !== false;
     el.overlayFloat.checked = savedSettings.overlayFloat !== false;
     if (window.AndroidPet && window.AndroidPet.setOverlayFloat) {
       window.AndroidPet.setOverlayFloat(el.overlayFloat.checked);
