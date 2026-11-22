@@ -1769,6 +1769,10 @@ function bindSheet() {
       renderHosts();
     }
   });
+  el.aiChip.addEventListener('click', () => {
+    el.aiOn.checked = !el.aiOn.checked;
+    el.aiOn.dispatchEvent(new Event('change'));
+  });
   el.aiModel.addEventListener('input', () => {
     if (el.aiChip && el.aiOn.checked) el.aiChip.textContent = 'AI · ' + (el.aiModel.value || 'bật');
   });
