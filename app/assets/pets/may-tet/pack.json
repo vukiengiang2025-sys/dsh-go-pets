@@ -1,0 +1,491 @@
+{
+  "schema": 1,
+  "id": "may-tet",
+  "name": "Mây Tết",
+  "author": "Vũ Huỳnh (vukiengiang2025-sys)",
+  "license": "CC-BY-4.0",
+  "source": "https://github.com/vukiengiang2025-sys/dsh-go-pets",
+  "pixelArt": true,
+  "scale": 1,
+  "canvas": {
+    "w": 64,
+    "h": 64
+  },
+  "anchor": {
+    "x": 32.5,
+    "baseline": 48
+  },
+  "contentBox": {
+    "x": 13,
+    "y": 18,
+    "w": 39,
+    "h": 30
+  },
+  "hitBoxes": {
+    "default": {
+      "x": 13,
+      "y": 21,
+      "w": 39,
+      "h": 27
+    },
+    "wide": {
+      "x": 13,
+      "y": 21,
+      "w": 39,
+      "h": 27
+    },
+    "sleeping": {
+      "x": 13,
+      "y": 23,
+      "w": 39,
+      "h": 27
+    },
+    "byAnim": {},
+    "wideAnims": [],
+    "sleepingAnims": [
+      "sleeping"
+    ]
+  },
+  "animations": {
+    "idle": {
+      "sheet": "idle.png",
+      "frameW": 39,
+      "frameH": 30,
+      "cols": 4,
+      "box": {
+        "x": 13,
+        "y": 18,
+        "w": 39,
+        "h": 30
+      },
+      "loop": true,
+      "ms": 2080,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 420
+        },
+        {
+          "i": 0,
+          "ms": 420
+        },
+        {
+          "i": 1,
+          "ms": 420
+        },
+        {
+          "i": 2,
+          "ms": 140
+        },
+        {
+          "i": 0,
+          "ms": 380
+        },
+        {
+          "i": 3,
+          "ms": 300
+        }
+      ]
+    },
+    "thinking": {
+      "sheet": "thinking.png",
+      "frameW": 39,
+      "frameH": 33,
+      "cols": 4,
+      "box": {
+        "x": 13,
+        "y": 15,
+        "w": 39,
+        "h": 33
+      },
+      "loop": true,
+      "ms": 1280,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 320
+        },
+        {
+          "i": 1,
+          "ms": 320
+        },
+        {
+          "i": 2,
+          "ms": 320
+        },
+        {
+          "i": 3,
+          "ms": 320
+        }
+      ]
+    },
+    "working": {
+      "sheet": "working.png",
+      "frameW": 39,
+      "frameH": 27,
+      "cols": 2,
+      "box": {
+        "x": 13,
+        "y": 22,
+        "w": 39,
+        "h": 27
+      },
+      "loop": true,
+      "ms": 600,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 150
+        },
+        {
+          "i": 1,
+          "ms": 150
+        },
+        {
+          "i": 0,
+          "ms": 150
+        },
+        {
+          "i": 1,
+          "ms": 150
+        }
+      ]
+    },
+    "error": {
+      "sheet": "error.png",
+      "frameW": 41,
+      "frameH": 34,
+      "cols": 3,
+      "box": {
+        "x": 12,
+        "y": 14,
+        "w": 41,
+        "h": 34
+      },
+      "loop": true,
+      "ms": 580,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        },
+        {
+          "i": 1,
+          "ms": 120
+        },
+        {
+          "i": 0,
+          "ms": 120
+        },
+        {
+          "i": 2,
+          "ms": 220
+        }
+      ]
+    },
+    "done": {
+      "sheet": "done.png",
+      "frameW": 39,
+      "frameH": 36,
+      "cols": 5,
+      "box": {
+        "x": 13,
+        "y": 12,
+        "w": 39,
+        "h": 36
+      },
+      "loop": true,
+      "ms": 1200,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 120
+        },
+        {
+          "i": 1,
+          "ms": 160
+        },
+        {
+          "i": 2,
+          "ms": 140
+        },
+        {
+          "i": 3,
+          "ms": 220
+        },
+        {
+          "i": 4,
+          "ms": 300
+        },
+        {
+          "i": 3,
+          "ms": 260
+        }
+      ]
+    },
+    "notification": {
+      "sheet": "notification.png",
+      "frameW": 39,
+      "frameH": 33,
+      "cols": 3,
+      "box": {
+        "x": 13,
+        "y": 15,
+        "w": 39,
+        "h": 33
+      },
+      "loop": true,
+      "ms": 700,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 160
+        },
+        {
+          "i": 1,
+          "ms": 140
+        },
+        {
+          "i": 0,
+          "ms": 160
+        },
+        {
+          "i": 2,
+          "ms": 240
+        }
+      ]
+    },
+    "sleeping": {
+      "sheet": "sleeping.png",
+      "frameW": 40,
+      "frameH": 39,
+      "cols": 4,
+      "box": {
+        "x": 13,
+        "y": 11,
+        "w": 40,
+        "h": 39
+      },
+      "loop": true,
+      "ms": 3600,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 900
+        },
+        {
+          "i": 1,
+          "ms": 900
+        },
+        {
+          "i": 2,
+          "ms": 900
+        },
+        {
+          "i": 3,
+          "ms": 900
+        }
+      ]
+    },
+    "waking": {
+      "sheet": "waking.png",
+      "frameW": 39,
+      "frameH": 32,
+      "cols": 4,
+      "box": {
+        "x": 13,
+        "y": 17,
+        "w": 39,
+        "h": 32
+      },
+      "loop": true,
+      "ms": 1500,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 200
+        },
+        {
+          "i": 1,
+          "ms": 180
+        },
+        {
+          "i": 2,
+          "ms": 220
+        },
+        {
+          "i": 3,
+          "ms": 900
+        }
+      ]
+    },
+    "roam": {
+      "sheet": "roam.png",
+      "frameW": 39,
+      "frameH": 27,
+      "cols": 2,
+      "box": {
+        "x": 13,
+        "y": 21,
+        "w": 39,
+        "h": 27
+      },
+      "loop": true,
+      "ms": 560,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 140
+        },
+        {
+          "i": 1,
+          "ms": 140
+        },
+        {
+          "i": 0,
+          "ms": 140
+        },
+        {
+          "i": 1,
+          "ms": 140
+        }
+      ]
+    },
+    "poke": {
+      "sheet": "poke.png",
+      "frameW": 41,
+      "frameH": 26,
+      "cols": 3,
+      "box": {
+        "x": 12,
+        "y": 22,
+        "w": 41,
+        "h": 26
+      },
+      "loop": true,
+      "ms": 500,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 110
+        },
+        {
+          "i": 1,
+          "ms": 130
+        },
+        {
+          "i": 2,
+          "ms": 260
+        }
+      ]
+    },
+    "drag": {
+      "sheet": "drag.png",
+      "frameW": 39,
+      "frameH": 26,
+      "cols": 2,
+      "box": {
+        "x": 13,
+        "y": 21,
+        "w": 39,
+        "h": 26
+      },
+      "loop": true,
+      "ms": 400,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 200
+        },
+        {
+          "i": 1,
+          "ms": 200
+        }
+      ]
+    },
+    "tickle": {
+      "sheet": "tickle.png",
+      "frameW": 41,
+      "frameH": 27,
+      "cols": 2,
+      "box": {
+        "x": 12,
+        "y": 21,
+        "w": 41,
+        "h": 27
+      },
+      "loop": true,
+      "ms": 490,
+      "frames": [
+        {
+          "i": 0,
+          "ms": 110
+        },
+        {
+          "i": 1,
+          "ms": 110
+        },
+        {
+          "i": 0,
+          "ms": 110
+        },
+        {
+          "i": 1,
+          "ms": 160
+        }
+      ]
+    }
+  },
+  "idlePool": {
+    "everyMs": {
+      "mean": 120000,
+      "min": 45000,
+      "max": 300000
+    },
+    "anims": []
+  },
+  "states": {
+    "attention": [
+      "done"
+    ],
+    "error": [
+      "error"
+    ],
+    "idle": [
+      "idle"
+    ],
+    "notification": [
+      "notification"
+    ],
+    "roam": [
+      "roam"
+    ],
+    "sleeping": [
+      "sleeping"
+    ],
+    "thinking": [
+      "thinking"
+    ],
+    "waking": [
+      "waking"
+    ],
+    "working": [
+      "working"
+    ]
+  },
+  "bonus": {},
+  "tiers": {},
+  "timings": {},
+  "reactions": {
+    "drag": "drag",
+    "tapLeft": "poke",
+    "tickle": "tickle"
+  },
+  "roam": {
+    "anim": "roam",
+    "faces": "front"
+  },
+  "sleep": {
+    "afterMs": 60000
+  }
+}

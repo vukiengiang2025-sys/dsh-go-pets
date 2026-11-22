@@ -6,6 +6,7 @@ import { replyTo, storyFor, summaryFrom } from './pet-chat.js';
 import { todayKey, bumpStreak, questDone, clock } from './care.js';
 import { shareUrl, pickConfig, decodeConfig } from './share.js';
 import { encodeGif, quantize } from './gif.js';
+import { seasonFor, SEASON_PACK } from './season.js';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
 
 const FALLBACK_PACKS = [
@@ -47,7 +48,7 @@ const DEFAULT_STORE = {
   journal: [], simple: false, autoTheme: false,
   speech: false, speechRate: 1, voiceName: '', breakReminder: false, breakMinutes: 45, lastBreak: 0,
   chat: [], memories: [],
-  onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 },
+  onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
 };
 
@@ -82,6 +83,7 @@ const el = {
   resetAll: document.getElementById('resetAll'),
   simpleMode: document.getElementById('simpleMode'),
   autoTheme: document.getElementById('autoTheme'),
+  autoSeason: document.getElementById('autoSeason'),
   importImage: document.getElementById('importImage'),
   importFile: document.getElementById('importFile'),
   importedList: document.getElementById('importedList'),
@@ -1013,6 +1015,11 @@ function bindSheet() {
     applySimple(el.simpleMode.checked);
     writeStore({ simple: el.simpleMode.checked });
   });
+  el.autoSeason.addEventListener('change', () => {
+    writeStore({ autoSeason: el.autoSeason.checked });
+    logEvent(el.autoSeason.checked ? 'bật đổi pet theo mùa' : 'tắt đổi pet theo mùa');
+    if (el.autoSeason.checked) location.reload();
+  });
   el.autoTheme.addEventListener('change', () => {
     const on = el.autoTheme.checked;
     writeStore({ autoTheme: on });
@@ -1258,7 +1265,11 @@ async function main() {
 
   const saved = readStore();
   const param = new URLSearchParams(location.search).get('pack');
-  const id = packs.some(p => p.id === param) ? param : (saved.pack || packs[0].id);
+  let id = packs.some(p => p.id === param) ? param : (saved.pack || packs[0].id);
+  if (!param && !saved.pack && saved.autoSeason !== false) {
+    const seasonId = SEASON_PACK[seasonFor(new Date())];
+    if (seasonId && packs.some(p => p.id === seasonId)) id = seasonId;
+  }
   el.pack.value = id;
 
   buildSettingsUI();
@@ -1284,6 +1295,7 @@ async function main() {
     applyName(savedSettings.name || '');
     const palParam = new URLSearchParams(location.search).get('palette');
     applyPalette(PALETTES[palParam] ? palParam : (savedSettings.palette || 'goc'));
+    el.autoSeason.checked = savedSettings.autoSeason !== false;
     applySimple(savedSettings.simple);
     applyAutoTheme(savedSettings.autoTheme, savedSettings.palette);
     if ('speechSynthesis' in window) {

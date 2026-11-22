@@ -1,6 +1,26 @@
 {
   "packs": [
-    { "id": "may", "name": "Mây", "url": "../app/assets/pets/may/pack.json" },
-    { "id": "dsh-bot", "name": "DSH Bot", "url": "../app/assets/pets/dsh-bot/pack.json" }
+    {
+      "id": "may",
+      "name": "Mây",
+      "url": "../app/assets/pets/may/pack.json"
+    },
+    {
+      "id": "dsh-bot",
+      "name": "DSH Bot",
+      "url": "../app/assets/pets/dsh-bot/pack.json"
+    },
+    {
+      "id": "may-snow",
+      "name": "Mây Tuyết",
+      "url": "../app/assets/pets/may-snow/pack.json",
+      "season": "snow"
+    },
+    {
+      "id": "may-tet",
+      "name": "Mây Tết",
+      "url": "../app/assets/pets/may-tet/pack.json",
+      "season": "tet"
+    }
   ]
 }

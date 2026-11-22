@@ -100,6 +100,11 @@ jobs:
             adb shell am start -W -n io.github.vukiengiang.petstudio/.MainActivity --es agent demo
             sleep 8
             adb exec-out screencap -p > app-agent.png
+            adb shell am force-stop io.github.vukiengiang.petstudio
+            sleep 2
+            adb shell am start -W -n io.github.vukiengiang.petstudio/.MainActivity --es pack may-tet
+            sleep 8
+            adb exec-out screencap -p > app-tet.png
             adb exec-out sh -c 'cat $(ls -t /sdcard/Download/DSH-Go/*.gif | head -1)' > pet-export.gif || true
             ls -l pet-export.gif || true
             adb shell dumpsys appwidget | grep -i -A4 "io.github.vukiengiang.petstudio" | head -12 || true
@@ -119,4 +124,5 @@ jobs:
             app-pip.png
             app-intro.png
             app-agent.png
+            app-tet.png
           if-no-files-found: warn
