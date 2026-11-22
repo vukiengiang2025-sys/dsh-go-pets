@@ -2,8 +2,8 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **61 xong** (có trong APK)
-- 🟡 **11 một phần** (có nền tảng, thiếu phần còn lại)
+- ✅ **62 xong** (có trong APK)
+- 🟡 **10 một phần** (có nền tảng, thiếu phần còn lại)
 - ⏸ **28 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)

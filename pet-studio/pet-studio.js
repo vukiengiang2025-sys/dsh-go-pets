@@ -300,7 +300,7 @@ function voices() {
 function fillVoices() {
   if (!el.voiceSelect) return;
   const saved = readStore().voiceName || '';
-  el.voiceSelect.innerHTML = '<option value="">Giọng mặc định</option>'
+  el.voiceSelect.innerHTML = '<option value="">' + pick('Giọng mặc định', 'Default voice') + '</option>'
     + voices().map(v => '<option value="' + v.name + '">' + v.name + ' (' + v.lang + ')</option>').join('');
   el.voiceSelect.value = saved;
 }
