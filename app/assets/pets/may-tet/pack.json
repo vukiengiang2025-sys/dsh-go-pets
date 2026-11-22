@@ -487,5 +487,19 @@
   },
   "sleep": {
     "afterMs": 60000
+  },
+  "checksums": {
+    "done.png": "962846a1e23aa1aacb8d7a6809c797d7697d6ea0464b8588612b30cc3446b6e4",
+    "drag.png": "3b48b266b1180a6bbb843ea401e6173b2229168e635c278dd2a06af47023c914",
+    "error.png": "8042346839103d5f2894aa052681070ff62e7de7417c835e8e8fdfc9e37c1d57",
+    "idle.png": "3550018b11d0abee81f26e4171a437adcb7a8b6d87787ff1c5506546a4dafde9",
+    "notification.png": "06701ffc6c4fc3c64e9b4c183fb89b157f280e76ac1077f3f56e491e0cc2df83",
+    "poke.png": "a52cb8481bde95e6bb5ea2b7c45597ceec87f7bd6fc1154640ac9fd0b5f53a38",
+    "roam.png": "bc93fa29bc6cb1cc00937fb4c36705b7db1cc7020561d1d45345d54d3484f9c1",
+    "sleeping.png": "035e1675bd48c9477c1e10423e537b41241b0c4698d4fcb038c9d0ef828e13c1",
+    "thinking.png": "bb2a57a0bd913a3be4ddc56de47bc74acf747e1d63a08c7ca1ce08e049f95bff",
+    "tickle.png": "9328c4099a1a98489021df12bcbf2462fba5d8a1757bf345f13c81a8f60e5344",
+    "waking.png": "0bc992265ee9bc93d04f000c92b6a812bd9307a478d1f48cc68f94e0ee9f1317",
+    "working.png": "d32b3369b3ecb7e00d111d48e4d8ec34a237832d764643c61faca5d9e21f99af"
   }
 }

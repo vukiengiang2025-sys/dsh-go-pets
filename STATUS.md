@@ -2,8 +2,8 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **74 xong** (có trong APK)
-- 🟡 **3 một phần** (có nền tảng, thiếu phần còn lại)
+- ✅ **75 xong** (có trong APK)
+- 🟡 **2 một phần** (có nền tảng, thiếu phần còn lại)
 - ⏸ **23 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
@@ -135,7 +135,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 83 | Đo FPS/pin | ✅ chip FPS + chip pin |
 | 84 | Nén atlas | ⏸ |
 | 85 | Lazy pack | ⏸ |
-| 86 | Kiểm chữ ký pack | 🟡 kiểm cấu trúc + CRC khi xuất zip |
+| 86 | Kiểm chữ ký pack | ✅ SHA-256 sheet trong pack.json, kiểm khi nhập |
 | 87 | Quyền tối thiểu | ✅ chỉ INTERNET tuỳ chọn |
 | 88 | Crash opt-in | ✅ log lỗi trên máy, mặc định tắt |
 | 89 | A/B | ⏸ |

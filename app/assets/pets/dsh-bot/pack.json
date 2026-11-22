@@ -435,5 +435,17 @@
   },
   "sleep": {
     "afterMs": 60000
+  },
+  "checksums": {
+    "done.png": "02914ebbfb17f4581cac1811d48bf09b9c8e2efc25f968c52ac97cd94e141298",
+    "error.png": "194cbed9006564154290ffad51211746c08b1d3f185e83629fa3d0d5c865490e",
+    "idle.png": "e47512e9f54d627056ac55046f6fd5a8b0c1515b62cf09e7939eabfcf8493dc1",
+    "notification.png": "0352c800f2540cdf76dfd4661ddfdd064ae97e907a9c57d6a2e0ca7161398bb8",
+    "roam.png": "2cf2f039f5952d6f785f18ec5a09e56eb521d087de975c2c6e3ffe5d58de773f",
+    "sleeping.png": "7cd4600ed935918e52a032c88b826cccecb0d7c4ac0e61849a4245cf73282b7a",
+    "thinking.png": "a215ecbf4cc4f619d2dcd79c5e64f6db6fc98ee3309975307d317c23f49ccd57",
+    "tickle.png": "9b64b6175ccf9d3a0fea4975b2782a202588f59366fe0355ecb6d3e694c96bd4",
+    "waking.png": "2b415f61511923a70d411282274e57c3ad7974d03d19b818d5bd5896ee62da7a",
+    "working.png": "60421a92a6ff4e7c35eb141382a74bcb9da207513d8c33a01114c54e5315e0dc"
   }
 }

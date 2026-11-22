@@ -7,6 +7,7 @@ import { todayKey, bumpStreak, questDone, clock, hostColor, batteryText } from '
 import { shareUrl, pickConfig, decodeConfig } from './share.js';
 import { encodeGif, quantize } from './gif.js';
 import { buildZip } from './zip-write.js';
+import { verifyChecksums } from './pack-integrity.js';
 import { applyLanguage, pick, stateText, getLang } from './i18n.js';
 import { upsertHost, removeHost } from './agent-hosts.js';
 import { seasonFor, SEASON_PACK } from './season.js';
@@ -593,6 +594,8 @@ function sheetNames(json) {
 }
 
 async function saveImported(built) {
+  const check = await verifyChecksums(built.pack, built.files);
+  if (!check.ok) throw new Error('checksum lỗi: ' + check.bad);
   if (builtinPacks.some(p => p.id === built.pack.id)) {
     built.pack.id = 'user-' + built.pack.id;
   }
@@ -1230,6 +1233,8 @@ async function installMarket(entry) {
       files[name] = await sheet.blob();
     }
     const packJson = { ...json, id: builtinPacks.some(p => p.id === json.id) ? 'user-' + json.id : json.id };
+    const check = await verifyChecksums(packJson, files);
+    if (!check.ok) throw new Error('checksum lỗi: ' + check.bad);
     await saveLocalPack({
       id: packJson.id, created: Date.now(), pack: packJson, files,
       frames: sheetNames(packJson).length,
