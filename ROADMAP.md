@@ -14,7 +14,7 @@ nền tảng Android → cộng đồng → kỹ thuật → sản phẩm.
 | **D. AI & giọng** | 31–40 | chat ngắn, tóm tắt, TTS, giọng riêng, hỏi lại, ghi nhớ, nhắc nghỉ, kể chuyện, cảm xúc tin nhắn, im lặng | đang làm: 31 (chat theo luật), 32, 33, 36, 37, 38; còn 34/35/39 |
 | **E. Tích hợp agent** | 41–50 | WebSocket, tool bubble, subagent, màu host, mở hội thoại, widget trạng thái, lỗi + log, nhiều host | chờ |
 | **F. Android** | 51–60 | overlay, widget, QS tile, live wallpaper, notification, PiP, pin/sạc, AOD, splash (59 đã có), AAB | 52 xong (provider + cập nhật trạng thái); 56 thử nghiệm; 59 đã có |
-| **H. Cộng đồng** | 71–78 | chợ pack, link, GIF, QR, xếp hạng, bình chọn, gallery, chia sẻ cấu hình | chờ |
+| **H. Cộng đồng** | 71–78 | chợ pack, link, GIF, QR, xếp hạng, bình chọn, gallery, chia sẻ cấu hình | 72, 78 xong; 73 mới xuất PNG |
 | **I. Kỹ thuật** | 81–90 | Espresso, golden, FPS/pin, nén atlas, lazy pack, chữ ký, quyền, crash opt-in, A/B, AAB | một phần |
 | **J. Sản phẩm** | 91–100 | onboarding, nhiệm vụ, streak, nghỉ mắt, Pomodoro, âm thanh, ủng hộ, tặng pet, widget đôi, roadmap | 91–93, 95 xong; 94 gộp vào 37 |
 
