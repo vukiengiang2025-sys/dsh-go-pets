@@ -36,7 +36,7 @@ const PROFILES = {
 const DEFAULT_STORE = {
   pack: null, size: '64', quiet: false, palette: 'goc', name: '',
   stats: { poke: 0, tickle: 0, drag: 0, seconds: 0, states: {} },
-  journal: [],
+  journal: [], simple: false, autoTheme: false,
 };
 
 const el = {
@@ -67,6 +67,8 @@ const el = {
   importBackup: document.getElementById('importBackup'),
   backupBox: document.getElementById('backupBox'),
   resetAll: document.getElementById('resetAll'),
+  simpleMode: document.getElementById('simpleMode'),
+  autoTheme: document.getElementById('autoTheme'),
 };
 const ctx = el.canvas.getContext('2d');
 
@@ -148,6 +150,19 @@ function applyProfile(key) {
   layout();
   writeStore({ size: conf.size, quiet: conf.quiet, palette: conf.palette, profile: key });
   logEvent('đổi hồ sơ: ' + conf.label);
+}
+
+function applySimple(on) {
+  document.body.classList.toggle('simple', !!on);
+  el.simpleMode.checked = !!on;
+}
+function paletteForNow() {
+  const hour = new Date().getHours();
+  return (hour >= 20 || hour < 6) ? 'tim' : 'goc';
+}
+function applyAutoTheme(on, savedPalette) {
+  el.autoTheme.checked = !!on;
+  applyPalette(on ? paletteForNow() : (savedPalette || 'goc'));
 }
 
 function openSheet(open) {
@@ -333,6 +348,16 @@ function bindSheet() {
     const b = ev.target.closest('button[data-profile]');
     if (b) applyProfile(b.dataset.profile);
   });
+  el.simpleMode.addEventListener('change', () => {
+    applySimple(el.simpleMode.checked);
+    writeStore({ simple: el.simpleMode.checked });
+  });
+  el.autoTheme.addEventListener('change', () => {
+    const on = el.autoTheme.checked;
+    writeStore({ autoTheme: on });
+    applyAutoTheme(on, readStore().palette);
+    logEvent(on ? 'bật đổi màu theo giờ' : 'tắt đổi màu theo giờ');
+  });
   el.copyBackup.addEventListener('click', copyBackup);
   el.importBackup.addEventListener('click', importBackup);
   el.resetAll.addEventListener('click', resetAll);
@@ -480,6 +505,11 @@ async function main() {
     applyName(savedSettings.name || '');
     const palParam = new URLSearchParams(location.search).get('palette');
     applyPalette(PALETTES[palParam] ? palParam : (savedSettings.palette || 'goc'));
+    applySimple(savedSettings.simple);
+    applyAutoTheme(savedSettings.autoTheme, savedSettings.palette);
+    setInterval(() => {
+      if (readStore().autoTheme) applyPalette(paletteForNow());
+    }, 600000);
     if (new URLSearchParams(location.search).get('sheet') === '1') openSheet(true);
     const initial = new URLSearchParams(location.search).get('state');
     if (initial && STATES.includes(initial)) model.setState(initial);
