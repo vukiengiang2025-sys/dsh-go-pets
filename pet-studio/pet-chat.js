@@ -90,10 +90,19 @@ export function moodFor(text) {
 
 export function memoryFrom(text) {
   const m = String(text || '').trim();
-  const match = m.match(/^(?:nhớ|ghi nhớ|remember)\s+(?:rằng|that)?\s*(.+)$/i);
-  if (!match) return null;
-  const value = match[1].trim();
-  return value ? value.slice(0, 60) : null;
+  const direct = m.match(/^(?:nhớ|ghi nhớ|remember)\s+(?:rằng|that)?\s*(.+)$/i);
+  if (direct && direct[1].trim()) return direct[1].trim().slice(0, 60);
+  const rules = [
+    [/(?:mình|tôi|tớ)\s+thích\s+(.+)/i, v => 'thích ' + v],
+    [/(?:mình|tôi|tớ)\s+ghét\s+(.+)/i, v => 'ghét ' + v],
+    [/(?:mình|tôi|tớ)\s+tên\s+(?:là\s+)?(.+)/i, v => 'tên ' + v],
+    [/(?:sinh nhật|birthday)\s+(?:của mình\s+)?(?:là\s+)?(.+)/i, v => 'sinh nhật ' + v],
+  ];
+  for (const [re, map] of rules) {
+    const hit = m.match(re);
+    if (hit && hit[1].trim()) return map(hit[1].trim()).slice(0, 60);
+  }
+  return null;
 }
 
 export function greetingFor(hour, lang = 'vi') {
