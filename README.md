@@ -15,15 +15,16 @@ Mã nguồn chức năng **Pets** — thú cưng trạng thái — của [dsh-go
 
 ![Pet Studio trên Android](docs/assets/android-phone.png)
 
-**[Tải PetStudio.apk](https://github.com/vukiengiang2025-sys/dsh-go-pets/releases/download/android-latest/PetStudio.apk)** — Android 7.0+, chạy offline, không xin quyền nào.
+**[Tải PetStudio.apk](https://github.com/vukiengiang2025-sys/dsh-go-pets/releases/download/android-latest/PetStudio.apk)** — Android 7.0+, chạy offline; chỉ xin quyền khi bạn bật tính năng tương ứng (mạng cho AI/agent, nổi trên app, thông báo).
 
 - Mở APK để cài (máy có thể hỏi "Cài từ nguồn không xác định" — bật cho trình quản lý tệp).
-- 5 pet (**Mây**, **Mây Tuyết**, **Mây Tết**, **Bơ**, **DSH Bot**) + **nhập pet riêng từ ảnh/GIF/APNG/WebP/zip, tự đổi pet theo mùa** ngay trong app, 9 trạng thái, chuyển cảnh mượt, hạt cảm xúc, vuốt ve, ném pet, chạm đúp mở cài đặt, đọc thành tiếng khi có việc, nhắc đứng dậy mỗi N phút, chat ngắn + sổ nhớ + kể chuyện + tóm tắt, bong bóng "Chờ bạn" có nút **Đã xử lý**, nhớ pack/cỡ/im lặng, onboarding, chuỗi ngày, nhiệm vụ đi dạo, Pomodoro 25/5, chia sẻ cấu hình bằng link/QR, xuất ảnh/GIF, tặng pet (.zip), thư viện ảnh/GIF đã xuất, âm thanh mưa/sóng, link lộ trình, kết nối agent qua endpoint HTTP (tuỳ chọn), cửa sổ pet nổi ngoài app, widget màn hình chính hiện pet + trạng thái, nhấn giữ icon có shortcut mở thẳng từng pet.
+- 6 pet (**Mây**, **Mây Tuyết**, **Mây Tết**, **Mây Đêm**, **Bơ**, **DSH Bot**) + **nhập pet riêng từ ảnh/GIF/APNG/WebP/zip, tự đổi pet theo mùa** ngay trong app, 9 trạng thái, chuyển cảnh mượt, hạt cảm xúc, vuốt ve, ném pet, chạm đúp mở cài đặt, đọc thành tiếng khi có việc, nhắc đứng dậy mỗi N phút, chat ngắn + sổ nhớ + kể chuyện + tóm tắt, bong bóng "Chờ bạn" có nút **Đã xử lý**, nhớ pack/cỡ/im lặng, onboarding, chuỗi ngày, nhiệm vụ đi dạo, Pomodoro 25/5, chia sẻ cấu hình bằng link/QR, xuất ảnh/GIF, tặng pet (.zip), thư viện ảnh/GIF đã xuất, âm thanh mưa/sóng, link lộ trình, kết nối agent qua endpoint HTTP (tuỳ chọn), cửa sổ pet nổi ngoài app, widget màn hình chính hiện pet + trạng thái, nhấn giữ icon có shortcut mở thẳng từng pet.
 - CI còn build **AAB** (1,18 MB) và chạy **Espresso** trên emulator (1 test: WebView mở đúng Pet Studio).
 - APK được GitHub Actions build lại mỗi khi `android/`, `pet-studio/` hoặc pet pack thay đổi; xem [android/README.md](android/README.md).
 - Bản phát hành ký bằng khoá cố định trong repo (cài đè được, không phải gỡ app); phát hành store thì thay keystore.
 - Bàn giao & việc tiếp theo: [HANDOVER.md](HANDOVER.md).
-- Trạng thái 100 ý tưởng: [STATUS.md](STATUS.md) — 54 xong, 8 một phần, 38 hoãn.
+- **Chat AI tuỳ chọn** (OpenAI/DeepSeek/Gemini/Groq/Ollama, key lưu trên máy), **pet nổi tự bay nhảy**, **AOD màn hình đêm**, **hình nền động**, menu vòng, “Dạy đi”.
+- Trạng thái 100 ý tưởng: [STATUS.md](STATUS.md) — 84 xong, 1 một phần, 15 hoãn.
 - Điểm chất lượng tự chấm: **1000/1000** — chi tiết và bằng chứng ở [QUALITY.md](QUALITY.md).
 
 ## Pets làm gì
