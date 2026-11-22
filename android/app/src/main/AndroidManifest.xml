@@ -36,7 +36,7 @@
 
         <activity
             android:name=".AodActivity"
-            android:exported="false"
+            android:exported="true"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
         <service
