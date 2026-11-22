@@ -2,7 +2,7 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **75 xong** (có trong APK)
+- ✅ **74 xong** (có trong APK)
 - 🟡 **3 một phần** (có nền tảng, thiếu phần còn lại)
 - ⏸ **23 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
