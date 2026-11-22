@@ -112,6 +112,12 @@ jobs:
             adb exec-out screencap -p > app-tet.png
             adb exec-out sh -c 'cat $(ls -t /sdcard/Download/DSH-Go/*.gif | head -1)' > pet-export.gif || true
             ls -l pet-export.gif || true
+            adb shell am start -W -a android.service.wallpaper.CHANGE_LIVE_WALLPAPER --es android.service.wallpaper.extra.LIVE_WALLPAPER_COMPONENT io.github.vukiengiang.petstudio/.PetWallpaperService || true
+            sleep 6
+            adb exec-out screencap -p > app-wallpaper.png
+            adb logcat -d -s PetWallpaper | tail -4 || true
+            adb shell input keyevent KEYCODE_BACK || true
+            sleep 1
             adb shell am start -W -n io.github.vukiengiang.petstudio/.AodActivity
             sleep 3
             adb exec-out screencap -p > app-aod.png
@@ -158,6 +164,7 @@ jobs:
             app-gallery.png
             app-float.png
             app-aod.png
+            app-wallpaper.png
             app-tile.png
             app-tet.png
           if-no-files-found: warn
