@@ -82,7 +82,8 @@ public class MainActivity extends Activity {
         settings.setTextZoom(100);
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        // Tài nguyên nằm trong APK, không cần cache: tránh CSS/JS cũ sau khi cập nhật.
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
 
         assetLoader = new WebViewAssetLoader.Builder()

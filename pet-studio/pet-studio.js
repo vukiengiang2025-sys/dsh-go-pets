@@ -720,6 +720,7 @@ window.__setPip = on => document.body.classList.toggle('pip', !!on);
 function bindPip() {
   if (new URLSearchParams(location.search).get('pip') === '1') {
     document.body.classList.add('pip');
+    console.log('pip layout on');
   }
   const bridge = window.AndroidPet;
   if (!bridge || typeof bridge.isPipSupported !== 'function' || !bridge.isPipSupported()) return;
