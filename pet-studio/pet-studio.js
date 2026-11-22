@@ -636,15 +636,13 @@ async function loadPack(id) {
   }
   pack = normalizePack(json);
   images = {};
-  await Promise.all(sheetNames(pack).map(name => new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => { images[name] = img; resolve(); };
-    img.onerror = () => reject(new Error('thiếu ảnh ' + name));
-    img.src = sheetSrc[name];
-  })));
+  sheetSources = sheetSrc;
   const saved = readStore();
   model = new PetModel(pack, { quiet: saved.quiet ?? false });
   model.on(onState);
+  const firstAnim = pack.animations[pack.states[model.state] && pack.states[model.state][0]]
+    || Object.values(pack.animations)[0];
+  if (firstAnim) ensureSheet(firstAnim.sheet);
   el.packInfo.textContent = (pack.name || pack.id) + ' · ' + pack.canvas.w + '×' + pack.canvas.h
     + ' · ' + Object.keys(pack.animations).length + ' animation';
   el.pack.value = pack.id;
@@ -849,6 +847,19 @@ function spawnFx(kind) {
   const c = petCenter();
   particles.push(...spawnParticles(kind, c.x, c.y).map(p => ({ ...p, kind })));
 }
+let sheetSources = {};
+
+function ensureSheet(name) {
+  if (!name || !sheetSources[name]) return null;
+  if (!images[name]) {
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = sheetSources[name];
+    images[name] = img;
+  }
+  return images[name];
+}
+
 let pathMode = false;
 let walkTarget = null;
 let walkPos = { x: 0, y: 0 };
@@ -861,7 +872,7 @@ function applyPetTransform() {
 }
 function drawFrame(anim, frame, alpha) {
   const f = anim && anim.frames ? anim.frames[frame] : null;
-  const img = anim ? images[anim.sheet] : null;
+  const img = anim ? (images[anim.sheet] || ensureSheet(anim.sheet)) : null;
   if (!f || !img || !img.width) return;
   const sx = (f.i % anim.cols) * anim.frameW;
   const sy = Math.floor(f.i / anim.cols) * anim.frameH;
