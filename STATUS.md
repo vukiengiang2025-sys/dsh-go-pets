@@ -2,8 +2,8 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **72 xong** (có trong APK)
-- 🟡 **5 một phần** (có nền tảng, thiếu phần còn lại)
+- ✅ **75 xong** (có trong APK)
+- 🟡 **3 một phần** (có nền tảng, thiếu phần còn lại)
 - ⏸ **23 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
@@ -91,7 +91,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 52 | Widget | ✅ |
 | 53 | Quick Settings tile | ✅ bật/tắt im lặng |
 | 54 | Live wallpaper | ⏸ |
-| 55 | Notification tuỳ biến | 🟡 báo khi app ở nền |
+| 55 | Notification tuỳ biến | ✅ báo khi nền + nút Im lặng |
 | 56 | PiP | 🟡 thử nghiệm, WebView đen trên emulator |
 | 57 | Pin/sạc | ✅ |
 | 58 | AOD | ⏸ |
@@ -111,7 +111,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 67 | Sao lưu | ✅ |
 | 68 | Chế độ đơn giản | ✅ |
 | 69 | Theme theo giờ | ✅ |
-| 70 | Ngôn ngữ vi/en | 🟡 giao diện chính + trạng thái; chat/truyện còn tiếng Việt |
+| 70 | Ngôn ngữ vi/en | ✅ giao diện, chat, truyện, tóm tắt; nhật ký giữ nguyên |
 
 ## H. Cộng đồng (8)
 
@@ -132,7 +132,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 |---|---|---|
 | 81 | Espresso | ✅ 1 test trên emulator |
 | 82 | Golden test | ✅ hash pixel 5 pack + CI chặn pack thiếu ảnh |
-| 83 | Đo FPS/pin | 🟡 chip FPS + chip pin |
+| 83 | Đo FPS/pin | ✅ chip FPS + chip pin |
 | 84 | Nén atlas | ⏸ |
 | 85 | Lazy pack | ⏸ |
 | 86 | Kiểm chữ ký pack | 🟡 kiểm cấu trúc + CRC khi xuất zip |

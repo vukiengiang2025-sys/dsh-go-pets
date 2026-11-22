@@ -55,6 +55,10 @@
         </service>
 
         <receiver
+            android:name=".QuietActionReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".PetClockWidgetProvider"
             android:exported="false"
             android:label="@string/widget_clock_name">

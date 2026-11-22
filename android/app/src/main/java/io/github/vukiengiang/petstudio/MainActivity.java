@@ -447,6 +447,11 @@ public class MainActivity extends Activity {
             Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                     ? new Notification.Builder(this, CHANNEL_ID)
                     : new Notification.Builder(this);
+            Intent quietIntent = new Intent(this, QuietActionReceiver.class);
+            quietIntent.setAction("io.github.vukiengiang.petstudio.QUIET");
+            PendingIntent quietPi = PendingIntent.getBroadcast(this, 1, quietIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            builder.addAction(android.R.drawable.ic_lock_silent_mode, "Im lặng", quietPi);
             Notification notification = builder
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(title == null ? "Pet Studio" : title)
