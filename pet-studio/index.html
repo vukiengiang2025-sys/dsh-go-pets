@@ -28,6 +28,7 @@
     </label>
     <label class="check"><input type="checkbox" id="quiet"> Im lặng</label>
     <label class="check"><input type="checkbox" id="demo"> Tự diễn</label>
+    <button class="gear" id="openSettings" aria-label="Cài đặt pet">Cài đặt</button>
   </div>
 </header>
 
@@ -37,7 +38,10 @@
       <span id="bubbleText"></span>
       <button id="bubbleAction" hidden>Đã xử lý</button>
     </div>
-    <div class="pet" id="pet"><canvas id="canvas" aria-label="Pet"></canvas></div>
+    <div class="pet" id="pet">
+      <canvas id="canvas" aria-label="Pet"></canvas>
+      <div class="pet-name" id="petName" hidden></div>
+    </div>
     <div class="ground"></div>
   </section>
 
@@ -62,6 +66,42 @@
   <span>dsh-go pets · <a href="https://github.com/vukiengiang2025-sys/dsh-go-pets">mã nguồn</a></span>
   <span id="version">v1.0.0</span>
 </footer>
+
+<div class="backdrop" id="backdrop" hidden></div>
+<section class="sheet" id="sheet" hidden aria-label="Cài đặt pet">
+  <header class="sheet-head">
+    <h2>Cài đặt pet</h2>
+    <button id="closeSheet">Đóng</button>
+  </header>
+  <div class="sheet-body">
+    <label class="field">Tên pet
+      <input id="petNameInput" maxlength="16" placeholder="đặt tên cho pet">
+    </label>
+
+    <div class="field">Màu
+      <div class="chips" id="paletteChips"></div>
+    </div>
+
+    <div class="field">Hồ sơ nhanh
+      <div class="profiles" id="profiles"></div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="field">Nhật ký
+      <ol class="journal" id="journal"></ol>
+    </div>
+
+    <div class="field">Sao lưu
+      <div class="row">
+        <button id="copyBackup">Sao chép JSON</button>
+        <button id="resetAll" class="danger">Đặt lại</button>
+      </div>
+      <textarea id="backupBox" rows="3" placeholder="Dán JSON sao lưu vào đây rồi bấm Nhập"></textarea>
+      <button id="importBackup">Nhập</button>
+    </div>
+  </div>
+</section>
 
 <script type="module" src="pet-studio.js"></script>
 <script nomodule>

@@ -19,6 +19,26 @@ const BUBBLES = {
 
 const STORE_KEY = 'pet-studio/v1';
 
+const PALETTES = {
+  goc: { label: 'Gốc', filter: 'none' },
+  bang: { label: 'Băng', filter: 'sepia(.35) saturate(1.5) hue-rotate(150deg)' },
+  sanho: { label: 'San hô', filter: 'sepia(.45) saturate(1.9) hue-rotate(-25deg)' },
+  chanh: { label: 'Chanh', filter: 'sepia(.45) saturate(1.7) hue-rotate(35deg)' },
+  tim: { label: 'Tím', filter: 'sepia(.5) saturate(1.5) hue-rotate(230deg)' },
+};
+
+const PROFILES = {
+  work: { label: 'Làm việc', size: '40', quiet: true, palette: 'bang' },
+  chill: { label: 'Thư giãn', size: '64', quiet: false, palette: 'goc' },
+  night: { label: 'Ban đêm', size: '40', quiet: true, palette: 'tim' },
+};
+
+const DEFAULT_STORE = {
+  pack: null, size: '64', quiet: false, palette: 'goc', name: '',
+  stats: { poke: 0, tickle: 0, drag: 0, seconds: 0, states: {} },
+  journal: [],
+};
+
 const el = {
   canvas: document.getElementById('canvas'),
   stage: document.getElementById('stage'),
@@ -33,6 +53,20 @@ const el = {
   demo: document.getElementById('demo'),
   states: document.getElementById('states'),
   version: document.getElementById('version'),
+  petName: document.getElementById('petName'),
+  openSettings: document.getElementById('openSettings'),
+  sheet: document.getElementById('sheet'),
+  backdrop: document.getElementById('backdrop'),
+  closeSheet: document.getElementById('closeSheet'),
+  petNameInput: document.getElementById('petNameInput'),
+  paletteChips: document.getElementById('paletteChips'),
+  profiles: document.getElementById('profiles'),
+  stats: document.getElementById('stats'),
+  journal: document.getElementById('journal'),
+  copyBackup: document.getElementById('copyBackup'),
+  importBackup: document.getElementById('importBackup'),
+  backupBox: document.getElementById('backupBox'),
+  resetAll: document.getElementById('resetAll'),
 };
 const ctx = el.canvas.getContext('2d');
 
@@ -48,11 +82,79 @@ let demoSeq = 0;
 let demoTimer = 0;
 
 function readStore() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
-  catch { return {}; }
+  let raw = {};
+  try { raw = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { raw = {}; }
+  return {
+    ...DEFAULT_STORE,
+    ...raw,
+    stats: { ...DEFAULT_STORE.stats, ...(raw.stats || {}), states: { ...((raw.stats || {}).states || {}) } },
+    journal: Array.isArray(raw.journal) ? raw.journal.slice(0, 50) : [],
+  };
 }
 function writeStore(patch) {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify({ ...readStore(), ...patch })); } catch {}
+  try { localStorage.setItem(STORE_KEY, JSON.stringify({ ...readStore(), ...patch })); renderSheet(); } catch {}
+}
+
+function bumpStat(key, n = 1) {
+  const s = readStore();
+  s.stats[key] = (s.stats[key] || 0) + n;
+  writeStore({ stats: s.stats });
+}
+function logEvent(text) {
+  const s = readStore();
+  const journal = [{ t: Date.now(), text }, ...s.journal].slice(0, 50);
+  writeStore({ journal });
+}
+function formatTime(ts) {
+  const d = new Date(ts);
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+function renderSheet() {
+  if (!el.stats) return;
+  const s = readStore();
+  const minutes = Math.round((s.stats.seconds || 0) / 60);
+  const seen = Object.keys(s.stats.states || {}).length;
+  el.stats.innerHTML =
+    '<span><b>' + (s.stats.poke || 0) + '</b> lần chọc</span>'
+    + '<span><b>' + (s.stats.tickle || 0) + '</b> lần cù</span>'
+    + '<span><b>' + minutes + '</b> phút bên pet</span>'
+    + '<span><b>' + seen + '</b> trạng thái đã thấy</span>';
+  el.journal.innerHTML = s.journal.map(e =>
+    '<li><time>' + formatTime(e.t) + '</time><span>' + e.text + '</span></li>').join('');
+  if (document.activeElement !== el.petNameInput) el.petNameInput.value = s.name || '';
+  el.paletteChips.querySelectorAll('button').forEach(b =>
+    b.classList.toggle('active', b.dataset.palette === (s.palette || 'goc')));
+  el.profiles.querySelectorAll('button').forEach(b =>
+    b.classList.toggle('active', b.dataset.profile === (s.profile || '')));
+}
+
+function applyName(name) {
+  el.petName.textContent = name;
+  el.petName.hidden = !name;
+}
+function applyPalette(key) {
+  const conf = PALETTES[key] || PALETTES.goc;
+  el.canvas.style.filter = conf.filter;
+  el.paletteChips.querySelectorAll('button').forEach(b =>
+    b.classList.toggle('active', b.dataset.palette === key));
+}
+function applyProfile(key) {
+  const conf = PROFILES[key];
+  if (!conf) return;
+  el.size.value = conf.size;
+  el.quiet.checked = conf.quiet;
+  if (model) model.quiet = conf.quiet;
+  applyPalette(conf.palette);
+  layout();
+  writeStore({ size: conf.size, quiet: conf.quiet, palette: conf.palette, profile: key });
+  logEvent('đổi hồ sơ: ' + conf.label);
+}
+
+function openSheet(open) {
+  el.sheet.hidden = !open;
+  el.backdrop.hidden = !open;
+  document.body.style.overflow = open ? 'hidden' : '';
+  if (open) renderSheet();
 }
 
 function setStatus(text) { el.status.textContent = text; }
@@ -156,6 +258,84 @@ function onState() {
     b.classList.toggle('active', b.dataset.state === model.state);
   });
   showBubble(model.state);
+  const st = model.state;
+  const stats = readStore().stats;
+  if (!stats.states[st]) {
+    stats.states[st] = 1;
+    writeStore({ stats });
+  }
+  if (st === 'attention') logEvent('pet vừa xong việc');
+  else if (st === 'error') logEvent('pet gặp lỗi');
+  else if (st === 'notification') logEvent('có việc đang chờ bạn');
+  else if (st === 'sleeping') logEvent('pet đi ngủ');
+}
+
+function buildSettingsUI() {
+  el.paletteChips.innerHTML = Object.entries(PALETTES).map(([key, conf]) =>
+    '<button data-palette="' + key + '">' + conf.label + '</button>').join('');
+  el.profiles.innerHTML = Object.entries(PROFILES).map(([key, conf]) =>
+    '<button data-profile="' + key + '">' + conf.label + '</button>').join('');
+}
+
+async function copyBackup() {
+  const text = JSON.stringify(readStore(), null, 2);
+  try {
+    await navigator.clipboard.writeText(text);
+    setStatus('đã sao chép bản sao lưu');
+  } catch {
+    el.backupBox.value = text;
+    el.backupBox.select();
+    setStatus('trình duyệt chặn clipboard — JSON đã đưa vào ô bên dưới');
+  }
+}
+
+function importBackup() {
+  try {
+    const data = JSON.parse(el.backupBox.value);
+    if (!data || typeof data !== 'object') throw new Error('không phải JSON');
+    const allowed = {};
+    for (const key of ['pack', 'size', 'quiet', 'palette', 'name', 'profile', 'stats', 'journal']) {
+      if (key in data) allowed[key] = data[key];
+    }
+    writeStore(allowed);
+    logEvent('khôi phục từ bản sao lưu');
+    location.reload();
+  } catch (err) {
+    setStatus('JSON không hợp lệ: ' + err.message);
+  }
+}
+
+function resetAll() {
+  if (!confirm('Xoá toàn bộ cài đặt và nhật ký của Pet Studio?')) return;
+  try { localStorage.removeItem(STORE_KEY); } catch {}
+  location.reload();
+}
+
+function bindSheet() {
+  el.openSettings.addEventListener('click', () => openSheet(true));
+  el.closeSheet.addEventListener('click', () => openSheet(false));
+  el.backdrop.addEventListener('click', () => openSheet(false));
+  document.addEventListener('keydown', ev => { if (ev.key === 'Escape') openSheet(false); });
+
+  el.petNameInput.addEventListener('input', () => {
+    const name = el.petNameInput.value.trim().slice(0, 16);
+    applyName(name);
+    writeStore({ name });
+  });
+  el.paletteChips.addEventListener('click', ev => {
+    const b = ev.target.closest('button[data-palette]');
+    if (!b) return;
+    applyPalette(b.dataset.palette);
+    writeStore({ palette: b.dataset.palette, profile: '' });
+    logEvent('đổi màu: ' + PALETTES[b.dataset.palette].label);
+  });
+  el.profiles.addEventListener('click', ev => {
+    const b = ev.target.closest('button[data-profile]');
+    if (b) applyProfile(b.dataset.profile);
+  });
+  el.copyBackup.addEventListener('click', copyBackup);
+  el.importBackup.addEventListener('click', importBackup);
+  el.resetAll.addEventListener('click', resetAll);
 }
 
 function bindStage() {
@@ -177,6 +357,8 @@ function bindStage() {
       down.dragging = true;
       model.drag();
       haptic(6);
+      bumpStat('drag');
+      logEvent('nhấc pet lên');
     }
   });
   el.stage.addEventListener('pointerup', ev => {
@@ -189,8 +371,16 @@ function bindStage() {
     clicks = clicks.filter(t => now - t < 1100);
     clicks.push(now);
     haptic(8);
-    if (clicks.length >= 3) { clicks = []; model.tickle(); return; }
+    if (clicks.length >= 3) {
+      clicks = [];
+      model.tickle();
+      bumpStat('tickle');
+      logEvent('cù pet');
+      return;
+    }
     model.poke(p.x - p.w / 2);
+    bumpStat('poke');
+    logEvent('chọc pet');
   });
   el.stage.addEventListener('pointercancel', () => { down = null; });
   el.stage.addEventListener('contextmenu', ev => ev.preventDefault());
@@ -211,7 +401,10 @@ function bindControls() {
     model.setState(b.dataset.state);
     haptic(8);
   });
-  el.size.addEventListener('change', () => { layout(); writeStore({ size: el.size.value }); });
+  el.size.addEventListener('change', () => {
+    layout();
+    writeStore({ size: el.size.value, profile: '' });
+  });
   el.quiet.addEventListener('change', () => {
     model.quiet = el.quiet.checked;
     writeStore({ quiet: el.quiet.checked });
@@ -266,14 +459,28 @@ async function main() {
   const id = packs.some(p => p.id === param) ? param : (saved.pack || packs[0].id);
   el.pack.value = id;
 
+  buildSettingsUI();
   bindStage();
   bindControls();
+  bindSheet();
   bindLifecycle();
+  setInterval(() => {
+    if (!document.hidden) {
+      const s = readStore();
+      s.stats.seconds = (s.stats.seconds || 0) + 30;
+      writeStore({ stats: s.stats });
+    }
+  }, 30000);
 
   try {
     await loadPack(id);
     const v = new URLSearchParams(location.search).get('v') || '1.0.0';
     el.version.textContent = 'v' + v;
+    const savedSettings = readStore();
+    applyName(savedSettings.name || '');
+    const palParam = new URLSearchParams(location.search).get('palette');
+    applyPalette(PALETTES[palParam] ? palParam : (savedSettings.palette || 'goc'));
+    if (new URLSearchParams(location.search).get('sheet') === '1') openSheet(true);
     const initial = new URLSearchParams(location.search).get('state');
     if (initial && STATES.includes(initial)) model.setState(initial);
     requestAnimationFrame(draw);
