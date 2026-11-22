@@ -648,7 +648,16 @@ async function loadPack(id) {
   model.on(onState);
   const firstAnim = pack.animations[pack.states[model.state] && pack.states[model.state][0]]
     || Object.values(pack.animations)[0];
-  if (firstAnim) ensureSheet(firstAnim.sheet);
+  if (firstAnim) {
+    const img = ensureSheet(firstAnim.sheet);
+    if (img && !img.complete) {
+      await new Promise(resolve => {
+        img.onload = resolve;
+        img.onerror = resolve;
+        setTimeout(resolve, 1500);
+      });
+    }
+  }
   el.packInfo.textContent = (pack.name || pack.id) + ' · ' + pack.canvas.w + '×' + pack.canvas.h
     + ' · ' + Object.keys(pack.animations).length + ' animation';
   el.pack.value = pack.id;
@@ -879,7 +888,10 @@ function applyPetTransform() {
 function drawFrame(anim, frame, alpha) {
   const f = anim && anim.frames ? anim.frames[frame] : null;
   const img = anim ? (images[anim.sheet] || ensureSheet(anim.sheet)) : null;
-  if (!f || !img || !img.width) return;
+  if (!f || !img || !img.width) {
+    lastDrawKey = '';
+    return;
+  }
   const sx = (f.i % anim.cols) * anim.frameW;
   const sy = Math.floor(f.i / anim.cols) * anim.frameH;
   ctx.globalAlpha = alpha;
