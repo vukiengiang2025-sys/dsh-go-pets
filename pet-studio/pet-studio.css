@@ -298,3 +298,8 @@ body.overlay main { padding: 0; height: 100vh; max-width: none; }
 body.overlay .stage { height: 100vh; max-height: none; border: 0; background: transparent; border-radius: 0; }
 body.overlay .ground { display: none; }
 body.overlay .pet { transform: none !important; }
+
+html[lang="en"] .journal:empty::before { content: "nothing yet"; }
+html[lang="en"] .imported:empty::before { content: "no pets imported yet"; }
+html[lang="en"] .memories:empty::before { content: "nothing yet"; }
+html[lang="en"] .error-list:empty::before { content: "no errors yet"; }

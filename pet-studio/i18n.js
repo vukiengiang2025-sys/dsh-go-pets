@@ -2,6 +2,16 @@
 
 export const VI_EN = {
   'Tên pet': 'Pet name',
+  'Ngôn ngữ': 'Language',
+  'phút': 'min',
+  'Gốc': 'Original',
+  'Băng': 'Ice',
+  'San hô': 'Coral',
+  'Chanh': 'Lime',
+  'Tím': 'Purple',
+  'Làm việc': 'Work',
+  'Thư giãn': 'Relax',
+  'Ban đêm': 'Night',
   'Màu': 'Color',
   'Hồ sơ nhanh': 'Quick profiles',
   'Chế độ đơn giản (ẩn bớt nút)': 'Simple mode (fewer buttons)',
@@ -97,7 +107,7 @@ const PLACEHOLDERS = {
   'đặt tên cho pet': 'name your pet',
   'nói gì đó với pet…': 'say something to your pet…',
   'điều muốn pet nhớ': 'something for your pet to remember',
-  'https://… trả về {"state":"working"}': 'https://… returns {"state":"working"}',
+  "https://… trả về {'state':'working'}": "https://… returns {'state':'working'}",
   'https://…/pet.zip': 'https://…/pet.zip',
   'Dán JSON sao lưu vào đây rồi bấm Nhập': 'Paste backup JSON here, then Import',
 };

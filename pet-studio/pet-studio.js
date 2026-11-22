@@ -888,11 +888,14 @@ function onState() {
   else if (st === 'notification') logEvent('có việc đang chờ bạn');
 }
 
+const EN_PALETTE = { goc: 'Original', bang: 'Ice', sanho: 'Coral', chanh: 'Lime', tim: 'Purple' };
+const EN_PROFILE = { work: 'Work', chill: 'Relax', night: 'Night' };
+
 function buildSettingsUI() {
   el.paletteChips.innerHTML = Object.entries(PALETTES).map(([key, conf]) =>
-    '<button data-palette="' + key + '">' + conf.label + '</button>').join('');
+    '<button data-palette="' + key + '">' + pick(conf.label, EN_PALETTE[key]) + '</button>').join('');
   el.profiles.innerHTML = Object.entries(PROFILES).map(([key, conf]) =>
-    '<button data-profile="' + key + '">' + conf.label + '</button>').join('');
+    '<button data-profile="' + key + '">' + pick(conf.label, EN_PROFILE[key]) + '</button>').join('');
 }
 
 async function copyBackup() {
@@ -1396,6 +1399,7 @@ function bindSheet() {
   el.langSel.addEventListener('change', () => {
     writeStore({ lang: el.langSel.value });
     applyLanguage(el.langSel.value);
+    buildSettingsUI();
     renderSheet();
     onState();
   });
@@ -1722,6 +1726,7 @@ async function main() {
     const lang = urlLang ? urlLang : (savedSettings.lang || 'vi');
     el.langSel.value = lang === 'en' ? 'en' : 'vi';
     applyLanguage(el.langSel.value);
+    buildSettingsUI();
     el.ambientMode.value = savedSettings.ambientMode || 'off';
     el.showFps.checked = !!savedSettings.showFps;
     el.errorLog.checked = !!savedSettings.errorLog;
