@@ -1,0 +1,305 @@
+{
+  "schema": 1,
+  "packs": {
+    "bo": {
+      "done.png": {
+        "w": 160,
+        "h": 41,
+        "hash": "11009c887731ebd2a47de96ee2e8710729de691f5723e6384090674f955e3c70"
+      },
+      "drag.png": {
+        "w": 54,
+        "h": 34,
+        "hash": "25274d2a4aed68e41202fd7adb4c5d9b9244aa6df1dc71a5104616904fdb483d"
+      },
+      "error.png": {
+        "w": 96,
+        "h": 39,
+        "hash": "b878bd69d15943d8bfc158d2554410c054da1eb0a9cbeec4cf927b73fd34903d"
+      },
+      "idle.png": {
+        "w": 120,
+        "h": 35,
+        "hash": "f579fee8c63d6d42f151494a85dac90edfd533ecea8e3f2ffdcbd73b7732c48c"
+      },
+      "notification.png": {
+        "w": 90,
+        "h": 38,
+        "hash": "ff720f5181465f03a771fe8758b8c636205ba097a8372501075cafe43b88cca8"
+      },
+      "poke.png": {
+        "w": 87,
+        "h": 34,
+        "hash": "d37df0990de2f6f2b757b2dd792faf8b1065997dedc38afb1d5d168d9fd919b0"
+      },
+      "roam.png": {
+        "w": 54,
+        "h": 35,
+        "hash": "236cbf621a17952cc02beb1fbe51a4572fb76b4e8bbca0df95cc5b04fd03e313"
+      },
+      "sleeping.png": {
+        "w": 136,
+        "h": 44,
+        "hash": "3537df0d47869047ecb9d5f601b2b2dbf9f27a6d6ec3b9d52f5258d5616de6e8"
+      },
+      "thinking.png": {
+        "w": 128,
+        "h": 38,
+        "hash": "9ae45ee593052911c72af30826dad3bc71efc4d2256f7a48fb668527a75d5d83"
+      },
+      "tickle.png": {
+        "w": 58,
+        "h": 35,
+        "hash": "5c4ca718b24a8cdb74672dba870bd93f85af1135eb7d7958199a08d41702a048"
+      },
+      "waking.png": {
+        "w": 120,
+        "h": 37,
+        "hash": "103c48b23de5644cb6d30fcb594b5e04be3207fb5288dfabed552b269f616b71"
+      },
+      "working.png": {
+        "w": 54,
+        "h": 35,
+        "hash": "3669feb0434669f3683ca4e3f468d9c20c4a59675e2fe52c31ba8c4c11e05249"
+      }
+    },
+    "dsh-bot": {
+      "done.png": {
+        "w": 465,
+        "h": 88,
+        "hash": "49557eb8ecf176057c4addd1e440f0da87c23935c5275fa4c0d29159cd4dbeff"
+      },
+      "error.png": {
+        "w": 384,
+        "h": 84,
+        "hash": "004d167ba7794cd06ce106fd59e72cc22eb27729f22af9041dfd7c06dad97d42"
+      },
+      "idle.png": {
+        "w": 365,
+        "h": 85,
+        "hash": "3d2e6c27a29c60d62a89f915f4fe54ad0c7add758df084e5225ba36b16ed1952"
+      },
+      "notification.png": {
+        "w": 297,
+        "h": 89,
+        "hash": "996adbad15b20ed0f0a8c3165f93dabc6d503bf54aa09c8ba119c5cfa0c963ee"
+      },
+      "roam.png": {
+        "w": 320,
+        "h": 81,
+        "hash": "6d0922e55f97c13dbb2ee421a7da5c7d3541be1fbaf05f9804bb378892c4e4d7"
+      },
+      "sleeping.png": {
+        "w": 352,
+        "h": 83,
+        "hash": "61630600745118ec749b503a0a29bf3d573c9e759a3266330704f3081150bd1f"
+      },
+      "thinking.png": {
+        "w": 280,
+        "h": 86,
+        "hash": "007c179ef6dcbb13ed85215fd030fd37b76342a4d1dccdcfb3788d28b5e0ca53"
+      },
+      "tickle.png": {
+        "w": 352,
+        "h": 79,
+        "hash": "8cd64992b2c83afc2fa7c190e82dfe24e0474714aeebb3cedb19c23a51180d62"
+      },
+      "waking.png": {
+        "w": 303,
+        "h": 85,
+        "hash": "a559fb869c8db47790271c384b04ed31ae3a0c1fa2d36b8f530e6e143820f60d"
+      },
+      "working.png": {
+        "w": 344,
+        "h": 88,
+        "hash": "d882a1cd8b07d5861efbc52a0699f71e3a12a9b3335c95c3f31e00d7b06b7be4"
+      }
+    },
+    "may": {
+      "done.png": {
+        "w": 195,
+        "h": 36,
+        "hash": "ccb1b21d6313fe4ed753e138b7a9b79ef85766b44046c75e9fae3dd8123266c9"
+      },
+      "drag.png": {
+        "w": 78,
+        "h": 26,
+        "hash": "e873c3556d2fa637aaf574882ce2e4f946c3999b71a610ac6ba3af2b89195f58"
+      },
+      "error.png": {
+        "w": 123,
+        "h": 34,
+        "hash": "bc29379907364de7862b396db9e285dc0f780c53664a45d34720edc49a563eee"
+      },
+      "idle.png": {
+        "w": 156,
+        "h": 30,
+        "hash": "81d74b6d049f8facea99803d086adfa8bf409b60eac6305dac8e9430593aa254"
+      },
+      "notification.png": {
+        "w": 117,
+        "h": 33,
+        "hash": "e5053358c12bdb650b11fd34a9c4a6f04bf08933a0205ed04e337280ffd902a0"
+      },
+      "poke.png": {
+        "w": 123,
+        "h": 26,
+        "hash": "d2ef37c1a471f9558d345d9b849c20fb008e3725fb5bf530f76e364c251c3df8"
+      },
+      "roam.png": {
+        "w": 78,
+        "h": 27,
+        "hash": "91ad4596a848c433163c8ec3c73df40b8b40c6fbb46032d744fcc97656f9c1bf"
+      },
+      "sleeping.png": {
+        "w": 160,
+        "h": 39,
+        "hash": "8aa66095f33c138d168eaf1670e0aea7cac201e4adadf5e920b63d6a18c67eaf"
+      },
+      "thinking.png": {
+        "w": 156,
+        "h": 33,
+        "hash": "0b39945d50eb5a7dbc7dbe36ab5bd70465ec7f806b19f84b4a62604236073619"
+      },
+      "tickle.png": {
+        "w": 82,
+        "h": 27,
+        "hash": "2b3520657f1074a531e6e5e1b9f024f2edcadfb222306f0068d6c33e3de1098e"
+      },
+      "waking.png": {
+        "w": 156,
+        "h": 32,
+        "hash": "b7408b87fb3da909dbbbb750318130e7c445060befbfd80b405f07711ccc3e36"
+      },
+      "working.png": {
+        "w": 78,
+        "h": 27,
+        "hash": "7e6962e504c3fdfd37b941b58872fd5fdfd54ba689f4de388b97e8614e42124e"
+      }
+    },
+    "may-snow": {
+      "done.png": {
+        "w": 195,
+        "h": 36,
+        "hash": "af9dbf57e391c91c49037ee90fe8c1bd78ec081070214a841f7ebf2eed8d9ce8"
+      },
+      "drag.png": {
+        "w": 78,
+        "h": 26,
+        "hash": "33f68a08d827860c9e3cbe3c0d2f89f7c4232b963f49e808d35d8108721001e5"
+      },
+      "error.png": {
+        "w": 123,
+        "h": 34,
+        "hash": "ac1d873dcfb9307a6a7c3a2832e8561c5a7f6f5b16aeb05d7136b2d4bf85c2db"
+      },
+      "idle.png": {
+        "w": 156,
+        "h": 30,
+        "hash": "dce2313c83d4dffa0be1e7a54f40604d59d2daa8c501b4e8c8e7169ab996f28b"
+      },
+      "notification.png": {
+        "w": 117,
+        "h": 33,
+        "hash": "3a04ab01f28d06caa28bd6edc0f4b9362523549477b152dc3c0228ee3111c53a"
+      },
+      "poke.png": {
+        "w": 123,
+        "h": 26,
+        "hash": "e27b66a744beccbcdd93ca27ee21d716206375bc69ee789ad245d562171655b8"
+      },
+      "roam.png": {
+        "w": 78,
+        "h": 27,
+        "hash": "5934561d12d274e5677a9918b74d9e399625d01080101905c6f1cf241ba6e966"
+      },
+      "sleeping.png": {
+        "w": 160,
+        "h": 39,
+        "hash": "2fa62a086927ad341e900f9a3b88adba79a3b4b14e110ffba9e985fa2ca98cc4"
+      },
+      "thinking.png": {
+        "w": 156,
+        "h": 33,
+        "hash": "31eb43771917118ec14c15d77b81783a4d0f8a98e6599c27539aaf5aded34a32"
+      },
+      "tickle.png": {
+        "w": 82,
+        "h": 27,
+        "hash": "012cde7603e37b0c229e593d89c7971c9f6768a66ae5495db21ca45a090c5f79"
+      },
+      "waking.png": {
+        "w": 156,
+        "h": 32,
+        "hash": "b296abbcd9801b721c713cdfa396b2c997086a28f30182e7344a93e3dc1d3b27"
+      },
+      "working.png": {
+        "w": 78,
+        "h": 27,
+        "hash": "12082c33eebbad2817b73689b1fd2d00b74c68bc69d396d0ad89e28d0f031070"
+      }
+    },
+    "may-tet": {
+      "done.png": {
+        "w": 195,
+        "h": 36,
+        "hash": "7753a020bebe8156b04ca5334501db1b32005971555c7382cfad2a6bd0d5e6ef"
+      },
+      "drag.png": {
+        "w": 78,
+        "h": 26,
+        "hash": "0eaef8429aab78d82da8fcebaaa5c2beb262258c7ca64c1fd77b10077b2d9ff7"
+      },
+      "error.png": {
+        "w": 123,
+        "h": 34,
+        "hash": "0e661b0eed60dcd8e5e137c8004772f2a184f823fecfab2ffde045fc45a603d1"
+      },
+      "idle.png": {
+        "w": 156,
+        "h": 30,
+        "hash": "7bc2b8593189391f7b4f31378086cd25fd33bc21d39c4ad7d86ffe26ab7edbd5"
+      },
+      "notification.png": {
+        "w": 117,
+        "h": 33,
+        "hash": "a5449f2aef0b9814332c69fbd96c12c11bae96f1c55a898835b774d6dca37dcc"
+      },
+      "poke.png": {
+        "w": 123,
+        "h": 26,
+        "hash": "b184d5019c4218432a9111735e36152e616e39ef39ced3be0e04b59ec49f9e2a"
+      },
+      "roam.png": {
+        "w": 78,
+        "h": 27,
+        "hash": "882d5fd9cc6c10860c9b31ce56899ccbd020281360fabf01981df3a670e40ac1"
+      },
+      "sleeping.png": {
+        "w": 160,
+        "h": 39,
+        "hash": "f3e702daab97d2d451a0c04d63656883b7f24a74185b8fc878d3acf8dc74d8a7"
+      },
+      "thinking.png": {
+        "w": 156,
+        "h": 33,
+        "hash": "86256dd4915414d707cdbc1d1352f201121eaaa657c5484e49859b40a0a24aac"
+      },
+      "tickle.png": {
+        "w": 82,
+        "h": 27,
+        "hash": "93122a2b4c78ef7069a44a6a192b5da751df64a8dd70dfcd6dac0f6193a2983a"
+      },
+      "waking.png": {
+        "w": 156,
+        "h": 32,
+        "hash": "8a0dd9ebc4f4a839ed5412adb28c77efeb9ecb8839568045fcd7555ab3a65939"
+      },
+      "working.png": {
+        "w": 78,
+        "h": 27,
+        "hash": "6bb0df9aca3f99e6c5eea03fd2b780c6d1dbb0977e772ce71f7bbfd73b7f4171"
+      }
+    }
+  }
+}
