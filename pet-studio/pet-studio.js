@@ -7,6 +7,7 @@ import { todayKey, bumpStreak, questDone, clock } from './care.js';
 import { shareUrl, pickConfig, decodeConfig } from './share.js';
 import { encodeGif, quantize } from './gif.js';
 import { seasonFor, SEASON_PACK } from './season.js';
+import qrcode from './vendor/qrcode.mjs';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
 
 const FALLBACK_PACKS = [
@@ -119,6 +120,12 @@ const el = {
   agentChip: document.getElementById('agentChip'),
   exportPng: document.getElementById('exportPng'),
   exportGif: document.getElementById('exportGif'),
+  shareQr: document.getElementById('shareQr'),
+  qrModal: document.getElementById('qrModal'),
+  qrCanvas: document.getElementById('qrCanvas'),
+  qrUrl: document.getElementById('qrUrl'),
+  qrSave: document.getElementById('qrSave'),
+  qrClose: document.getElementById('qrClose'),
 };
 const ctx = el.canvas.getContext('2d');
 
@@ -952,6 +959,37 @@ function exportPng() {
   }
 }
 
+function showQr() {
+  try {
+    const url = shareUrl(location.origin + location.pathname, pickConfig(readStore()));
+    const qr = qrcode(0, 'M');
+    qr.addData(url);
+    qr.make();
+    const count = qr.getModuleCount();
+    const scale = 8;
+    const quiet = 4;
+    const size = (count + quiet * 2) * scale;
+    const canvas = el.qrCanvas;
+    canvas.width = size;
+    canvas.height = size;
+    const g = canvas.getContext('2d');
+    g.fillStyle = '#ffffff';
+    g.fillRect(0, 0, size, size);
+    g.fillStyle = '#10141c';
+    for (let y = 0; y < count; y++) {
+      for (let x = 0; x < count; x++) {
+        if (qr.isDark(y, x)) g.fillRect((x + quiet) * scale, (y + quiet) * scale, scale, scale);
+      }
+    }
+    el.qrUrl.textContent = url;
+    el.qrModal.hidden = false;
+    logEvent('mở mã QR cấu hình');
+  } catch (err) {
+    console.error(err);
+    setStatus('QR lỗi: ' + err.message);
+  }
+}
+
 async function shareConfig() {
   const url = shareUrl(location.origin + location.pathname, pickConfig(readStore()));
   try {
@@ -1053,6 +1091,22 @@ function bindSheet() {
   el.agentStart.addEventListener('click', () => startAgent((el.agentUrl.value || '').trim()));
   el.agentStop.addEventListener('click', stopAgent);
   el.shareConfig.addEventListener('click', shareConfig);
+  el.shareQr.addEventListener('click', showQr);
+  el.qrClose.addEventListener('click', () => { el.qrModal.hidden = true; });
+  el.qrSave.addEventListener('click', () => {
+    try {
+      const b64 = el.qrCanvas.toDataURL('image/png').split(',')[1];
+      if (window.AndroidPet && window.AndroidPet.savePng) {
+        window.AndroidPet.savePng(b64, 'pet-qr.png');
+        setStatus('đã lưu mã QR vào Download/DSH-Go');
+      } else {
+        const a = document.createElement('a');
+        a.href = 'data:image/png;base64,' + b64;
+        a.download = 'pet-qr.png';
+        a.click();
+      }
+    } catch (err) { setStatus('lưu QR lỗi: ' + err.message); }
+  });
   el.exportPng.addEventListener('click', exportPng);
   el.exportGif.addEventListener('click', exportGif);
   el.focusStart.addEventListener('click', () => startMinuteTimer('focus', readStore().focusMinutes));
@@ -1325,6 +1379,9 @@ async function main() {
     const agentParam = new URLSearchParams(location.search).get('agent');
     if (agentParam === 'demo') startAgent('./agent.json');
     else if (agentParam && /^https?:/.test(agentParam)) startAgent(agentParam);
+    if (new URLSearchParams(location.search).get('qr') === '1') {
+      setTimeout(showQr, 800);
+    }
     if (new URLSearchParams(location.search).get('gif') === '1') {
       setTimeout(exportGif, 900);
     }

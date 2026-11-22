@@ -246,3 +246,15 @@ body.pip .bubble { display: none !important; }
 .agent-chip { margin: 6px 0 0; font-size: 12px; color: #8fd0ff;
   background: rgba(99,179,255,.08); border: 1px solid rgba(99,179,255,.25);
   border-radius: 9px; padding: 6px 9px; }
+
+.qr-modal { position: fixed; inset: 0; z-index: 21; display: grid; place-items: center;
+  background: rgba(4,8,14,.78); padding: 18px; }
+.qr-modal[hidden] { display: none; }
+.qr-card { background: #fff; color: #10141c; border-radius: 16px; padding: 16px;
+  width: min(320px, 100%); text-align: center; }
+.qr-card h2 { margin: 0 0 10px; font-size: 16px; }
+.qr-card canvas { width: 100%; height: auto; image-rendering: pixelated; }
+.qr-card p { font-size: 10.5px; color: #4b5a70; word-break: break-all; margin: 8px 0 10px; }
+.qr-card .row { justify-content: center; }
+.qr-card button { background: #10141c; color: #e9eef7; border: 0; border-radius: 9px;
+  padding: 9px 12px; font: inherit; font-size: 13px; }
