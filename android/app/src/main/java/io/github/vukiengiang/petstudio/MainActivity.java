@@ -440,7 +440,12 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (webView != null) webView.onResume();
+        if (webView != null) {
+            webView.onResume();
+            boolean quiet = getSharedPreferences(PetQuietTileService.PREFS, MODE_PRIVATE)
+                    .getBoolean(PetQuietTileService.KEY_QUIET, false);
+            webView.evaluateJavascript("window.__setQuiet && window.__setQuiet(" + quiet + ");", null);
+        }
     }
 
     @Override

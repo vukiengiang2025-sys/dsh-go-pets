@@ -853,6 +853,12 @@ function resetAll() {
 }
 
 window.__setPip = on => document.body.classList.toggle('pip', !!on);
+window.__setQuiet = on => {
+  el.quiet.checked = !!on;
+  if (model) model.quiet = !!on;
+  writeStore({ quiet: !!on });
+  if (on) hideBubble();
+};
 
 function bytesToBase64(bytes) {
   let bin = '';
