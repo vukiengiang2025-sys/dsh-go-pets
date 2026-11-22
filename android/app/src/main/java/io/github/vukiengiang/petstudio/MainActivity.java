@@ -6,6 +6,8 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.WallpaperManager;
+import android.content.ComponentName;
 import android.app.PictureInPictureParams;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -349,6 +351,20 @@ public class MainActivity extends Activity {
             stopService(new Intent(MainActivity.this, PetOverlayService.class));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(MainActivity.this)) return;
             startService(new Intent(MainActivity.this, PetOverlayService.class));
+        }
+
+        @JavascriptInterface
+        public void openWallpaper() {
+            runOnUiThread(() -> {
+                try {
+                    Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+                    intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                            new ComponentName(MainActivity.this, PetWallpaperService.class));
+                    startActivity(intent);
+                } catch (Exception err) {
+                    Log.e(TAG, "wallpaper intent failed", err);
+                }
+            });
         }
 
         @JavascriptInterface

@@ -152,6 +152,7 @@ const el = {
   overlaySize: document.getElementById('overlaySize'),
   overlayStop: document.getElementById('overlayStop'),
   openAod: document.getElementById('openAod'),
+  openWallpaper: document.getElementById('openWallpaper'),
   openWheel: document.getElementById('openWheel'),
   wheel: document.getElementById('wheel'),
   openMarket: document.getElementById('openMarket'),
@@ -1560,6 +1561,10 @@ function bindSheet() {
     } else {
       setStatus('chỉ chạy trong app Android');
     }
+  });
+  el.openWallpaper.addEventListener('click', () => {
+    if (window.AndroidPet && window.AndroidPet.openWallpaper) window.AndroidPet.openWallpaper();
+    else setStatus(pick('chỉ chạy trong app Android', 'Android app only'));
   });
   el.openAod.addEventListener('click', () => {
     if (window.AndroidPet && window.AndroidPet.openAod) window.AndroidPet.openAod();

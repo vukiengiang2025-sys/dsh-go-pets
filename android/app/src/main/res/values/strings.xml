@@ -10,6 +10,7 @@
     <string name="widget_description">Pet nhỏ trên màn hình chính: chạm để mở Pet Studio.</string>
     <string name="tile_quiet">Pet im lặng</string>
     <string name="aod_hint">Chạm để mở Pet Studio</string>
+    <string name="wallpaper_description">Pet nhỏ bơi trên hình nền, kèm đồng hồ.</string>
     <string name="widget_clock_name">Pet &amp; giờ</string>
     <string name="widget_clock_description">Pet nhỏ kèm đồng hồ trên màn hình chính.</string>
 </resources>
