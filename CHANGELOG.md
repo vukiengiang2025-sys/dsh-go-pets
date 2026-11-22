@@ -1,5 +1,19 @@
 # Thay đổi gần đây
 
+## 4.47.1
+- Nut xoa API key da luu.
+
+## 4.47.0
+- Ban sao luu JSON khong chua API key.
+
+## 4.46.0
+- Chip AI tren header, cham de bat/tat nhanh.
+
+## 4.45.x
+- Loi chao theo gio moi ngay (offline), sua loi commit thieu noi dung.
+
+
+
 ## 4.29.0
 - Footer hiện đúng phiên bản APK (native truyền v).
 - Header Cài đặt dính khi cuộn.
