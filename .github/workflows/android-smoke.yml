@@ -55,7 +55,7 @@ jobs:
             set -e
             adb() { timeout 30 command adb "$@"; }
             adb uninstall io.github.vukiengiang.petstudio || true
-            gradle -p android connectedDebugAndroidTest --no-daemon --stacktrace
+            timeout 360 gradle -p android connectedDebugAndroidTest --no-daemon --stacktrace
             adb install PetStudio.apk
             adb shell am start -W -n io.github.vukiengiang.petstudio/.MainActivity
             sleep 14
