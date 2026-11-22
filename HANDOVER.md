@@ -22,6 +22,20 @@ Xem [STATUS.md](STATUS.md): **58 xong · 11 một phần · 31 hoãn** trên 100
 4. **Nén atlas (84)** — giảm dung lượng pack (PNG palette/WebP) và đo lại.
 5. **AOD / live wallpaper (54, 58)** — chỉ nên làm nếu thật sự cần; tốn pin và quyền.
 
+## Vì sao dừng ở đây (chờ quyết định)
+
+Mục tiêu “triển khai 100 ý tưởng” đã đi được 59 xong, 11 một phần, 30 hoãn.
+30 mục còn lại **không thể tự làm tiếp một cách an toàn** vì cần một trong các thứ sau:
+
+1. Backend + kiểm duyệt cho chợ pack/xếp hạng/ủng hộ.
+2. Bộ art mới (pack nghề, động vật, template).
+3. Quyền hệ thống Android cho overlay/AOD/live wallpaper (dễ bị ROM chặn, tốn pin).
+4. Giao thức engine DSH cho WebSocket/mở hội thoại/đa host.
+5. Quyết định phạm vi cho 11 mục một phần (i18n, mini mode, bộ sưu tập…).
+
+Khi bạn chọn hướng, mình có thể mở lại và làm tiếp từng đợt như trước.
+Repo, APK và CI vẫn đang ở trạng thái chạy được.
+
 ## Cần bạn quyết định
 
 | Việc | Vì sao cần bạn |
