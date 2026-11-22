@@ -4,6 +4,7 @@ import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } fro
 import { shouldRemind, breakText } from './reminders.js';
 import { replyTo, storyFor, summaryFrom } from './pet-chat.js';
 import { todayKey, bumpStreak, questDone, clock } from './care.js';
+import { shareUrl, pickConfig, decodeConfig } from './share.js';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
 
 const FALLBACK_PACKS = [
@@ -107,6 +108,8 @@ const el = {
   breakStart: document.getElementById('breakStart'),
   focusStop: document.getElementById('focusStop'),
   timerLine: document.getElementById('timerLine'),
+  shareConfig: document.getElementById('shareConfig'),
+  exportPng: document.getElementById('exportPng'),
 };
 const ctx = el.canvas.getContext('2d');
 
@@ -803,6 +806,57 @@ function resetAll() {
 
 window.__setPip = on => document.body.classList.toggle('pip', !!on);
 
+function exportPng() {
+  try {
+    const out = document.createElement('canvas');
+    out.width = Math.max(1, el.canvas.width * 2);
+    out.height = Math.max(1, el.canvas.height * 2);
+    const octx = out.getContext('2d');
+    octx.imageSmoothingEnabled = false;
+    octx.drawImage(el.canvas, 0, 0, out.width, out.height);
+    const b64 = out.toDataURL('image/png').split(',')[1];
+    if (window.AndroidPet && typeof window.AndroidPet.savePng === 'function') {
+      window.AndroidPet.savePng(b64, 'pet-studio-' + Date.now() + '.png');
+      setStatus('đã lưu ảnh vào Download/DSH-Go');
+    } else {
+      const link = document.createElement('a');
+      link.href = 'data:image/png;base64,' + b64;
+      link.download = 'pet-studio.png';
+      link.click();
+      setStatus('đã xuất ảnh');
+    }
+    haptic(10);
+    logEvent('xuất ảnh pet');
+  } catch (err) {
+    console.error(err);
+    setStatus('xuất ảnh lỗi: ' + err.message);
+  }
+}
+
+async function shareConfig() {
+  const url = shareUrl(location.origin + location.pathname, pickConfig(readStore()));
+  try {
+    await navigator.clipboard.writeText(url);
+    setStatus('đã chép liên kết cấu hình');
+  } catch {
+    el.backupBox.value = url;
+    el.backupBox.select();
+    setStatus('trình duyệt chặn clipboard — liên kết đã vào ô bên dưới');
+  }
+  logEvent('chia sẻ cấu hình');
+}
+
+function applySharedConfig() {
+  const hash = location.hash || '';
+  if (!hash.startsWith('#cfg=')) return false;
+  const config = decodeConfig(hash.slice(5));
+  if (!config) return false;
+  writeStore(config);
+  history.replaceState(null, '', location.pathname + location.search);
+  location.reload();
+  return true;
+}
+
 function bindPip() {
   if (new URLSearchParams(location.search).get('pip') === '1') {
     document.body.classList.add('pip');
@@ -872,6 +926,8 @@ function bindSheet() {
     const s = readStore();
     petSay(summaryFrom(s.stats, s.memories));
   });
+  el.shareConfig.addEventListener('click', shareConfig);
+  el.exportPng.addEventListener('click', exportPng);
   el.focusStart.addEventListener('click', () => startMinuteTimer('focus', readStore().focusMinutes));
   el.breakStart.addEventListener('click', () => startMinuteTimer('break', readStore().restMinutes));
   el.focusStop.addEventListener('click', stopFocus);
@@ -1077,6 +1133,7 @@ function bindLifecycle() {
 }
 
 async function main() {
+  if (applySharedConfig()) return;
   await loadPacks();
   renderPackOptions();
 
@@ -1130,6 +1187,9 @@ async function main() {
     const importDemo = new URLSearchParams(location.search).get('import');
     if (importDemo === 'demo') demoImport();
     else if (importDemo === 'zip') demoZipImport();
+    if (new URLSearchParams(location.search).get('export') === '1') {
+      setTimeout(exportPng, 700);
+    }
     if (new URLSearchParams(location.search).get('chat') === 'demo') {
       setTimeout(() => sendChat('xin chào'), 800);
     }

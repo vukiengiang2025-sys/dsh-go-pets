@@ -3,12 +3,15 @@ package io.github.vukiengiang.petstudio;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PictureInPictureParams;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,6 +33,10 @@ import androidx.annotation.Nullable;
 import androidx.webkit.WebResourceErrorCompat;
 import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewClientCompat;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 /**
  * Vỏ Android cho Pet Studio: WebView nạp tài nguyên đóng gói trong APK
@@ -156,7 +163,8 @@ public class MainActivity extends Activity {
         });
 
         if (savedInstanceState == null) {
-            webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent()), chatOf(getIntent()), pipOnLoad, introOf(getIntent())));
+            webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent()), chatOf(getIntent()),
+                    pipOnLoad, introOf(getIntent()), exportOf(getIntent())));
         } else {
             webView.restoreState(savedInstanceState);
         }
@@ -167,7 +175,7 @@ public class MainActivity extends Activity {
     }
 
     private static String startUrl(@Nullable String pack, @Nullable String fx, @Nullable String chat,
-                                   boolean pip, boolean intro) {
+                                   boolean pip, boolean intro, boolean export) {
         String url = START_URL;
         if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
             url += "&pack=" + pack;
@@ -184,6 +192,9 @@ public class MainActivity extends Activity {
         if (intro) {
             url += "&intro=1";
         }
+        if (export) {
+            url += "&export=1";
+        }
         return url;
     }
 
@@ -199,12 +210,16 @@ public class MainActivity extends Activity {
         return intent != null && intent.getBooleanExtra("intro", false);
     }
 
+    private static boolean exportOf(@Nullable Intent intent) {
+        return intent != null && intent.getBooleanExtra("export", false);
+    }
+
     @Override
     protected void onNewIntent(@NonNull Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
         if (webView != null) {
-            webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent), false, introOf(intent)));
+            webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent), false, introOf(intent), exportOf(intent)));
         }
     }
 
@@ -236,6 +251,44 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void updateWidget(String state) {
             runOnUiThread(() -> PetWidgetProvider.updateAll(MainActivity.this, state));
+        }
+
+        @JavascriptInterface
+        public void savePng(String base64, String name) {
+            runOnUiThread(() -> savePngFile(base64, name));
+        }
+    }
+
+    private void savePngFile(String base64, String name) {
+        try {
+            byte[] data = Base64.decode(base64, Base64.DEFAULT);
+            String safe = (name == null || !name.matches("[A-Za-z0-9._-]{1,40}")) ? "pet-studio.png" : name;
+            Uri uri = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.MediaColumns.DISPLAY_NAME, safe);
+                values.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+                values.put(MediaStore.MediaColumns.RELATIVE_PATH,
+                        Environment.DIRECTORY_DOWNLOADS + "/DSH-Go");
+                uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                if (uri != null) {
+                    try (OutputStream out = getContentResolver().openOutputStream(uri)) {
+                        if (out != null) out.write(data);
+                    }
+                }
+            }
+            if (uri == null) {
+                File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                File file = new File(dir, safe);
+                try (FileOutputStream out = new FileOutputStream(file)) {
+                    out.write(data);
+                }
+                Log.d(TAG, "saved png " + file.getAbsolutePath());
+            } else {
+                Log.d(TAG, "saved png " + uri);
+            }
+        } catch (Exception err) {
+            Log.e(TAG, "savePng failed", err);
         }
     }
 
