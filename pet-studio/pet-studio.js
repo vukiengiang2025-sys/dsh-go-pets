@@ -143,6 +143,7 @@ const el = {
   aiOn: document.getElementById('aiOn'),
   aiGreet: document.getElementById('aiGreet'),
   aiTest: document.getElementById('aiTest'),
+  aiRetest: document.getElementById('aiRetest'),
   aiStatus: document.getElementById('aiStatus'),
   agentHosts: document.getElementById('agentHosts'),
   saveHost: document.getElementById('saveHost'),
@@ -1744,6 +1745,13 @@ function bindSheet() {
   el.aiOn.addEventListener('change', () => {
     writeStore({ aiOn: el.aiOn.checked });
     if (el.aiStatus) el.aiStatus.textContent = el.aiOn.checked ? 'đã bật' : 'đã tắt';
+  });
+  el.aiRetest.addEventListener('click', () => {
+    writeStore({ aiTestAt: 0 });
+    el.aiTest.click();
+  });
+  el.quickInput.addEventListener('focus', () => {
+    setTimeout(() => el.quickInput.scrollIntoView({ block: 'center', behavior: 'smooth' }), 280);
   });
   el.aiTest.addEventListener('click', async () => {
     const s = readStore();
