@@ -790,9 +790,13 @@ function spawnFx(kind) {
   const c = petCenter();
   particles.push(...spawnParticles(kind, c.x, c.y).map(p => ({ ...p, kind })));
 }
+let pathMode = false;
+let walkTarget = null;
+let walkPos = { x: 0, y: 0 };
+
 function applyPetTransform() {
-  const tx = look.x + (thrower ? thrower.x : 0);
-  const ty = look.y + (thrower ? thrower.y : 0);
+  const tx = look.x + (thrower ? thrower.x : 0) + walkPos.x;
+  const ty = look.y + (thrower ? thrower.y : 0) + walkPos.y;
   el.pet.style.transform = 'translateY(-26px) translate(' + tx.toFixed(2) + 'px, ' + ty.toFixed(2)
     + 'px) scale(' + (1 + (1 - squash) * 0.55).toFixed(3) + ', ' + squash.toFixed(3) + ')';
 }
@@ -866,9 +870,30 @@ function draw(now) {
   look.x += (look.tx - look.x) * 0.12;
   look.y += (look.ty - look.y) * 0.12;
   squash += (1 - squash) * 0.16;
+  if (walkTarget) {
+    const dx = walkTarget.x - walkPos.x;
+    const dy = walkTarget.y - walkPos.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 3) {
+      walkTarget = null;
+    } else {
+      walkPos.x += (dx / dist) * 2.2;
+      walkPos.y += (dy / dist) * 2.2;
+    }
+  }
   applyPetTransform();
   stepParticles(particles, dt);
   drawFx();
+  if (walkTarget) {
+    fxCtx.save();
+    fxCtx.strokeStyle = 'rgba(150,200,255,.6)';
+    fxCtx.setLineDash([4, 4]);
+    fxCtx.beginPath();
+    fxCtx.moveTo(el.canvas.width / 2, el.canvas.height * 0.7);
+    fxCtx.lineTo(el.canvas.width / 2 + walkTarget.x, el.canvas.height * 0.7 + walkTarget.y);
+    fxCtx.stroke();
+    fxCtx.restore();
+  }
 
   const frameIndex = out ? (reduceMotion ? 0 : out.frame) : 0;
   const key = out ? out.name + ':' + frameIndex : '';
@@ -1634,6 +1659,12 @@ function bindStage() {
   el.moodMenu.addEventListener('click', ev => {
     const b = ev.target.closest('button[data-mood]');
     if (!b) return;
+    if (b.dataset.mood === 'path') {
+      pathMode = true;
+      hideMood();
+      setStatus(pick('chạm vào chỗ muốn pet đi tới', 'tap where the pet should walk'));
+      return;
+    }
     if (b.dataset.mood === 'stretch') {
       el.stage.classList.add('stretching');
       setTimeout(() => el.stage.classList.remove('stretching'), 700);
@@ -1649,6 +1680,19 @@ function bindStage() {
     const r = el.canvas.getBoundingClientRect();
     return { x: ev.clientX - r.left, y: ev.clientY - r.top, w: r.width };
   };
+  el.stage.addEventListener('pointerdown', ev => {
+    if (!pathMode) return;
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    pathMode = false;
+    const rect = el.canvas.getBoundingClientRect();
+    walkTarget = {
+      x: Math.max(-90, Math.min(90, ev.clientX - rect.left - rect.width / 2)),
+      y: Math.max(-80, Math.min(80, ev.clientY - rect.top - rect.height * 0.7)),
+    };
+    haptic(8);
+    logEvent('dạy pet đi');
+  }, true);
   el.stage.addEventListener('pointerdown', ev => {
     el.stage.setPointerCapture(ev.pointerId);
     const p = pos(ev);
@@ -1914,6 +1958,9 @@ async function main() {
     }
     if (new URLSearchParams(location.search).get('market') === '1') {
       setTimeout(showMarket, 900);
+    }
+    if (new URLSearchParams(location.search).get('walk') === '1') {
+      setTimeout(() => { walkTarget = { x: 70, y: -10 }; }, 900);
     }
     if (new URLSearchParams(location.search).get('mood') === '1') {
       setTimeout(() => { el.moodMenu.hidden = false; }, 900);
