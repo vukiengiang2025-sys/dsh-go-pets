@@ -62,6 +62,7 @@ const el = {
   version: document.getElementById('version'),
   petName: document.getElementById('petName'),
   openSettings: document.getElementById('openSettings'),
+  pipBtn: document.getElementById('pipBtn'),
   sheet: document.getElementById('sheet'),
   backdrop: document.getElementById('backdrop'),
   closeSheet: document.getElementById('closeSheet'),
@@ -714,6 +715,13 @@ function resetAll() {
   location.reload();
 }
 
+function bindPip() {
+  const bridge = window.AndroidPet;
+  if (!bridge || typeof bridge.isPipSupported !== 'function' || !bridge.isPipSupported()) return;
+  el.pipBtn.hidden = false;
+  el.pipBtn.addEventListener('click', () => bridge.enterPip());
+}
+
 function bindSheet() {
   el.openSettings.addEventListener('click', () => openSheet(true));
   el.closeSheet.addEventListener('click', () => openSheet(false));
@@ -978,6 +986,7 @@ async function main() {
   bindStage();
   bindControls();
   bindSheet();
+  bindPip();
   bindLifecycle();
   setInterval(checkBreak, 60000);
   setInterval(() => {

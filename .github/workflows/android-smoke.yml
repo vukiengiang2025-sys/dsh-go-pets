@@ -54,7 +54,12 @@ jobs:
             adb shell am start -W -n io.github.vukiengiang.petstudio/.MainActivity --es chat demo
             sleep 6
             adb exec-out screencap -p > app-chat.png
-            ls -l app.png app-bot.png app-fx.png app-chat.png
+            adb shell am force-stop io.github.vukiengiang.petstudio
+            sleep 2
+            adb shell am start -W -n io.github.vukiengiang.petstudio/.MainActivity --ez pip true
+            sleep 7
+            adb exec-out screencap -p > app-pip.png
+            ls -l app.png app-bot.png app-fx.png app-chat.png app-pip.png
             adb logcat -d -s PetStudio | tail -30 || true
 
       - uses: actions/upload-artifact@v4
@@ -65,4 +70,5 @@ jobs:
             app-bot.png
             app-fx.png
             app-chat.png
+            app-pip.png
           if-no-files-found: error

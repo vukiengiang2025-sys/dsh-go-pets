@@ -2,15 +2,21 @@ package io.github.vukiengiang.petstudio;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.PictureInPictureParams;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Rational;
 import android.view.View;
 import android.view.Window;
 import android.webkit.ConsoleMessage;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -41,6 +47,7 @@ public class MainActivity extends Activity {
     private WebView webView;
     private WebViewAssetLoader assetLoader;
     private ValueCallback<Uri[]> filePathCallback;
+    private boolean pipOnLoad;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -83,7 +90,18 @@ public class MainActivity extends Activity {
                 .addPathHandler("/", new WebViewAssetLoader.AssetsPathHandler(this))
                 .build();
 
+        pipOnLoad = getIntent() != null && getIntent().getBooleanExtra("pip", false);
+        webView.addJavascriptInterface(new PipBridge(), "AndroidPet");
+
         webView.setWebViewClient(new WebViewClientCompat() {
+            @Override
+            public void onPageFinished(@NonNull WebView view, String url) {
+                super.onPageFinished(view, url);
+                if (pipOnLoad) {
+                    pipOnLoad = false;
+                    view.postDelayed(MainActivity.this::enterPip, 900);
+                }
+            }
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(@NonNull WebView view,
@@ -189,6 +207,40 @@ public class MainActivity extends Activity {
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public class PipBridge {
+        @JavascriptInterface
+        public boolean isPipSupported() {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                    && getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
+        }
+
+        @JavascriptInterface
+        public void enterPip() {
+            runOnUiThread(MainActivity.this::enterPip);
+        }
+    }
+
+    private void enterPip() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) return;
+        try {
+            PictureInPictureParams.Builder builder = new PictureInPictureParams.Builder()
+                    .setAspectRatio(new Rational(1, 1));
+            enterPictureInPictureMode(builder.build());
+        } catch (Exception err) {
+            Log.e(TAG, "enterPip failed", err);
+        }
+    }
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean inPip, @NonNull Configuration config) {
+        super.onPictureInPictureModeChanged(inPip, config);
+        if (webView != null) {
+            webView.evaluateJavascript(
+                    "document.body.classList.toggle('pip', " + inPip + ");", null);
+        }
     }
 
     @Override

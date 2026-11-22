@@ -221,3 +221,9 @@ label.check input { width: 18px; height: 18px; accent-color: var(--accent); }
   background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px;
   font-size: 12.5px; }
 .memories:empty::before { content: "chưa có gì"; color: #6c7a90; font-size: 12.5px; }
+
+body.pip .bar, body.pip .panel, body.pip .foot { display: none !important; }
+body.pip main { padding: 0; max-width: none; height: 100vh; }
+body.pip .stage { max-height: none; height: 100vh; border: 0; border-radius: 0; }
+body.pip .pet { transform: translateY(-6px) !important; }
+body.pip .bubble { display: none !important; }
