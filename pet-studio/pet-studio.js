@@ -442,7 +442,10 @@ let aiSlowTimer = 0;
 function renderAiUsage() {
   if (!el.aiUsage) return;
   const s = readStore();
-  el.aiUsage.textContent = (s.aiCalls || 0) + pick(' lần gọi · ~', ' calls · ~') + (s.aiTokens || 0) + pick(' token (ước lượng)', ' tokens (approx)');
+  const many = (s.aiTokens || 0) >= 100000;
+  el.aiUsage.textContent = (s.aiCalls || 0) + pick(' lần gọi · ~', ' calls · ~') + (s.aiTokens || 0)
+    + pick(' token (ước lượng)', ' tokens (approx)') + (many ? pick(' · đã dùng nhiều', ' · heavy use') : '');
+  el.aiUsage.classList.toggle('warn', many);
 }
 
 function bumpAiUsage(promptText, replyText) {
