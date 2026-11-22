@@ -1574,6 +1574,13 @@ function bindStage() {
   el.moodMenu.addEventListener('click', ev => {
     const b = ev.target.closest('button[data-mood]');
     if (!b) return;
+    if (b.dataset.mood === 'stretch') {
+      el.stage.classList.add('stretching');
+      setTimeout(() => el.stage.classList.remove('stretching'), 700);
+      petSay(pick('Vươn vai một cái nào!', 'Time to stretch!'));
+      hideMood();
+      return;
+    }
     model.setState(b.dataset.mood);
     petSay(b.dataset.mood === 'attention' ? 'Mình vui lắm!' : b.dataset.mood === 'sleeping' ? 'Mình buồn ngủ…' : 'Hừm, mình đang hờn.');
     hideMood();

@@ -2,8 +2,8 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **70 xong** (có trong APK)
-- 🟡 **7 một phần** (có nền tảng, thiếu phần còn lại)
+- ✅ **71 xong** (có trong APK)
+- 🟡 **6 một phần** (có nền tảng, thiếu phần còn lại)
 - ⏸ **23 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
@@ -35,7 +35,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 16 | Hạt (tim/zzz/sparkles) | ✅ |
 | 17 | Crossfade | ✅ |
 | 18 | Nhịp thở khi nền | ⏸ app dừng vẽ khi ẩn |
-| 19 | Vươn vai | 🟡 squash/stretch |
+| 19 | Vươn vai | ✅ nút vươn vai trong menu cảm xúc |
 | 20 | Buồn ngủ theo giờ | ✅ qua auto-theme/season |
 
 ## C. Tương tác (10)

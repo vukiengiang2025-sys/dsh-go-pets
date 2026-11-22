@@ -314,3 +314,11 @@ html[lang="en"] .error-list:empty::before { content: "no errors yet"; }
 .collection span { font-size: 11px; color: #6c7a90; background: #0f1622; border: 1px solid var(--line);
   border-radius: 8px; padding: 6px; text-align: center; }
 .collection span.got { color: #c8f7d0; border-color: #2f6b46; background: #12241a; }
+
+@keyframes pet-stretch {
+  0% { transform: scale(1, 1); }
+  35% { transform: scale(0.94, 1.14); }
+  70% { transform: scale(1.04, 0.96); }
+  100% { transform: scale(1, 1); }
+}
+.stage.stretching .pet { animation: pet-stretch .65s ease !important; }
