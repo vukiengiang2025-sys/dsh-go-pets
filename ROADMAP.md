@@ -15,7 +15,7 @@ nền tảng Android → cộng đồng → kỹ thuật → sản phẩm.
 | **E. Tích hợp agent** | 41–50 | WebSocket, tool bubble, subagent, màu host, mở hội thoại, widget trạng thái, lỗi + log, nhiều host | 41 bản HTTP endpoint; 43 tool bubble, 45 subagent (trong payload) |
 | **F. Android** | 51–60 | overlay, widget, QS tile, live wallpaper, notification, PiP, pin/sạc, AOD, splash (59 đã có), AAB | 52 xong (provider + cập nhật trạng thái); 56 thử nghiệm; 59 đã có |
 | **H. Cộng đồng** | 71–78 | chợ pack, link, GIF, QR, xếp hạng, bình chọn, gallery, chia sẻ cấu hình | 72, 73, 78 xong; còn QR/chợ/gallery |
-| **I. Kỹ thuật** | 81–90 | Espresso, golden, FPS/pin, nén atlas, lazy pack, chữ ký, quyền, crash opt-in, A/B, AAB | một phần |
+| **I. Kỹ thuật** | 81–90 | Espresso, golden, FPS/pin, nén atlas, lazy pack, chữ ký, quyền, crash opt-in, A/B, AAB | 81, 90 xong; còn golden/FPS |
 | **J. Sản phẩm** | 91–100 | onboarding, nhiệm vụ, streak, nghỉ mắt, Pomodoro, âm thanh, ủng hộ, tặng pet, widget đôi, roadmap | 91–93, 95 xong; 94 gộp vào 37 |
 
 ## Chống chồng chéo
