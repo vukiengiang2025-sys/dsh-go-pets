@@ -476,3 +476,6 @@ button.ai-chip { cursor: pointer; font: inherit; font-size: 11px; }
 .bubble { top: auto; bottom: 52%; max-width: min(320px, 80%); border-radius: 14px; }
 
 .ab-b .bubble { background: #16213a; color: #e9eef7; border: 1px solid rgba(120,150,190,.3); }
+
+.sheet-nav button.active { background: rgba(110,168,255,.22); border-color: rgba(110,168,255,.6); color: #dcebff; }
+.sheet-nav button:first-child.active, .sheet-nav button.active { font-weight: 600; }

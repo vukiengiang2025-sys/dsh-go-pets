@@ -1920,6 +1920,7 @@ function bindSheet() {
     btn.addEventListener('click', () => {
       const target = document.getElementById(btn.dataset.goto);
       if (target) target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      document.querySelectorAll('.sheet-nav [data-goto]').forEach(b => b.classList.toggle('active', b === btn));
     });
   });
   el.openMarket.addEventListener('click', showMarket);
