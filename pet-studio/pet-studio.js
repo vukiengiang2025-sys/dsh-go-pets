@@ -52,7 +52,7 @@ const DEFAULT_STORE = {
   chat: [], memories: [],
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
-  ambientMode: 'off', ambientVolume: 0.35,
+  ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [],
 };
 
 const el = {
@@ -124,6 +124,10 @@ const el = {
   agentLine: document.getElementById('agentLine'),
   agentChip: document.getElementById('agentChip'),
   batteryChip: document.getElementById('batteryChip'),
+  fpsChip: document.getElementById('fpsChip'),
+  showFps: document.getElementById('showFps'),
+  errorLog: document.getElementById('errorLog'),
+  errorList: document.getElementById('errorList'),
   exportPng: document.getElementById('exportPng'),
   exportGif: document.getElementById('exportGif'),
   shareQr: document.getElementById('shareQr'),
@@ -203,6 +207,7 @@ function renderSheet() {
   const seen = Object.keys(s.stats.states || {}).length;
   renderChat();
   renderMemories();
+  renderErrors();
   renderCare();
   el.stats.innerHTML =
     '<span><b>' + (s.stats.poke || 0) + '</b> lần chọc</span>'
@@ -666,6 +671,28 @@ function layout() {
   resizeFx();
 }
 
+let fpsFrames = 0;
+let fpsSince = 0;
+
+function renderErrors() {
+  if (!el.errorList) return;
+  const errors = readStore().errors || [];
+  el.errorList.innerHTML = errors.map(e => '<p>' + escapeHtml(e.text) + '</p>').join('');
+}
+
+function recordError(text) {
+  if (!readStore().errorLog) return;
+  const s = readStore();
+  s.errors = [{ t: Date.now(), text: String(text).slice(0, 200) }, ...(s.errors || [])].slice(0, 10);
+  writeStore({ errors: s.errors });
+  renderErrors();
+}
+
+function installErrorHooks() {
+  window.addEventListener('error', ev => recordError('JS: ' + (ev.message || ev.error)));
+  window.addEventListener('unhandledrejection', ev => recordError('Promise: ' + (ev.reason && ev.reason.message || ev.reason)));
+}
+
 let lastFrameKey = '';
 const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -747,6 +774,15 @@ function drawFx() {
 
 function draw(now) {
   if (!running) return;
+  fpsFrames += 1;
+  if (now - fpsSince >= 1000) {
+    if (readStore().showFps) {
+      el.fpsChip.textContent = Math.round(fpsFrames * 1000 / (now - fpsSince)) + ' fps';
+      el.fpsChip.hidden = false;
+    }
+    fpsFrames = 0;
+    fpsSince = now;
+  }
   const dt = Math.min(60, lastFrameTime ? now - lastFrameTime : 16);
   lastFrameTime = now;
   const out = model.tick(now);
@@ -1207,6 +1243,11 @@ function bindSheet() {
     applySimple(el.simpleMode.checked);
     writeStore({ simple: el.simpleMode.checked });
   });
+  el.showFps.addEventListener('change', () => {
+    writeStore({ showFps: el.showFps.checked });
+    if (!el.showFps.checked) el.fpsChip.hidden = true;
+  });
+  el.errorLog.addEventListener('change', () => writeStore({ errorLog: el.errorLog.checked }));
   el.autoSeason.addEventListener('change', () => {
     writeStore({ autoSeason: el.autoSeason.checked });
     logEvent(el.autoSeason.checked ? 'bật đổi pet theo mùa' : 'tắt đổi pet theo mùa');
@@ -1525,6 +1566,14 @@ async function main() {
     applyPalette(PALETTES[palParam] ? palParam : (savedSettings.palette || 'goc'));
     el.autoSeason.checked = savedSettings.autoSeason !== false;
     el.ambientMode.value = savedSettings.ambientMode || 'off';
+    el.showFps.checked = !!savedSettings.showFps;
+    el.errorLog.checked = !!savedSettings.errorLog;
+    if (new URLSearchParams(location.search).get('fps') === '1') {
+      el.showFps.checked = true;
+      writeStore({ showFps: true });
+    }
+    installErrorHooks();
+    renderErrors();
     el.ambientVolume.value = savedSettings.ambientVolume ?? 0.35;
     applyAmbient();
     applySimple(savedSettings.simple);
@@ -1555,6 +1604,10 @@ async function main() {
     const agentParam = new URLSearchParams(location.search).get('agent');
     if (agentParam === 'demo') startAgent('./agent.json');
     else if (agentParam && /^https?:/.test(agentParam)) startAgent(agentParam);
+    if (new URLSearchParams(location.search).get('boom') === '1') {
+      writeStore({ errorLog: true });
+      setTimeout(() => { throw new Error('lỗi thử nghiệm từ ?boom=1'); }, 1200);
+    }
     if (new URLSearchParams(location.search).get('gallery') === '1') {
       setTimeout(showGallery, 900);
     }

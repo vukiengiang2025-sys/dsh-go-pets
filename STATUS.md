@@ -2,9 +2,9 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **56 xong** (có trong APK)
-- 🟡 **8 một phần** (có nền tảng, thiếu phần còn lại)
-- ⏸ **36 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
+- ✅ **57 xong** (có trong APK)
+- 🟡 **9 một phần** (có nền tảng, thiếu phần còn lại)
+- ⏸ **34 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
 
@@ -132,12 +132,12 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 |---|---|---|
 | 81 | Espresso | ✅ 1 test trên emulator |
 | 82 | Golden test | ⏸ |
-| 83 | Đo FPS/pin | ⏸ |
+| 83 | Đo FPS/pin | 🟡 chip FPS + chip pin |
 | 84 | Nén atlas | ⏸ |
 | 85 | Lazy pack | ⏸ |
 | 86 | Kiểm chữ ký pack | 🟡 kiểm cấu trúc + CRC khi xuất zip |
 | 87 | Quyền tối thiểu | ✅ chỉ INTERNET tuỳ chọn |
-| 88 | Crash opt-in | ⏸ |
+| 88 | Crash opt-in | ✅ log lỗi trên máy, mặc định tắt |
 | 89 | A/B | ⏸ |
 | 90 | AAB | ✅ |
 
@@ -156,7 +156,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 99 | Widget đôi | ⏸ |
 | 100 | Roadmap công khai | ✅ nút mở ROADMAP |
 
-## Vì sao 36 ý tưởng còn hoãn
+## Vì sao 34 ý tưởng còn hoãn
 
 1. **Cần backend/tài khoản**: chợ pack, xếp hạng, bình chọn, ủng hộ, crash report.
 2. **Cần quyền hệ thống Android**: overlay, live wallpaper, AOD, notification tuỳ biến — mỗi thứ là một service + luồng xin quyền, dễ bị ROM chặn.

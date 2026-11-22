@@ -63,6 +63,7 @@
     <p class="status" id="status" aria-live="polite">đang tải pack…</p>
     <p class="agent-chip" id="agentChip" hidden></p>
     <p class="battery-chip" id="batteryChip" hidden></p>
+    <p class="fps-chip" id="fpsChip" hidden></p>
   </section>
 </main>
 
@@ -101,6 +102,9 @@
     <label class="check"><input type="checkbox" id="simpleMode"> Chế độ đơn giản (ẩn bớt nút)</label>
     <label class="check"><input type="checkbox" id="autoTheme"> Đổi màu theo giờ (tối = tím)</label>
     <label class="check"><input type="checkbox" id="autoSeason" checked> Tự đổi pet theo mùa (Tết / tuyết)</label>
+    <label class="check"><input type="checkbox" id="showFps"> Hiện FPS</label>
+    <label class="check"><input type="checkbox" id="errorLog"> Ghi lỗi trên máy (không gửi đi)</label>
+    <div class="error-list" id="errorList"></div>
 
     <label class="check"><input type="checkbox" id="speechOn"> Đọc thành tiếng khi có việc</label>
     <div class="field">Giọng đọc
