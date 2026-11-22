@@ -1,5 +1,6 @@
 import { PetModel, normalizePack, STATES } from './pet-engine.js';
 import { buildPackFromFile, buildPackFromZip } from './pack-import.js';
+import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } from './pet-fx.js';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
 
 const FALLBACK_PACKS = [
@@ -74,6 +75,8 @@ const el = {
   importImage: document.getElementById('importImage'),
   importFile: document.getElementById('importFile'),
   importedList: document.getElementById('importedList'),
+  fx: document.getElementById('fx'),
+  pet: document.getElementById('pet'),
 };
 const ctx = el.canvas.getContext('2d');
 
@@ -90,6 +93,20 @@ let rafId = 0;
 let running = true;
 let demoSeq = 0;
 let demoTimer = 0;
+
+const fxCtx = el.fx.getContext('2d');
+let fxW = 1, fxH = 1, fxDpr = 1;
+let particles = [];
+let thrower = null;
+let look = { x: 0, y: 0, tx: 0, ty: 0 };
+let squash = 1;
+let prevDraw = null;
+let lastDraw = null;
+let lastDrawKey = '';
+let fadeStart = 0;
+let lastFrameTime = 0;
+let pokeTimes = [];
+const strokeDetector = createStrokeDetector({ reversals: 3, windowMs: 1400 });
 
 function readStore() {
   let raw = {};
@@ -383,33 +400,122 @@ function layout() {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.imageSmoothingEnabled = !pack.pixelArt;
   ctx.imageSmoothingQuality = pack.pixelArt ? 'low' : 'high';
+  resizeFx();
 }
 
 let lastFrameKey = '';
 const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+function resizeFx() {
+  const rect = el.stage.getBoundingClientRect();
+  fxW = Math.max(1, rect.width);
+  fxH = Math.max(1, rect.height);
+  fxDpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  el.fx.width = Math.round(fxW * fxDpr);
+  el.fx.height = Math.round(fxH * fxDpr);
+  fxCtx.setTransform(fxDpr, 0, 0, fxDpr, 0, 0);
+}
+
+function petCenter() {
+  const pet = el.canvas.getBoundingClientRect();
+  const stage = el.stage.getBoundingClientRect();
+  return {
+    x: pet.left - stage.left + pet.width / 2,
+    y: pet.top - stage.top + pet.height * 0.45,
+  };
+}
+function spawnFx(kind) {
+  const c = petCenter();
+  particles.push(...spawnParticles(kind, c.x, c.y).map(p => ({ ...p, kind })));
+}
+function applyPetTransform() {
+  const tx = look.x + (thrower ? thrower.x : 0);
+  const ty = look.y + (thrower ? thrower.y : 0);
+  el.pet.style.transform = 'translateY(-26px) translate(' + tx.toFixed(2) + 'px, ' + ty.toFixed(2)
+    + 'px) scale(' + (1 + (1 - squash) * 0.55).toFixed(3) + ', ' + squash.toFixed(3) + ')';
+}
+function drawFrame(anim, frame, alpha) {
+  const f = anim && anim.frames ? anim.frames[frame] : null;
+  const img = anim ? images[anim.sheet] : null;
+  if (!f || !img || !img.width) return;
+  const sx = (f.i % anim.cols) * anim.frameW;
+  const sy = Math.floor(f.i / anim.cols) * anim.frameH;
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(img, sx, sy, anim.frameW, anim.frameH,
+    anim.box.x * scale, anim.box.y * scale, anim.box.w * scale, anim.box.h * scale);
+  ctx.globalAlpha = 1;
+}
+function drawFx() {
+  fxCtx.clearRect(0, 0, fxW, fxH);
+  for (const p of particles) {
+    const a = Math.max(0, Math.min(1, p.life / p.max));
+    fxCtx.globalAlpha = a;
+    if (p.kind === 'zzz') {
+      fxCtx.fillStyle = '#9fc6ff';
+      fxCtx.font = '600 ' + (8 + p.size) + 'px system-ui, sans-serif';
+      fxCtx.fillText('z', p.x, p.y);
+    } else if (p.kind === 'hearts') {
+      fxCtx.fillStyle = '#ff7d9c';
+      fxCtx.save();
+      fxCtx.translate(p.x, p.y);
+      fxCtx.scale(p.size / 8, p.size / 8);
+      fxCtx.beginPath();
+      fxCtx.moveTo(0, 3);
+      fxCtx.bezierCurveTo(-6, -4, -4, -8, 0, -3);
+      fxCtx.bezierCurveTo(4, -8, 6, -4, 0, 3);
+      fxCtx.fill();
+      fxCtx.restore();
+    } else {
+      fxCtx.fillStyle = '#ffd479';
+      fxCtx.save();
+      fxCtx.translate(p.x, p.y);
+      const s = p.size / 2;
+      fxCtx.beginPath();
+      fxCtx.moveTo(0, -s); fxCtx.lineTo(s * 0.35, -s * 0.35);
+      fxCtx.lineTo(s, 0); fxCtx.lineTo(s * 0.35, s * 0.35);
+      fxCtx.lineTo(0, s); fxCtx.lineTo(-s * 0.35, s * 0.35);
+      fxCtx.lineTo(-s, 0); fxCtx.lineTo(-s * 0.35, -s * 0.35);
+      fxCtx.closePath(); fxCtx.fill();
+      fxCtx.restore();
+    }
+  }
+  fxCtx.globalAlpha = 1;
+}
+
 function draw(now) {
   if (!running) return;
+  const dt = Math.min(60, lastFrameTime ? now - lastFrameTime : 16);
+  lastFrameTime = now;
   const out = model.tick(now);
-  const key = out ? out.name + ':' + (reduceMotion ? 0 : out.frame) : '';
-  if (key === lastFrameKey) {
-    rafId = requestAnimationFrame(draw);
-    return;
+
+  if (thrower) {
+    thrower.step(dt / 1000);
+    if (thrower.settled) thrower = null;
   }
-  lastFrameKey = key;
-  ctx.clearRect(0, 0, el.canvas.width, el.canvas.height);
-  if (out) {
-    const { anim } = out;
-    const frame = reduceMotion ? 0 : out.frame;
-    const f = anim.frames[frame];
-    const img = images[anim.sheet];
-    if (img && f) {
-      const sx = (f.i % anim.cols) * anim.frameW;
-      const sy = Math.floor(f.i / anim.cols) * anim.frameH;
-      ctx.drawImage(img, sx, sy, anim.frameW, anim.frameH,
-        anim.box.x * scale, anim.box.y * scale, anim.box.w * scale, anim.box.h * scale);
-    }
-    if (Math.random() < 0.06) setStatus((STATE_LABEL[model.state] || model.state) + ' · ' + out.name + ' · frame ' + frame);
+  look.x += (look.tx - look.x) * 0.12;
+  look.y += (look.ty - look.y) * 0.12;
+  squash += (1 - squash) * 0.16;
+  applyPetTransform();
+  stepParticles(particles, dt);
+  drawFx();
+
+  const frameIndex = out ? (reduceMotion ? 0 : out.frame) : 0;
+  const key = out ? out.name + ':' + frameIndex : '';
+  if (key !== lastFrameKey) {
+    if (lastDraw) prevDraw = lastDraw;
+    fadeStart = now;
+    lastFrameKey = key;
+  }
+  const fade = prevDraw ? Math.min(1, (now - fadeStart) / 160) : 1;
+  if (prevDraw && fade >= 1) prevDraw = null;
+
+  if (key !== lastDrawKey || fade < 1) {
+    ctx.clearRect(0, 0, el.canvas.width, el.canvas.height);
+    if (prevDraw && fade < 1) drawFrame(prevDraw.anim, prevDraw.frame, 1 - fade);
+    if (out) drawFrame(out.anim, frameIndex, fade);
+    lastDraw = out ? { anim: out.anim, frame: frameIndex } : null;
+    lastDrawKey = key;
+    if (Math.random() < 0.05) setStatus((STATE_LABEL[model.state] || model.state) + ' · ' + out?.name + ' · frame ' + frameIndex);
   }
   rafId = requestAnimationFrame(draw);
 }
@@ -425,10 +531,10 @@ function onState() {
     stats.states[st] = 1;
     writeStore({ stats });
   }
-  if (st === 'attention') logEvent('pet vừa xong việc');
-  else if (st === 'error') logEvent('pet gặp lỗi');
+  if (st === 'attention') { spawnFx('sparkles'); squash = 0.86; logEvent('pet vừa xong việc'); }
+  else if (st === 'sleeping') { spawnFx('zzz'); logEvent('pet đi ngủ'); }
+  else if (st === 'error') { squash = 0.9; logEvent('pet gặp lỗi'); }
   else if (st === 'notification') logEvent('có việc đang chờ bạn');
-  else if (st === 'sleeping') logEvent('pet đi ngủ');
 }
 
 function buildSettingsUI() {
@@ -524,6 +630,14 @@ function bindSheet() {
   el.resetAll.addEventListener('click', resetAll);
 }
 
+function hidePet() {
+  el.pet.classList.add('hidden-pet');
+  model.setState('sleeping');
+  logEvent('pet trốn vì bị chọc nhiều');
+  setTimeout(() => el.pet.classList.remove('hidden-pet'), 6000);
+  pokeTimes = [];
+}
+
 function bindStage() {
   let down = null;
   let clicks = [];
@@ -534,24 +648,56 @@ function bindStage() {
   el.stage.addEventListener('pointerdown', ev => {
     el.stage.setPointerCapture(ev.pointerId);
     const p = pos(ev);
-    down = { x: p.x, y: p.y, dragging: false };
+    down = {
+      x: p.x, y: p.y, dragging: false, petting: false,
+      lastX: p.x, lastY: p.y, lastT: ev.timeStamp, vx: 0, vy: 0,
+    };
+    strokeDetector.reset();
   });
   el.stage.addEventListener('pointermove', ev => {
+    const r = el.canvas.getBoundingClientRect();
+    const dx = (ev.clientX - (r.left + r.width / 2)) / Math.max(40, r.width);
+    const dy = (ev.clientY - (r.top + r.height * 0.5)) / Math.max(40, r.height);
+    look.tx = Math.max(-1, Math.min(1, dx)) * 3.5;
+    look.ty = Math.max(-1, Math.min(1, dy)) * 2.5;
     if (!down) return;
     const p = pos(ev);
-    if (!down.dragging && Math.hypot(p.x - down.x, p.y - down.y) > 8) {
+    if (!down.petting && strokeDetector.push(p.x, ev.timeStamp)) {
+      down.petting = true;
+      model.tickle();
+      spawnFx('hearts');
+      bumpStat('tickle');
+      logEvent('vuốt ve pet');
+      haptic(10);
+      return;
+    }
+    if (!down.dragging && !down.petting && Math.hypot(p.x - down.x, p.y - down.y) > 8) {
       down.dragging = true;
       model.drag();
       haptic(6);
       bumpStat('drag');
       logEvent('nhấc pet lên');
     }
+    const dt = ev.timeStamp - down.lastT;
+    if (dt > 0) {
+      down.vx = (p.x - down.lastX) / dt;
+      down.vy = (p.y - down.lastY) / dt;
+    }
+    down.lastX = p.x;
+    down.lastY = p.y;
+    down.lastT = ev.timeStamp;
   });
   el.stage.addEventListener('pointerup', ev => {
     if (!down) return;
-    const dragging = down.dragging;
+    const d = down;
     down = null;
-    if (dragging) return;
+    if (d.dragging) {
+      const clamp = (v, m) => Math.max(-m, Math.min(m, v));
+      thrower = new ThrowPhysics({ vx: clamp(d.vx * 1000, 900), vy: clamp(d.vy * 1000, 900) });
+      squash = 0.9;
+      return;
+    }
+    if (d.petting) return;
     const p = pos(ev);
     const now = performance.now();
     clicks = clicks.filter(t => now - t < 1100);
@@ -560,8 +706,20 @@ function bindStage() {
     if (clicks.length >= 3) {
       clicks = [];
       model.tickle();
+      spawnFx('hearts');
       bumpStat('tickle');
       logEvent('cù pet');
+      return;
+    }
+    if (clicks.length === 2) {
+      clicks = [];
+      openSheet(true);
+      return;
+    }
+    pokeTimes = pokeTimes.filter(t => now - t < 8000);
+    pokeTimes.push(now);
+    if (pokeTimes.length >= 6) {
+      hidePet();
       return;
     }
     model.poke(p.x - p.w / 2);
@@ -626,6 +784,7 @@ function bindLifecycle() {
     running = !document.hidden;
     if (running) {
       model.lastActivity = performance.now();
+      lastFrameTime = 0;
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(draw);
     } else {
@@ -633,6 +792,7 @@ function bindLifecycle() {
     }
   });
   window.addEventListener('resize', layout);
+  if (window.ResizeObserver) new ResizeObserver(() => resizeFx()).observe(el.stage);
 }
 
 async function main() {
@@ -676,6 +836,16 @@ async function main() {
     else if (importDemo === 'zip') demoZipImport();
     const initial = new URLSearchParams(location.search).get('state');
     if (initial && STATES.includes(initial)) model.setState(initial);
+    const fxParam = new URLSearchParams(location.search).get('fx');
+    if (fxParam === 'hearts') {
+      model.setState('attention');
+      setInterval(() => spawnFx('hearts'), 700);
+    } else if (fxParam === 'zzz') {
+      model.setState('sleeping');
+      setInterval(() => spawnFx('zzz'), 900);
+    } else if (fxParam === 'throw') {
+      thrower = new ThrowPhysics({ vx: 480, vy: -320 });
+    }
     requestAnimationFrame(draw);
     setStatus('sẵn sàng');
   } catch (err) {

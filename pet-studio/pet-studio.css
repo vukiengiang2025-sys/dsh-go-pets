@@ -201,3 +201,8 @@ label.check input { width: 18px; height: 18px; accent-color: var(--accent); }
 .imported button { background: transparent; border: 1px solid #5b2b34; color: #ff9aa8;
   border-radius: 8px; padding: 4px 8px; font: inherit; font-size: 11.5px; }
 .imported:empty::before { content: "chưa nhập pet nào"; color: #6c7a90; font-size: 12.5px; }
+
+#fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.pet.hidden-pet { opacity: 0; transition: opacity .35s ease; }
+
+.pet { transform-origin: 50% 100%; }
