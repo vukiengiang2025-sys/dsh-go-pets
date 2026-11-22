@@ -326,3 +326,11 @@ html[lang="en"] .error-list:empty::before { content: "no errors yet"; }
 .state-picks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 6px 0; }
 .state-picks label { display: flex; gap: 4px; align-items: center; font-size: 11px; color: #9fb0c8;
   background: #0f1622; border: 1px solid var(--line); border-radius: 8px; padding: 5px 6px; }
+
+.wheel { position: absolute; left: 50%; top: 50%; width: 0; height: 0; z-index: 5; }
+.wheel[hidden] { display: none; }
+.wheel button { position: absolute; width: 58px; height: 58px; margin: -29px 0 0 -29px;
+  border-radius: 50%; border: 1px solid var(--line); background: rgba(17,24,36,.97);
+  color: var(--text); font-size: 10.5px; line-height: 1.15; padding: 4px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.45); }
+.wheel button:active { transform: scale(.94); }

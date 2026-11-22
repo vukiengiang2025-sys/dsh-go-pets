@@ -152,6 +152,8 @@ const el = {
   overlaySize: document.getElementById('overlaySize'),
   overlayStop: document.getElementById('overlayStop'),
   openAod: document.getElementById('openAod'),
+  openWheel: document.getElementById('openWheel'),
+  wheel: document.getElementById('wheel'),
   openMarket: document.getElementById('openMarket'),
   marketModal: document.getElementById('marketModal'),
   marketGrid: document.getElementById('marketGrid'),
@@ -1298,7 +1300,31 @@ async function installMarket(entry) {
   }
 }
 
-async function showMarket() {
+async const WHEEL_ACTIONS = [
+  { key: 'settings', vi: 'Cài đặt', en: 'Settings', run: () => openSheet(true) },
+  { key: 'quiet', vi: 'Im lặng', en: 'Quiet', run: () => { el.quiet.checked = !el.quiet.checked; writeStore({ quiet: el.quiet.checked }); if (model) model.quiet = el.quiet.checked; } },
+  { key: 'market', vi: 'Chợ pack', en: 'Market', run: () => showMarket() },
+  { key: 'aod', vi: 'Màn đêm', en: 'Night', run: () => window.AndroidPet && window.AndroidPet.openAod && window.AndroidPet.openAod() },
+  { key: 'walk', vi: 'Dạy đi', en: 'Walk', run: () => { pathMode = true; setStatus(pick('chạm vào chỗ muốn pet đi tới', 'tap where the pet should walk')); } },
+  { key: 'stretch', vi: 'Vươn vai', en: 'Stretch', run: () => { el.stage.classList.add('stretching'); setTimeout(() => el.stage.classList.remove('stretching'), 700); } },
+];
+
+function openWheel() {
+  const radius = 86;
+  el.wheel.innerHTML = WHEEL_ACTIONS.map((a, i) => {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / WHEEL_ACTIONS.length;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    return '<button data-wheel="' + a.key + '" style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px">'
+      + escapeHtml(pick(a.vi, a.en)) + '</button>';
+  }).join('');
+  el.wheel.hidden = false;
+  logEvent('mở menu vòng');
+}
+
+function closeWheel() { el.wheel.hidden = true; }
+
+function showMarket() {
   try {
     const data = await loadMarket();
     const locals = new Set(localPacks.map(p => p.id));
@@ -1548,6 +1574,17 @@ function bindSheet() {
   el.overlayStop.addEventListener('click', () => {
     if (window.AndroidPet && window.AndroidPet.stopOverlay) window.AndroidPet.stopOverlay();
     setStatus('đã tắt cửa sổ nổi');
+  });
+  el.openWheel.addEventListener('click', ev => { ev.stopPropagation(); openWheel(); });
+  el.wheel.addEventListener('click', ev => {
+    const b = ev.target.closest('[data-wheel]');
+    if (!b) return;
+    const action = WHEEL_ACTIONS.find(a => a.key === b.dataset.wheel);
+    closeWheel();
+    if (action) action.run();
+  });
+  document.addEventListener('pointerdown', ev => {
+    if (!el.wheel.hidden && !el.wheel.contains(ev.target) && ev.target !== el.openWheel) closeWheel();
   });
   el.openMarket.addEventListener('click', showMarket);
   el.marketClose.addEventListener('click', () => { el.marketModal.hidden = true; });
@@ -1958,6 +1995,9 @@ async function main() {
     }
     if (new URLSearchParams(location.search).get('market') === '1') {
       setTimeout(showMarket, 900);
+    }
+    if (new URLSearchParams(location.search).get('wheel') === '1') {
+      setTimeout(openWheel, 900);
     }
     if (new URLSearchParams(location.search).get('walk') === '1') {
       setTimeout(() => { walkTarget = { x: 70, y: -10 }; }, 900);
