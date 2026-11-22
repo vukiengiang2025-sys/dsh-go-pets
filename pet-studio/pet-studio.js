@@ -10,7 +10,7 @@ import { buildZip } from './zip-write.js';
 import { verifyChecksums } from './pack-integrity.js';
 import { applyLanguage, pick, stateText, getLang } from './i18n.js';
 import { upsertHost, removeHost } from './agent-hosts.js';
-import { askAI, PRESETS, friendlyAIError } from './ai.js';
+import { askAI, PRESETS, friendlyAIError, buildSystemPrompt, PERSONAS } from './ai.js';
 import { assignVariant, newSeed } from './ab.js';
 import { seasonFor, SEASON_PACK } from './season.js';
 import qrcode from './vendor/qrcode.mjs';
@@ -58,7 +58,7 @@ const DEFAULT_STORE = {
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
   ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi', agentHosts: [], overlayFloat: true,
-  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai', installId: '',
+  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai', aiPersona: 'gentle', installId: '',
 };
 
 const el = {
@@ -132,6 +132,7 @@ const el = {
   agentStop: document.getElementById('agentStop'),
   agentLine: document.getElementById('agentLine'),
   agentChip: document.getElementById('agentChip'),
+  aiPersona: document.getElementById('aiPersona'),
   aiProvider: document.getElementById('aiProvider'),
   aiEndpoint: document.getElementById('aiEndpoint'),
   aiModel: document.getElementById('aiModel'),
@@ -397,12 +398,13 @@ function aiConfig(s) {
 }
 
 function aiSystemPrompt(s) {
-  const name = s.name || (pack && pack.name) || 'pet';
-  return 'Bạn là ' + name + ', một pet nhỏ sống trên màn hình điện thoại. '
-    + 'Trả lời ngắn (1-2 câu), ấm áp, tự nhiên, xưng "mình" và gọi người dùng là "bạn". '
-    + 'Trả lời cùng ngôn ngữ với người dùng. Không bịa việc bạn không biết. '
-    + (model ? 'Trạng thái hiện tại của bạn: ' + stateText(model.state) + '. ' : '')
-    + (s.memories && s.memories.length ? 'Bạn nhớ: ' + s.memories.join('; ') + '. ' : '');
+  return buildSystemPrompt({
+    name: s.name || (pack && pack.name) || 'pet',
+    persona: s.aiPersona || 'gentle',
+    memories: s.memories || [],
+    state: model ? stateText(model.state) : '',
+    hour: new Date().getHours(),
+  });
 }
 
 async function sendChat(text) {
@@ -420,6 +422,7 @@ async function sendChat(text) {
   if (s.aiOn && s.aiEndpoint && s.aiModel) {
     if (el.aiStatus) el.aiStatus.textContent = 'đang gọi AI…';
     setStatus('AI đang trả lời…');
+    model.setState('thinking');
     try {
       const history = [
         { role: 'system', content: aiSystemPrompt(s) },
@@ -430,8 +433,9 @@ async function sendChat(text) {
       petSay(reply);
       if (el.aiStatus) el.aiStatus.textContent = 'AI trả lời OK';
       setStatus(pick('sẵn sàng', 'ready'));
-      const mood = moodFor(t);
-      if (mood) setTimeout(() => model.setState(mood), 700);
+      const mood = moodFor(reply) || moodFor(t);
+      if (mood) setTimeout(() => model.setState(mood), 400);
+      else setTimeout(() => model.setState('attention'), 300);
       logEvent('chat AI: ' + s.aiModel);
       return;
     } catch (err) {
@@ -1590,7 +1594,24 @@ function bindSheet() {
     renderChat();
     petSay(pick('Mình quên hết rồi, bắt đầu lại nhé.', 'I forgot everything, let us start again.'));
   });
-  el.storyBtn.addEventListener('click', () => petSay(storyFor(new Date().getHours(), readStore().name || (pack && pack.name) || 'pet', getLang())));
+  el.storyBtn.addEventListener('click', async () => {
+    const s = readStore();
+    if (s.aiOn && s.aiEndpoint && s.aiModel) {
+      setStatus('AI đang kể chuyện…');
+      try {
+        const reply = await askAI(aiConfig(s), [
+          { role: 'system', content: aiSystemPrompt(s) },
+          { role: 'user', content: 'Kể cho mình một câu chuyện ngắn 2-3 câu, ấm áp và có bài học nhỏ.' },
+        ]);
+        pushChat('pet', reply);
+        petSay(reply);
+        return;
+      } catch (err) {
+        setStatus('AI lỗi (' + friendlyAIError(err) + '), kể chuyện offline');
+      }
+    }
+    petSay(storyFor(new Date().getHours(), s.name || (pack && pack.name) || 'pet', getLang()));
+  });
   el.summaryBtn.addEventListener('click', () => {
     const s = readStore();
     petSay(summaryFrom(s.stats, s.memories, getLang()));
@@ -1639,6 +1660,10 @@ function bindSheet() {
     const node = el[key];
     if (!node) return;
     node.addEventListener('input', () => writeStore({ [key]: node.value.trim() }));
+  });
+  el.aiPersona.addEventListener('change', () => {
+    writeStore({ aiPersona: el.aiPersona.value });
+    if (el.aiStatus) el.aiStatus.textContent = 'tính cách: ' + el.aiPersona.value;
   });
   el.aiProvider.addEventListener('change', () => {
     const provider = el.aiProvider.value;
@@ -2079,6 +2104,7 @@ async function main() {
     renderHosts();
     renderCollection();
     renderExperiment();
+    el.aiPersona.value = savedSettings.aiPersona || 'gentle';
     el.aiProvider.value = savedSettings.aiProvider || 'openai';
     el.aiEndpoint.value = savedSettings.aiEndpoint || '';
     el.aiModel.value = savedSettings.aiModel || '';

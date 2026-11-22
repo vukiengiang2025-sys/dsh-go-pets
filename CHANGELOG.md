@@ -1,5 +1,10 @@
 # Thay đổi gần đây
 
+## 4.26.0
+- Giao diện 2.0: nền gradient, thẻ bo tròn, section trong Cài đặt, nút trạng thái gọn hơn.
+- AI thông minh hơn: chọn tính cách (dịu dàng/hài hước/lười), prompt có giờ + trạng thái + ký ức.
+- AI kể chuyện khi bật key; pet chuyển "đang nghĩ" khi chờ và đổi cảm xúc theo câu trả lời.
+
 ## 4.25.0
 - A/B cục bộ: nhóm A/B ổn định theo máy, đổi kiểu bong bóng; dòng thử nghiệm trong Cài đặt.
 

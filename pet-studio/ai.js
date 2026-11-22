@@ -120,3 +120,21 @@ export function friendlyAIError(err) {
   if (/Failed to fetch|NetworkError|ENOTFOUND|timeout/i.test(msg)) return 'Không kết nối được tới API';
   return msg;
 }
+
+export const PERSONAS = {
+  gentle: { vi: 'dịu dàng', hint: 'nói nhẹ nhàng, quan tâm, kiên nhẫn' },
+  funny: { vi: 'hài hước', hint: 'hóm hỉnh, thích đùa, câu ngắn' },
+  lazy: { vi: 'lười', hint: 'lười biếng, càu nhàu nhẹ nhưng vẫn quan tâm' },
+};
+
+export function buildSystemPrompt({ name = 'pet', persona = 'gentle', memories = [], state = '', hour = 12 } = {}) {
+  const p = PERSONAS[persona] || PERSONAS.gentle;
+  const time = hour >= 22 || hour < 6 ? 'đêm khuya' : hour < 11 ? 'buổi sáng' : hour < 18 ? 'buổi chiều' : 'buổi tối';
+  return 'Bạn là ' + name + ', một pet nhỏ sống trên màn hình điện thoại của người dùng. '
+    + 'Tính cách: ' + p.hint + '. '
+    + 'Trả lời ngắn (1-2 câu), tự nhiên, xưng "mình" và gọi người dùng là "bạn". '
+    + 'Trả lời cùng ngôn ngữ với người dùng. Không bịa việc bạn không biết, không hứa làm việc thật. '
+    + 'Bây giờ là ' + time + '. '
+    + (state ? 'Trạng thái hiện tại của bạn: ' + state + '. ' : '')
+    + (memories.length ? 'Bạn nhớ: ' + memories.slice(-5).join('; ') + '. ' : '');
+}
