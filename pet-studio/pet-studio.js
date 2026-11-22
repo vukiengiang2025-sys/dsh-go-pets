@@ -1300,7 +1300,7 @@ async function installMarket(entry) {
   }
 }
 
-async const WHEEL_ACTIONS = [
+const WHEEL_ACTIONS = [
   { key: 'settings', vi: 'Cài đặt', en: 'Settings', run: () => openSheet(true) },
   { key: 'quiet', vi: 'Im lặng', en: 'Quiet', run: () => { el.quiet.checked = !el.quiet.checked; writeStore({ quiet: el.quiet.checked }); if (model) model.quiet = el.quiet.checked; } },
   { key: 'market', vi: 'Chợ pack', en: 'Market', run: () => showMarket() },
@@ -1324,7 +1324,7 @@ function openWheel() {
 
 function closeWheel() { el.wheel.hidden = true; }
 
-function showMarket() {
+async function showMarket() {
   try {
     const data = await loadMarket();
     const locals = new Set(localPacks.map(p => p.id));
