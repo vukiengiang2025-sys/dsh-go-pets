@@ -164,7 +164,8 @@ public class MainActivity extends Activity {
 
         if (savedInstanceState == null) {
             webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent()), chatOf(getIntent()),
-                    pipOnLoad, introOf(getIntent()), exportOf(getIntent()), gifOf(getIntent())));
+                    pipOnLoad, introOf(getIntent()), exportOf(getIntent()), gifOf(getIntent()),
+                    agentOf(getIntent())));
         } else {
             webView.restoreState(savedInstanceState);
         }
@@ -175,7 +176,8 @@ public class MainActivity extends Activity {
     }
 
     private static String startUrl(@Nullable String pack, @Nullable String fx, @Nullable String chat,
-                                   boolean pip, boolean intro, boolean export, boolean gif) {
+                                   boolean pip, boolean intro, boolean export, boolean gif,
+                                   @Nullable String agent) {
         String url = START_URL;
         if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
             url += "&pack=" + pack;
@@ -197,6 +199,9 @@ public class MainActivity extends Activity {
         }
         if (gif) {
             url += "&gif=1";
+        }
+        if ("demo".equals(agent)) {
+            url += "&agent=demo";
         }
         return url;
     }
@@ -221,13 +226,17 @@ public class MainActivity extends Activity {
         return intent != null && intent.getBooleanExtra("gif", false);
     }
 
+    private static String agentOf(@Nullable Intent intent) {
+        return intent != null ? intent.getStringExtra("agent") : null;
+    }
+
     @Override
     protected void onNewIntent(@NonNull Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
         if (webView != null) {
             webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent), false, introOf(intent),
-                    exportOf(intent), gifOf(intent)));
+                    exportOf(intent), gifOf(intent), agentOf(intent)));
         }
     }
 

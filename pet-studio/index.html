@@ -106,6 +106,15 @@
       <button id="testSpeech">Nghe thử</button>
     </div>
 
+    <div class="field">Kết nối agent (tuỳ chọn)
+      <input id="agentUrl" placeholder="https://… trả về {\"state\":\"working\"}">
+      <div class="row">
+        <button id="agentStart">Bật</button>
+        <button id="agentStop">Tắt</button>
+      </div>
+      <div class="care-line" id="agentLine">chưa kết nối</div>
+    </div>
+
     <div class="field">Chăm sóc
       <div class="care-line" id="streakLine">Chuỗi: —</div>
       <div class="care-line" id="questLine">Đi dạo hôm nay: 0/3</div>

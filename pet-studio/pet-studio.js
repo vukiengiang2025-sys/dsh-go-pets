@@ -110,6 +110,10 @@ const el = {
   focusStop: document.getElementById('focusStop'),
   timerLine: document.getElementById('timerLine'),
   shareConfig: document.getElementById('shareConfig'),
+  agentUrl: document.getElementById('agentUrl'),
+  agentStart: document.getElementById('agentStart'),
+  agentStop: document.getElementById('agentStop'),
+  agentLine: document.getElementById('agentLine'),
   exportPng: document.getElementById('exportPng'),
   exportGif: document.getElementById('exportGif'),
 };
@@ -857,6 +861,45 @@ function exportGif() {
   }
 }
 
+let agentTimer = 0;
+
+async function pollAgent() {
+  const s = readStore();
+  const url = s.agentUrl;
+  if (!url) return;
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
+    const data = await res.json();
+    const state = data && (data.state || data.status);
+    if (STATES.includes(state)) {
+      model.setState(state);
+      el.agentLine.textContent = 'agent: ' + state;
+      setStatus('agent: ' + state);
+    } else {
+      el.agentLine.textContent = 'agent: không rõ trạng thái';
+    }
+  } catch (err) {
+    el.agentLine.textContent = 'agent lỗi: ' + err.message;
+  }
+}
+
+function startAgent(url) {
+  stopAgent();
+  if (!url) return;
+  writeStore({ agentUrl: url });
+  el.agentUrl.value = url;
+  pollAgent();
+  agentTimer = setInterval(pollAgent, 10000);
+  logEvent('kết nối agent');
+}
+
+function stopAgent() {
+  clearInterval(agentTimer);
+  agentTimer = 0;
+  writeStore({ agentUrl: '' });
+  el.agentLine.textContent = 'chưa kết nối';
+}
+
 function exportPng() {
   try {
     const out = document.createElement('canvas');
@@ -977,6 +1020,8 @@ function bindSheet() {
     const s = readStore();
     petSay(summaryFrom(s.stats, s.memories));
   });
+  el.agentStart.addEventListener('click', () => startAgent((el.agentUrl.value || '').trim()));
+  el.agentStop.addEventListener('click', stopAgent);
   el.shareConfig.addEventListener('click', shareConfig);
   el.exportPng.addEventListener('click', exportPng);
   el.exportGif.addEventListener('click', exportGif);
@@ -1242,6 +1287,9 @@ async function main() {
     if (new URLSearchParams(location.search).get('export') === '1') {
       setTimeout(exportPng, 700);
     }
+    const agentParam = new URLSearchParams(location.search).get('agent');
+    if (agentParam === 'demo') startAgent('./agent.json');
+    else if (agentParam && /^https?:/.test(agentParam)) startAgent(agentParam);
     if (new URLSearchParams(location.search).get('gif') === '1') {
       setTimeout(exportGif, 900);
     }
