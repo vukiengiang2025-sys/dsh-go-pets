@@ -1,5 +1,9 @@
 package io.github.vukiengiang.petstudio;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Color;
@@ -10,7 +14,9 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.view.WindowManager;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -28,10 +34,16 @@ import androidx.webkit.WebViewAssetLoader;
 public class PetOverlayService extends Service {
     private static final String TAG = "PetOverlay";
     private static final String DOMAIN = "appassets.androidplatform.net";
+    private static final String CHANNEL = "pet-overlay";
 
     private WindowManager windowManager;
     private FrameLayout root;
     private WebView webView;
+    private WindowManager.LayoutParams params;
+    private float dragX;
+    private float dragY;
+    private int startX;
+    private int startY;
 
     @Nullable
     @Override
@@ -47,6 +59,7 @@ public class PetOverlayService extends Service {
             return;
         }
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        startAsForeground();
         int size = Math.round(140 * getResources().getDisplayMetrics().density);
 
         root = new FrameLayout(this);
@@ -82,7 +95,35 @@ public class PetOverlayService extends Service {
         root.addView(webView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+        ImageView handle = new ImageView(this);
+        handle.setBackgroundColor(0x66202430);
+        handle.setAlpha(0.75f);
+        handle.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    dragX = event.getRawX();
+                    dragY = event.getRawY();
+                    startX = params.x;
+                    startY = params.y;
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    params.x = startX + Math.round(event.getRawX() - dragX);
+                    params.y = startY + Math.round(event.getRawY() - dragY);
+                    if (windowManager != null && root != null) {
+                        windowManager.updateViewLayout(root, params);
+                    }
+                    return true;
+                default:
+                    return true;
+            }
+        });
+        FrameLayout.LayoutParams handleParams = new FrameLayout.LayoutParams(
+                Math.round(28 * getResources().getDisplayMetrics().density),
+                Math.round(28 * getResources().getDisplayMetrics().density));
+        handleParams.gravity = Gravity.TOP | Gravity.END;
+        root.addView(handle, handleParams);
+
+        params = new WindowManager.LayoutParams(
                 size, size,
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                         ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -105,6 +146,30 @@ public class PetOverlayService extends Service {
         String url = "https://" + DOMAIN + "/www/pet-studio/index.html?v=" + BuildConfig.VERSION_NAME + "&overlay=1";
         webView.loadUrl(url);
         Log.d(TAG, "overlay shown");
+    }
+
+    private void startAsForeground() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                NotificationChannel channel = new NotificationChannel(
+                        CHANNEL, "Floating pet", NotificationManager.IMPORTANCE_LOW);
+                manager.createNotificationChannel(channel);
+            }
+        }
+        Intent open = new Intent(this, MainActivity.class);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, open,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                ? new Notification.Builder(this, CHANNEL)
+                : new Notification.Builder(this);
+        Notification notification = builder
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Pet Studio")
+                .setContentText("Pet is floating on your screen")
+                .setContentIntent(pi)
+                .build();
+        startForeground(7, notification);
     }
 
     @Override
