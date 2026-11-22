@@ -448,6 +448,7 @@ async function sendChat(text) {
   if (s.aiOn && s.aiEndpoint && s.aiModel) {
     if (aiBusy) { setStatus(pick('đang chờ AI trả lời…', 'waiting for AI…')); return; }
     aiBusy = true;
+    const slowTimer = setTimeout(() => setStatus(pick('AI vẫn đang xử lý…', 'AI is still working…')), 12000);
     if (el.quickSend) el.quickSend.disabled = true;
     if (el.aiStatus) el.aiStatus.textContent = 'đang gọi AI…';
     setStatus('AI đang trả lời…');
@@ -466,11 +467,13 @@ async function sendChat(text) {
       if (mood) setTimeout(() => model.setState(mood), 400);
       else setTimeout(() => model.setState('attention'), 300);
       logEvent('chat AI: ' + s.aiModel);
+      clearTimeout(slowTimer);
       aiBusy = false;
       if (el.quickSend) el.quickSend.disabled = false;
       return;
     } catch (err) {
       console.error(err);
+      clearTimeout(slowTimer);
       aiBusy = false;
       if (el.quickSend) el.quickSend.disabled = false;
       const friendly = friendlyAIError(err);

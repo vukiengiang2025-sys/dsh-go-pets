@@ -104,7 +104,14 @@ export async function askAI(config, messages, fetchImpl = null) {
   }
 
   const doFetch = fetchImpl || fetch;
-  const res = await doFetch(target, { ...init, headers });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 30000);
+  let res;
+  try {
+    res = await doFetch(target, { ...init, headers, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
   if (!res.ok) {
     const body = await res.text().catch(() => '');
     throw new Error('HTTP ' + res.status + (body ? ': ' + body.slice(0, 120) : ''));
