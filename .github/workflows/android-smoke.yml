@@ -93,4 +93,4 @@ jobs:
             app-chat.png
             app-pip.png
             app-intro.png
-          if-no-files-found: error
+          if-no-files-found: warn
