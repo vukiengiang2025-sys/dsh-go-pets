@@ -1142,6 +1142,7 @@ function importBackup() {
 }
 
 function resetAll() {
+  if (!confirm(pick('Xoá toàn bộ dữ liệu và cài đặt? Không hoàn tác được.', 'Erase all data and settings? This cannot be undone.'))) return;
   if (!confirm('Xoá toàn bộ cài đặt và nhật ký của Pet Studio?')) return;
   try { localStorage.removeItem(STORE_KEY); } catch {}
   location.reload();
@@ -1947,6 +1948,7 @@ function bindSheet() {
   });
   el.importedList.addEventListener('click', ev => {
     const b = ev.target.closest('button[data-remove]');
+    if (b && !confirm(pick('Xoá pack này?', 'Delete this pack?'))) return;
     if (b) removeImported(b.dataset.remove);
   });
   el.copyBackup.addEventListener('click', copyBackup);
