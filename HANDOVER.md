@@ -2,7 +2,7 @@
 
 ## Hiện tại
 
-- App **Pet Studio 4.25.0** (versionCode 67), Android 7.0+, offline mặc định; chat AI tuỳ chọn.
+- App **Pet Studio 4.27.0** (versionCode 70), Android 7.0+, offline mặc định; chat AI tuỳ chọn.
 - APK: https://github.com/vukiengiang2025-sys/dsh-go-pets/releases/download/android-latest/PetStudio.apk
 - Bản trong máy: /sdcard/Download/DSH-Go/PetStudio.apk
 - 4 pet: Mây, Mây Tuyết, Mây Tết, DSH Bot + nhập ảnh/GIF/zip/link.
@@ -52,7 +52,7 @@ Repo, APK và CI vẫn đang ở trạng thái chạy được.
 - **PiP**: vào được nhưng WebView hiện khung đen trên emulator; đã ẩn nút sau cờ thử nghiệm.
 - **Overlay**: kéo bằng chấm nhỏ góc dưới; nhớ vị trí và cỡ (120/150/200) qua lần mở sau.
 - **Live wallpaper**: đã build service nhưng chưa đặt thử; smoke mở trình chọn hình nền bị treo nên đã bỏ bước đó.
-- **AI chat**: hỗ trợ OpenAI/DeepSeek/Gemini/Groq/Ollama; request qua bridge native tránh CORS; **chưa thử với key thật**.
+- **AI chat**: hỗ trợ OpenAI/DeepSeek/Gemini/Groq/Ollama; tính cách, ký ức, trạng thái, chào khi mở app; request qua bridge native tránh CORS; **chưa thử với key thật**.
 - **Pet nổi tự bay nhảy**: đã xác nhận bằng 2 ảnh cách nhau 2 giây (pet lệch 58 px), giữ lề 36 dp.
 - **Dạy đi**: đường nét đứt chỉ hiện lúc đang đi, ảnh chụp chỉ thấy pet đã dời chỗ.
 - **FPS**: chip có nhưng chưa chụp được ảnh xác nhận số.

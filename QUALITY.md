@@ -1,6 +1,6 @@
 # Chấm điểm chất lượng: 1000/1000
 
-> Cập nhật 4.25.0: 61 test, AI chat, overlay bay nhảy, AOD, live wallpaper.
+> Cập nhật 4.27.0: 64 test, AI chat (tính cách/chào), overlay bay nhảy, AOD, live wallpaper.
 > Cập nhật 2.9.0: 40 test (engine, pack, zip, GIF, QR, streak…), AAB + Espresso trong CI,
 > kèm [STATUS.md](STATUS.md) đối chiếu 100 ý tưởng (54 xong, 8 một phần, 38 hoãn).
 
