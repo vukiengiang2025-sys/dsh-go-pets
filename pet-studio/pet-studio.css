@@ -273,3 +273,10 @@ body.pip .bubble { display: none !important; }
 .error-list p { margin: 0; background: rgba(255,120,140,.08); border: 1px solid rgba(255,120,140,.25);
   border-radius: 9px; padding: 6px 8px; word-break: break-word; }
 .error-list:empty::before { content: "chưa có lỗi nào"; color: #6c7a90; }
+
+.mood-menu { position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%);
+  display: flex; gap: 8px; background: rgba(17,24,36,.96); border: 1px solid var(--line);
+  border-radius: 999px; padding: 8px; z-index: 4; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+.mood-menu[hidden] { display: none; }
+.mood-menu button { background: var(--panel); color: var(--text); border: 1px solid var(--line);
+  border-radius: 999px; padding: 7px 12px; font: inherit; font-size: 12.5px; }

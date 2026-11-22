@@ -125,6 +125,7 @@ const el = {
   agentChip: document.getElementById('agentChip'),
   batteryChip: document.getElementById('batteryChip'),
   fpsChip: document.getElementById('fpsChip'),
+  moodMenu: document.getElementById('moodMenu'),
   showFps: document.getElementById('showFps'),
   errorLog: document.getElementById('errorLog'),
   errorList: document.getElementById('errorList'),
@@ -1402,6 +1403,16 @@ function hidePet() {
 function bindStage() {
   let down = null;
   let clicks = [];
+  let holdTimer = 0;
+
+  function hideMood() { el.moodMenu.hidden = true; }
+  el.moodMenu.addEventListener('click', ev => {
+    const b = ev.target.closest('button[data-mood]');
+    if (!b) return;
+    model.setState(b.dataset.mood);
+    petSay(b.dataset.mood === 'attention' ? 'Mình vui lắm!' : b.dataset.mood === 'sleeping' ? 'Mình buồn ngủ…' : 'Hừm, mình đang hờn.');
+    hideMood();
+  });
   const pos = ev => {
     const r = el.canvas.getBoundingClientRect();
     return { x: ev.clientX - r.left, y: ev.clientY - r.top, w: r.width };
@@ -1410,10 +1421,17 @@ function bindStage() {
     el.stage.setPointerCapture(ev.pointerId);
     const p = pos(ev);
     down = {
-      x: p.x, y: p.y, dragging: false, petting: false,
+      x: p.x, y: p.y, dragging: false, petting: false, held: false,
       lastX: p.x, lastY: p.y, lastT: ev.timeStamp, vx: 0, vy: 0,
     };
     strokeDetector.reset();
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(() => {
+      if (!down || down.dragging || down.petting) return;
+      down.held = true;
+      el.moodMenu.hidden = false;
+      haptic(12);
+    }, 600);
   });
   el.stage.addEventListener('pointermove', ev => {
     const r = el.canvas.getBoundingClientRect();
@@ -1423,6 +1441,7 @@ function bindStage() {
     look.ty = Math.max(-1, Math.min(1, dy)) * 2.5;
     if (!down) return;
     const p = pos(ev);
+    if (!down.held && Math.hypot(p.x - down.x, p.y - down.y) > 8) clearTimeout(holdTimer);
     if (!down.petting && strokeDetector.push(p.x, ev.timeStamp)) {
       down.petting = true;
       model.tickle();
@@ -1452,6 +1471,8 @@ function bindStage() {
     if (!down) return;
     const d = down;
     down = null;
+    clearTimeout(holdTimer);
+    if (d.held) { el.moodMenu.hidden = true; return; }
     if (d.dragging) {
       const clamp = (v, m) => Math.max(-m, Math.min(m, v));
       thrower = new ThrowPhysics({ vx: clamp(d.vx * 1000, 900), vy: clamp(d.vy * 1000, 900) });
@@ -1637,6 +1658,9 @@ async function main() {
     const agentParam = new URLSearchParams(location.search).get('agent');
     if (agentParam === 'demo') startAgent('./agent.json');
     else if (agentParam && /^https?:/.test(agentParam)) startAgent(agentParam);
+    if (new URLSearchParams(location.search).get('mood') === '1') {
+      setTimeout(() => { el.moodMenu.hidden = false; }, 900);
+    }
     if (new URLSearchParams(location.search).get('notify') === '1') {
       setTimeout(() => {
         if (window.AndroidPet && window.AndroidPet.notify) {
