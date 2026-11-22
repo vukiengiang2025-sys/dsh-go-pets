@@ -141,13 +141,14 @@ export const PERSONAS = {
   lazy: { vi: 'lười', hint: 'lười biếng, càu nhàu nhẹ nhưng vẫn quan tâm' },
 };
 
-export function buildSystemPrompt({ name = 'pet', persona = 'gentle', memories = [], state = '', hour = 12 } = {}) {
+export function buildSystemPrompt({ name = 'pet', persona = 'gentle', memories = [], state = '', hour = 12, userName = '' } = {}) {
   const p = PERSONAS[persona] || PERSONAS.gentle;
   const time = hour >= 22 || hour < 6 ? 'đêm khuya' : hour < 11 ? 'buổi sáng' : hour < 18 ? 'buổi chiều' : 'buổi tối';
   return 'Bạn là ' + name + ', một pet nhỏ sống trên màn hình điện thoại của người dùng. '
     + 'Tính cách: ' + p.hint + '. '
     + 'Trả lời ngắn (1-2 câu), tự nhiên, xưng "mình" và gọi người dùng là "bạn". '
     + 'Trả lời cùng ngôn ngữ với người dùng. Không bịa việc bạn không biết, không hứa làm việc thật. '
+    + (userName ? 'Người dùng tên ' + userName + '. ' : '')
     + 'Bây giờ là ' + time + '. '
     + (state ? 'Trạng thái hiện tại của bạn: ' + state + '. ' : '')
     + (memories.length ? 'Bạn nhớ: ' + memories.slice(-5).join('; ') + '. ' : '');

@@ -58,7 +58,7 @@ const DEFAULT_STORE = {
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
   ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi', agentHosts: [], overlayFloat: true,
-  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai', aiPersona: 'gentle', aiGreet: false, lastOpen: 0, installId: '',
+  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai', aiPersona: 'gentle', aiGreet: false, lastOpen: 0, userName: '', installId: '',
 };
 
 const el = {
@@ -87,6 +87,7 @@ const el = {
   backdrop: document.getElementById('backdrop'),
   closeSheet: document.getElementById('closeSheet'),
   petNameInput: document.getElementById('petNameInput'),
+  userName: document.getElementById('userName'),
   paletteChips: document.getElementById('paletteChips'),
   profiles: document.getElementById('profiles'),
   stats: document.getElementById('stats'),
@@ -445,6 +446,7 @@ function aiSystemPrompt(s) {
     name: s.name || (pack && pack.name) || 'pet',
     persona: s.aiPersona || 'gentle',
     memories: s.memories || [],
+    userName: s.userName || '',
     state: model ? stateText(model.state) : '',
     hour: new Date().getHours(),
   });
@@ -510,7 +512,7 @@ async function sendChat(text) {
   const reply = replyTo(t, { lang: getLang(),
     petName: s.name || (pack && pack.name) || 'pet',
     memories: s.memories,
-    you: 'bạn',
+    you: s.userName || 'bạn',
   });
   petSay(reply);
   if (el.lastReply) { el.lastReply.textContent = reply; el.lastReply.hidden = false; }
@@ -1622,6 +1624,9 @@ function bindSheet() {
   el.backdrop.addEventListener('click', () => openSheet(false));
   document.addEventListener('keydown', ev => { if (ev.key === 'Escape') openSheet(false); });
 
+  el.userName.addEventListener('input', () => {
+    writeStore({ userName: el.userName.value.trim().slice(0, 16) }, { render: false });
+  });
   el.petNameInput.addEventListener('input', () => {
     const name = el.petNameInput.value.trim().slice(0, 16);
     applyName(name);
@@ -2267,6 +2272,7 @@ async function main() {
     renderExperiment();
     maybeAIGreet();
     maybeDailyGreet();
+    if (el.userName) el.userName.value = savedSettings.userName || '';
     el.aiPersona.value = savedSettings.aiPersona || 'gentle';
     el.aiProvider.value = savedSettings.aiProvider || 'openai';
     el.aiEndpoint.value = savedSettings.aiEndpoint || '';
