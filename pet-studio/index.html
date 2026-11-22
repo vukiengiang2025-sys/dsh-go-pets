@@ -179,6 +179,7 @@
         <button id="exportGif">Xuất GIF</button>
         <button id="shareQr">Mã QR</button>
         <button id="giftPack">Tặng pet (.zip)</button>
+        <button id="openGallery">Thư viện</button>
       </div>
     </div>
 
@@ -198,6 +199,14 @@
     </div>
   </div>
 </section>
+
+<div class="qr-modal" id="galleryModal" hidden>
+  <div class="qr-card gallery-card">
+    <h2>Ảnh & GIF đã xuất</h2>
+    <div class="gallery" id="galleryGrid"></div>
+    <div class="row"><button id="galleryClose">Đóng</button></div>
+  </div>
+</div>
 
 <div class="qr-modal" id="qrModal" hidden>
   <div class="qr-card">

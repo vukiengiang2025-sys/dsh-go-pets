@@ -260,3 +260,10 @@ body.pip .bubble { display: none !important; }
   padding: 9px 12px; font: inherit; font-size: 13px; }
 
 .battery-chip { margin: 6px 0 0; font-size: 11.5px; color: #9fb0c8; }
+
+.gallery-card { max-height: 78vh; overflow: auto; }
+.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 0 12px; }
+.gallery figure { margin: 0; background: #0f1622; border-radius: 10px; padding: 6px; }
+.gallery img { width: 100%; height: 84px; object-fit: contain; display: block; }
+.gallery figcaption { font-size: 9.5px; color: #8fa2ba; margin-top: 4px; word-break: break-all; }
+.gallery .empty { grid-column: 1 / -1; color: #4b5a70; font-size: 12.5px; padding: 12px; }

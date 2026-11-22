@@ -3,7 +3,9 @@ package io.github.vukiengiang.petstudio;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PictureInPictureParams;
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -34,9 +36,14 @@ import androidx.webkit.WebResourceErrorCompat;
 import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewClientCompat;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Vỏ Android cho Pet Studio: WebView nạp tài nguyên đóng gói trong APK
@@ -165,7 +172,7 @@ public class MainActivity extends Activity {
         if (savedInstanceState == null) {
             webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent()), chatOf(getIntent()),
                     pipOnLoad, introOf(getIntent()), exportOf(getIntent()), gifOf(getIntent()),
-                    agentOf(getIntent())));
+                    agentOf(getIntent()), galleryOf(getIntent())));
         } else {
             webView.restoreState(savedInstanceState);
         }
@@ -177,7 +184,7 @@ public class MainActivity extends Activity {
 
     private static String startUrl(@Nullable String pack, @Nullable String fx, @Nullable String chat,
                                    boolean pip, boolean intro, boolean export, boolean gif,
-                                   @Nullable String agent) {
+                                   @Nullable String agent, boolean gallery) {
         String url = START_URL;
         if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
             url += "&pack=" + pack;
@@ -202,6 +209,9 @@ public class MainActivity extends Activity {
         }
         if ("demo".equals(agent)) {
             url += "&agent=demo";
+        }
+        if (gallery) {
+            url += "&gallery=1";
         }
         return url;
     }
@@ -230,13 +240,17 @@ public class MainActivity extends Activity {
         return intent != null ? intent.getStringExtra("agent") : null;
     }
 
+    private static boolean galleryOf(@Nullable Intent intent) {
+        return intent != null && intent.getBooleanExtra("gallery", false);
+    }
+
     @Override
     protected void onNewIntent(@NonNull Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
         if (webView != null) {
             webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent), false, introOf(intent),
-                    exportOf(intent), gifOf(intent), agentOf(intent)));
+                    exportOf(intent), gifOf(intent), agentOf(intent), galleryOf(intent)));
         }
     }
 
@@ -286,6 +300,42 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public String listExports() {
+            JSONArray out = new JSONArray();
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    Uri collection = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
+                    String[] projection = {
+                            MediaStore.MediaColumns.DISPLAY_NAME,
+                            MediaStore.MediaColumns.MIME_TYPE,
+                            MediaStore.MediaColumns._ID,
+                    };
+                    String selection = MediaStore.MediaColumns.RELATIVE_PATH + " LIKE ?";
+                    try (Cursor cursor = getContentResolver().query(
+                            collection, projection, selection,
+                            new String[]{"%" + "DSH-Go" + "%"},
+                            MediaStore.MediaColumns.DATE_ADDED + " DESC")) {
+                        while (cursor != null && cursor.moveToNext() && out.length() < 12) {
+                            String name = cursor.getString(0);
+                            String mime = cursor.getString(1);
+                            long id = cursor.getLong(2);
+                            byte[] data = readUpTo(ContentUris.withAppendedId(collection, id), 512 * 1024);
+                            if (data == null) continue;
+                            JSONObject item = new JSONObject();
+                            item.put("name", name);
+                            item.put("mime", mime);
+                            item.put("data", Base64.encodeToString(data, Base64.NO_WRAP));
+                            out.put(item);
+                        }
+                    }
+                }
+            } catch (Exception err) {
+                Log.e(TAG, "listExports failed", err);
+            }
+            return out.toString();
+        }
+
+        @JavascriptInterface
         public void openUrl(String url) {
             if (url == null || !url.matches("https?://.*")) return;
             runOnUiThread(() -> {
@@ -295,6 +345,23 @@ public class MainActivity extends Activity {
                     Log.e(TAG, "openUrl failed", err);
                 }
             });
+        }
+    }
+
+    private byte[] readUpTo(Uri uri, int limit) {
+        try (InputStream in = getContentResolver().openInputStream(uri)) {
+            if (in == null) return null;
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) > 0) {
+                out.write(buffer, 0, read);
+                if (out.size() > limit) return null;
+            }
+            return out.toByteArray();
+        } catch (Exception err) {
+            Log.e(TAG, "readUpTo failed", err);
+            return null;
         }
     }
 

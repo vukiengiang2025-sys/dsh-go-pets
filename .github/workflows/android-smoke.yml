@@ -97,6 +97,11 @@ jobs:
             adb shell ls -l /sdcard/Download/DSH-Go | tail -5 || true
             adb shell am force-stop io.github.vukiengiang.petstudio
             sleep 2
+            adb shell am start -W -n io.github.vukiengiang.petstudio/.MainActivity --ez gallery true
+            sleep 6
+            adb exec-out screencap -p > app-gallery.png
+            adb shell am force-stop io.github.vukiengiang.petstudio
+            sleep 2
             adb shell am start -W -n io.github.vukiengiang.petstudio/.MainActivity --es agent demo
             sleep 8
             adb exec-out screencap -p > app-agent.png
@@ -124,5 +129,6 @@ jobs:
             app-pip.png
             app-intro.png
             app-agent.png
+            app-gallery.png
             app-tet.png
           if-no-files-found: warn

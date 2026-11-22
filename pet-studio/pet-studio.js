@@ -132,6 +132,10 @@ const el = {
   qrUrl: document.getElementById('qrUrl'),
   qrSave: document.getElementById('qrSave'),
   giftPack: document.getElementById('giftPack'),
+  openGallery: document.getElementById('openGallery'),
+  galleryModal: document.getElementById('galleryModal'),
+  galleryGrid: document.getElementById('galleryGrid'),
+  galleryClose: document.getElementById('galleryClose'),
   qrClose: document.getElementById('qrClose'),
 };
 const ctx = el.canvas.getContext('2d');
@@ -1084,6 +1088,24 @@ async function exportGift() {
   }
 }
 
+function showGallery() {
+  try {
+    const raw = window.AndroidPet && window.AndroidPet.listExports
+      ? window.AndroidPet.listExports()
+      : '[]';
+    const items = JSON.parse(raw || '[]');
+    el.galleryGrid.innerHTML = items.length
+      ? items.map(item => '<figure><img alt="" src="data:' + item.mime + ';base64,' + item.data + '">'
+        + '<figcaption>' + escapeHtml(item.name) + '</figcaption></figure>').join('')
+      : '<p class="empty">Chưa có ảnh/GIF nào. Dùng “Xuất ảnh pet” hoặc “Xuất GIF” trước.</p>';
+    el.galleryModal.hidden = false;
+    logEvent('mở thư viện');
+  } catch (err) {
+    console.error(err);
+    setStatus('thư viện lỗi: ' + err.message);
+  }
+}
+
 function showQr() {
   try {
     const url = shareUrl(location.origin + location.pathname, pickConfig(readStore()));
@@ -1232,6 +1254,8 @@ function bindSheet() {
   el.shareConfig.addEventListener('click', shareConfig);
   el.shareQr.addEventListener('click', showQr);
   el.giftPack.addEventListener('click', exportGift);
+  el.openGallery.addEventListener('click', showGallery);
+  el.galleryClose.addEventListener('click', () => { el.galleryModal.hidden = true; });
   el.qrClose.addEventListener('click', () => { el.qrModal.hidden = true; });
   el.qrSave.addEventListener('click', () => {
     try {
@@ -1525,6 +1549,9 @@ async function main() {
     const agentParam = new URLSearchParams(location.search).get('agent');
     if (agentParam === 'demo') startAgent('./agent.json');
     else if (agentParam && /^https?:/.test(agentParam)) startAgent(agentParam);
+    if (new URLSearchParams(location.search).get('gallery') === '1') {
+      setTimeout(showGallery, 900);
+    }
     if (new URLSearchParams(location.search).get('gift') === '1') {
       setTimeout(exportGift, 900);
     }
