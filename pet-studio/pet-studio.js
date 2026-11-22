@@ -146,6 +146,7 @@ const el = {
   aiGreet: document.getElementById('aiGreet'),
   aiTest: document.getElementById('aiTest'),
   aiRetest: document.getElementById('aiRetest'),
+  aiClearKey: document.getElementById('aiClearKey'),
   aiStatus: document.getElementById('aiStatus'),
   agentHosts: document.getElementById('agentHosts'),
   saveHost: document.getElementById('saveHost'),
@@ -1768,6 +1769,12 @@ function bindSheet() {
       writeStore({ agentHosts: removeHost(readStore().agentHosts || [], del.dataset.del) });
       renderHosts();
     }
+  });
+  el.aiClearKey.addEventListener('click', () => {
+    if (!confirm(pick('Xoá API key đã lưu?', 'Delete the saved API key?'))) return;
+    el.aiKey.value = '';
+    writeStore({ aiKey: '', aiTestAt: 0 });
+    if (el.aiStatus) el.aiStatus.textContent = 'đã xoá key';
   });
   el.aiChip.addEventListener('click', () => {
     el.aiOn.checked = !el.aiOn.checked;
