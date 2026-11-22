@@ -156,7 +156,7 @@ public class MainActivity extends Activity {
         });
 
         if (savedInstanceState == null) {
-            webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent()), chatOf(getIntent()), pipOnLoad));
+            webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent()), chatOf(getIntent()), pipOnLoad, introOf(getIntent())));
         } else {
             webView.restoreState(savedInstanceState);
         }
@@ -166,7 +166,8 @@ public class MainActivity extends Activity {
         return intent != null ? intent.getStringExtra("pack") : null;
     }
 
-    private static String startUrl(@Nullable String pack, @Nullable String fx, @Nullable String chat, boolean pip) {
+    private static String startUrl(@Nullable String pack, @Nullable String fx, @Nullable String chat,
+                                   boolean pip, boolean intro) {
         String url = START_URL;
         if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
             url += "&pack=" + pack;
@@ -180,6 +181,9 @@ public class MainActivity extends Activity {
         if (pip) {
             url += "&pip=1";
         }
+        if (intro) {
+            url += "&intro=1";
+        }
         return url;
     }
 
@@ -191,12 +195,16 @@ public class MainActivity extends Activity {
         return intent != null ? intent.getStringExtra("chat") : null;
     }
 
+    private static boolean introOf(@Nullable Intent intent) {
+        return intent != null && intent.getBooleanExtra("intro", false);
+    }
+
     @Override
     protected void onNewIntent(@NonNull Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
         if (webView != null) {
-            webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent), false));
+            webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent), false, introOf(intent)));
         }
     }
 

@@ -3,6 +3,7 @@ import { buildPackFromFile, buildPackFromZip } from './pack-import.js';
 import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } from './pet-fx.js';
 import { shouldRemind, breakText } from './reminders.js';
 import { replyTo, storyFor, summaryFrom } from './pet-chat.js';
+import { todayKey, bumpStreak, questDone, clock } from './care.js';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
 
 const FALLBACK_PACKS = [
@@ -44,6 +45,8 @@ const DEFAULT_STORE = {
   journal: [], simple: false, autoTheme: false,
   speech: false, speechRate: 1, voiceName: '', breakReminder: false, breakMinutes: 45, lastBreak: 0,
   chat: [], memories: [],
+  onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 },
+  focusMinutes: 25, restMinutes: 5,
 };
 
 const el = {
@@ -96,6 +99,14 @@ const el = {
   memoryList: document.getElementById('memoryList'),
   memoryInput: document.getElementById('memoryInput'),
   memoryAdd: document.getElementById('memoryAdd'),
+  intro: document.getElementById('intro'),
+  introStart: document.getElementById('introStart'),
+  streakLine: document.getElementById('streakLine'),
+  questLine: document.getElementById('questLine'),
+  focusStart: document.getElementById('focusStart'),
+  breakStart: document.getElementById('breakStart'),
+  focusStop: document.getElementById('focusStop'),
+  timerLine: document.getElementById('timerLine'),
 };
 const ctx = el.canvas.getContext('2d');
 
@@ -162,6 +173,7 @@ function renderSheet() {
   const seen = Object.keys(s.stats.states || {}).length;
   renderChat();
   renderMemories();
+  renderCare();
   el.stats.innerHTML =
     '<span><b>' + (s.stats.poke || 0) + '</b> lần chọc</span>'
     + '<span><b>' + (s.stats.tickle || 0) + '</b> lần cù</span>'
@@ -329,6 +341,69 @@ function addMemory() {
   el.memoryInput.value = '';
   renderMemories();
   petSay('Mình nhớ rồi: ' + text);
+}
+
+let focusMode = 'idle';
+let focusEnds = 0;
+let focusTimer = 0;
+
+function renderCare() {
+  if (!el.streakLine) return;
+  const s = readStore();
+  el.streakLine.innerHTML = 'Chuỗi: <b>' + (s.streak.count || 0) + ' ngày</b>';
+  const roam = s.quest.date === todayKey() ? s.quest.roam || 0 : 0;
+  el.questLine.innerHTML = 'Đi dạo hôm nay: <b>' + Math.min(roam, 3) + '/3</b>'
+    + (questDone(roam, 3) ? ' ✓' : '');
+  el.timerLine.textContent = focusMode === 'idle'
+    ? 'chưa chạy'
+    : (focusMode === 'focus' ? 'Tập trung ' : 'Nghỉ ') + clock(focusEnds - Date.now());
+}
+
+function stopFocus() {
+  clearInterval(focusTimer);
+  focusTimer = 0;
+  focusMode = 'idle';
+  focusEnds = 0;
+  renderCare();
+}
+
+function tickFocus() {
+  if (focusMode === 'idle') return;
+  const left = focusEnds - Date.now();
+  el.timerLine.textContent = (focusMode === 'focus' ? 'Tập trung ' : 'Nghỉ ') + clock(left);
+  if (left > 0) return;
+  if (focusMode === 'focus') {
+    petSay('Hết ' + readStore().focusMinutes + ' phút tập trung. Nghỉ ' + readStore().restMinutes + ' phút nhé.');
+    startMinuteTimer('break', readStore().restMinutes);
+  } else {
+    petSay('Nghỉ xong rồi. Mình tiếp tục nhé!');
+    stopFocus();
+  }
+}
+
+function startMinuteTimer(mode, minutes) {
+  clearInterval(focusTimer);
+  focusMode = mode;
+  focusEnds = Date.now() + Math.max(1, minutes) * 60000;
+  model.setState(mode === 'focus' ? 'working' : 'attention');
+  renderCare();
+  focusTimer = setInterval(tickFocus, 1000);
+  tickFocus();
+}
+
+function applyStreak() {
+  const s = readStore();
+  const today = todayKey();
+  const streak = bumpStreak(s.streak, today);
+  const quest = s.quest.date === today ? s.quest : { date: today, roam: 0 };
+  writeStore({ streak, quest });
+}
+
+function maybeIntro() {
+  const force = new URLSearchParams(location.search).get('intro') === '1';
+  const s = readStore();
+  if (!force && s.onboarded) return;
+  el.intro.hidden = false;
 }
 
 function checkBreak() {
@@ -671,6 +746,14 @@ function onState() {
     stats.states[st] = 1;
     writeStore({ stats });
   }
+  if (st === 'roam') {
+    const s = readStore();
+    const today = todayKey();
+    const quest = s.quest.date === today ? s.quest : { date: today, roam: 0 };
+    quest.roam = (quest.roam || 0) + 1;
+    writeStore({ quest });
+    renderCare();
+  }
   if (st === 'attention') { spawnFx('sparkles'); squash = 0.86; logEvent('pet vừa xong việc'); }
   else if (st === 'sleeping') { spawnFx('zzz'); logEvent('pet đi ngủ'); }
   else if (st === 'error') { squash = 0.9; logEvent('pet gặp lỗi'); }
@@ -788,6 +871,14 @@ function bindSheet() {
   el.summaryBtn.addEventListener('click', () => {
     const s = readStore();
     petSay(summaryFrom(s.stats, s.memories));
+  });
+  el.focusStart.addEventListener('click', () => startMinuteTimer('focus', readStore().focusMinutes));
+  el.breakStart.addEventListener('click', () => startMinuteTimer('break', readStore().restMinutes));
+  el.focusStop.addEventListener('click', stopFocus);
+  el.introStart.addEventListener('click', () => {
+    el.intro.hidden = true;
+    writeStore({ onboarded: true });
+    logEvent('bắt đầu dùng app');
   });
   el.memoryAdd.addEventListener('click', addMemory);
   el.memoryInput.addEventListener('keydown', ev => { if (ev.key === 'Enter') addMemory(); });
@@ -1034,6 +1125,8 @@ async function main() {
       if (readStore().autoTheme) applyPalette(paletteForNow());
     }, 600000);
     if (new URLSearchParams(location.search).get('sheet') === '1') openSheet(true);
+    applyStreak();
+    maybeIntro();
     const importDemo = new URLSearchParams(location.search).get('import');
     if (importDemo === 'demo') demoImport();
     else if (importDemo === 'zip') demoZipImport();

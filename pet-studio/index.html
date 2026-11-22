@@ -106,6 +106,17 @@
       <button id="testSpeech">Nghe thử</button>
     </div>
 
+    <div class="field">Chăm sóc
+      <div class="care-line" id="streakLine">Chuỗi: —</div>
+      <div class="care-line" id="questLine">Đi dạo hôm nay: 0/3</div>
+      <div class="row">
+        <button id="focusStart">Tập trung 25′</button>
+        <button id="breakStart">Nghỉ 5′</button>
+        <button id="focusStop">Dừng</button>
+      </div>
+      <div class="timer" id="timerLine">chưa chạy</div>
+    </div>
+
     <label class="check"><input type="checkbox" id="breakOn"> Nhắc đứng dậy mỗi</label>
     <div class="row">
       <input type="number" id="breakMinutes" min="5" max="180" step="5" value="45" class="minutes">
@@ -148,6 +159,19 @@
     </div>
   </div>
 </section>
+
+<div class="intro" id="intro" hidden>
+  <div class="intro-card">
+    <h2>Chào mừng đến Pet Studio</h2>
+    <p>Một chú pet nhỏ sống trên màn hình của bạn.</p>
+    <ul>
+      <li><b>Chạm</b> để chọc, chạm 3 lần để cù, kéo để nhấc, vuốt để ve.</li>
+      <li><b>Đổi pet</b> ở ô Pack; nhập thêm ảnh/GIF/zip trong Cài đặt.</li>
+      <li><b>Cài đặt</b> có màu, giọng đọc, nhắc nghỉ và Pomodoro.</li>
+    </ul>
+    <button id="introStart">Bắt đầu</button>
+  </div>
+</div>
 
 <script type="module" src="pet-studio.js"></script>
 <script nomodule>
