@@ -415,3 +415,9 @@ button { border-radius: 10px; }
 @media (min-width: 720px) { .states { flex-wrap: wrap; } }
 
 .sheet-head { position: sticky; top: 0; z-index: 3; background: linear-gradient(180deg,#101827,#0e1520); border-bottom: 1px solid rgba(120,150,190,.14); }
+
+
+.quick-chat { display: flex; gap: 8px; margin: 8px 0 6px; }
+.quick-chat input { flex: 1; min-height: 40px; }
+.quick-chat button { padding: 0 16px; border: 0; border-radius: 10px;
+  background: var(--accent, #6ea8ff); color: #07101d; font-weight: 800; font-size: 13px; }

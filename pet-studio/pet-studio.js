@@ -70,6 +70,8 @@ const el = {
   status: document.getElementById('status'),
   packInfo: document.getElementById('packInfo'),
   brandPet: document.getElementById('brandPet'),
+  quickInput: document.getElementById('quickInput'),
+  quickSend: document.getElementById('quickSend'),
   pack: document.getElementById('pack'),
   size: document.getElementById('size'),
   quiet: document.getElementById('quiet'),
@@ -1617,6 +1619,19 @@ function bindSheet() {
     const minutes = Math.max(5, Math.min(180, Number(el.breakMinutes.value) || 45));
     el.breakMinutes.value = minutes;
     writeStore({ breakMinutes: minutes });
+  });
+  el.quickSend.addEventListener('click', () => {
+    const text = (el.quickInput.value || '').trim();
+    if (!text) return;
+    el.quickInput.value = '';
+    sendChat(text);
+  });
+  el.quickInput.addEventListener('keydown', ev => {
+    if (ev.key !== 'Enter') return;
+    const text = (el.quickInput.value || '').trim();
+    if (!text) return;
+    el.quickInput.value = '';
+    sendChat(text);
   });
   el.chatSend.addEventListener('click', () => { sendChat(el.chatInput.value); el.chatInput.value = ''; });
   el.chatInput.addEventListener('keydown', ev => {
