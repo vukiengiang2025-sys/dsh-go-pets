@@ -95,3 +95,12 @@ export function memoryFrom(text) {
   const value = match[1].trim();
   return value ? value.slice(0, 60) : null;
 }
+
+export function greetingFor(hour, lang = 'vi') {
+  const en = lang === 'en';
+  if (hour >= 5 && hour < 11) return en ? 'Good morning! New day, new energy.' : 'Chào buổi sáng! Ngày mới vui vẻ nhé.';
+  if (hour >= 11 && hour < 14) return en ? 'Lunch time - eat something good.' : 'Đến giờ ăn trưa rồi, ăn gì ngon nhé.';
+  if (hour >= 14 && hour < 18) return en ? 'Good afternoon! Take it easy.' : 'Chào buổi chiều! Làm việc nhẹ nhàng thôi.';
+  if (hour >= 18 && hour < 22) return en ? 'Good evening! You did enough today.' : 'Chào buổi tối! Hôm nay bạn làm đủ rồi.';
+  return en ? 'Still awake? I will stay with you.' : 'Còn thức à? Mình ngồi cùng bạn.';
+}
