@@ -5,6 +5,7 @@ import { shouldRemind, breakText } from './reminders.js';
 import { replyTo, storyFor, summaryFrom } from './pet-chat.js';
 import { todayKey, bumpStreak, questDone, clock } from './care.js';
 import { shareUrl, pickConfig, decodeConfig } from './share.js';
+import { encodeGif, quantize } from './gif.js';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
 
 const FALLBACK_PACKS = [
@@ -110,6 +111,7 @@ const el = {
   timerLine: document.getElementById('timerLine'),
   shareConfig: document.getElementById('shareConfig'),
   exportPng: document.getElementById('exportPng'),
+  exportGif: document.getElementById('exportGif'),
 };
 const ctx = el.canvas.getContext('2d');
 
@@ -806,6 +808,55 @@ function resetAll() {
 
 window.__setPip = on => document.body.classList.toggle('pip', !!on);
 
+function bytesToBase64(bytes) {
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 8192) {
+    bin += String.fromCharCode(...bytes.subarray(i, i + 8192));
+  }
+  return btoa(bin);
+}
+
+function exportGif() {
+  try {
+    const anim = (lastDraw && lastDraw.anim) || pickStateAnim(pack, model.state);
+    if (!anim) throw new Error('chưa có animation');
+    const scale = Math.min(2, 256 / Math.max(pack.canvas.w, pack.canvas.h));
+    const w = Math.max(1, Math.round(pack.canvas.w * scale));
+    const h = Math.max(1, Math.round(pack.canvas.h * scale));
+    const frames = [];
+    for (const f of anim.frames.slice(0, 24)) {
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const g = c.getContext('2d');
+      g.imageSmoothingEnabled = !pack.pixelArt;
+      const img = images[anim.sheet];
+      const sx = (f.i % anim.cols) * anim.frameW;
+      const sy = Math.floor(f.i / anim.cols) * anim.frameH;
+      g.drawImage(img, sx, sy, anim.frameW, anim.frameH,
+        anim.box.x * scale, anim.box.y * scale, anim.box.w * scale, anim.box.h * scale);
+      const data = g.getImageData(0, 0, w, h).data;
+      frames.push({ width: w, height: h, indices: quantize(data, w, h), delay: f.ms });
+    }
+    const bytes = encodeGif(frames, { width: w, height: h });
+    const b64 = bytesToBase64(bytes);
+    if (window.AndroidPet && typeof window.AndroidPet.saveGif === 'function') {
+      window.AndroidPet.saveGif(b64, 'pet-studio-' + Date.now() + '.gif');
+      setStatus('đã lưu GIF vào Download/DSH-Go');
+    } else {
+      const link = document.createElement('a');
+      link.href = 'data:image/gif;base64,' + b64;
+      link.download = 'pet-studio.gif';
+      link.click();
+      setStatus('đã xuất GIF');
+    }
+    logEvent('xuất GIF');
+  } catch (err) {
+    console.error(err);
+    setStatus('xuất GIF lỗi: ' + err.message);
+  }
+}
+
 function exportPng() {
   try {
     const out = document.createElement('canvas');
@@ -928,6 +979,7 @@ function bindSheet() {
   });
   el.shareConfig.addEventListener('click', shareConfig);
   el.exportPng.addEventListener('click', exportPng);
+  el.exportGif.addEventListener('click', exportGif);
   el.focusStart.addEventListener('click', () => startMinuteTimer('focus', readStore().focusMinutes));
   el.breakStart.addEventListener('click', () => startMinuteTimer('break', readStore().restMinutes));
   el.focusStop.addEventListener('click', stopFocus);
@@ -1189,6 +1241,9 @@ async function main() {
     else if (importDemo === 'zip') demoZipImport();
     if (new URLSearchParams(location.search).get('export') === '1') {
       setTimeout(exportPng, 700);
+    }
+    if (new URLSearchParams(location.search).get('gif') === '1') {
+      setTimeout(exportGif, 900);
     }
     if (new URLSearchParams(location.search).get('chat') === 'demo') {
       setTimeout(() => sendChat('xin chào'), 800);

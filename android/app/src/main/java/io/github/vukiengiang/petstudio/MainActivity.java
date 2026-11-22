@@ -164,7 +164,7 @@ public class MainActivity extends Activity {
 
         if (savedInstanceState == null) {
             webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent()), chatOf(getIntent()),
-                    pipOnLoad, introOf(getIntent()), exportOf(getIntent())));
+                    pipOnLoad, introOf(getIntent()), exportOf(getIntent()), gifOf(getIntent())));
         } else {
             webView.restoreState(savedInstanceState);
         }
@@ -175,7 +175,7 @@ public class MainActivity extends Activity {
     }
 
     private static String startUrl(@Nullable String pack, @Nullable String fx, @Nullable String chat,
-                                   boolean pip, boolean intro, boolean export) {
+                                   boolean pip, boolean intro, boolean export, boolean gif) {
         String url = START_URL;
         if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
             url += "&pack=" + pack;
@@ -194,6 +194,9 @@ public class MainActivity extends Activity {
         }
         if (export) {
             url += "&export=1";
+        }
+        if (gif) {
+            url += "&gif=1";
         }
         return url;
     }
@@ -214,12 +217,17 @@ public class MainActivity extends Activity {
         return intent != null && intent.getBooleanExtra("export", false);
     }
 
+    private static boolean gifOf(@Nullable Intent intent) {
+        return intent != null && intent.getBooleanExtra("gif", false);
+    }
+
     @Override
     protected void onNewIntent(@NonNull Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
         if (webView != null) {
-            webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent), false, introOf(intent), exportOf(intent)));
+            webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent), false, introOf(intent),
+                    exportOf(intent), gifOf(intent)));
         }
     }
 
@@ -255,19 +263,26 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void savePng(String base64, String name) {
-            runOnUiThread(() -> savePngFile(base64, name));
+            runOnUiThread(() -> savePngFile(base64, name, "image/png"));
+        }
+
+        @JavascriptInterface
+        public void saveGif(String base64, String name) {
+            runOnUiThread(() -> savePngFile(base64, name, "image/gif"));
         }
     }
 
-    private void savePngFile(String base64, String name) {
+    private void savePngFile(String base64, String name, String mime) {
         try {
             byte[] data = Base64.decode(base64, Base64.DEFAULT);
-            String safe = (name == null || !name.matches("[A-Za-z0-9._-]{1,40}")) ? "pet-studio.png" : name;
+            boolean gif = "image/gif".equals(mime);
+            String fallback = gif ? "pet-studio.gif" : "pet-studio.png";
+            String safe = (name == null || !name.matches("[A-Za-z0-9._-]{1,40}")) ? fallback : name;
             Uri uri = null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.MediaColumns.DISPLAY_NAME, safe);
-                values.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+                values.put(MediaStore.MediaColumns.MIME_TYPE, mime);
                 values.put(MediaStore.MediaColumns.RELATIVE_PATH,
                         Environment.DIRECTORY_DOWNLOADS + "/DSH-Go");
                 uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
