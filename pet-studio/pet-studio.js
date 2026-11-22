@@ -389,8 +389,8 @@ function pushChat(role, text) {
   renderChat();
 }
 
-function petSay(text) {
-  pushChat('pet', text);
+function petSay(text, opts = {}) {
+  if (opts.chat !== false) pushChat('pet', text);
   if (!el.quiet.checked) {
     el.bubbleText.textContent = text;
     el.bubbleAction.hidden = true;
@@ -407,7 +407,7 @@ function maybeDailyGreet() {
   const day = todayKey();
   if (s.lastGreetDay === day) return;
   writeStore({ lastGreetDay: day });
-  setTimeout(() => petSay(greetingFor(new Date().getHours(), getLang())), 1200);
+  setTimeout(() => petSay(greetingFor(new Date().getHours(), getLang()), { chat: false }), 1200);
 }
 
 function maybeAIGreet() {
@@ -527,7 +527,7 @@ function addMemory() {
   writeStore({ memories: [...s.memories, text].slice(-10) });
   el.memoryInput.value = '';
   renderMemories();
-  petSay('Mình nhớ rồi: ' + text);
+  petSay('Mình nhớ rồi: ' + text, { chat: false });
 }
 
 let focusMode = 'idle';
@@ -560,10 +560,10 @@ function tickFocus() {
   el.timerLine.textContent = (focusMode === 'focus' ? 'Tập trung ' : 'Nghỉ ') + clock(left);
   if (left > 0) return;
   if (focusMode === 'focus') {
-    petSay('Hết ' + readStore().focusMinutes + ' phút tập trung. Nghỉ ' + readStore().restMinutes + ' phút nhé.');
+    petSay('Hết ' + readStore().focusMinutes + ' phút tập trung. Nghỉ ' + readStore().restMinutes + ' phút nhé.', { chat: false });
     startMinuteTimer('break', readStore().restMinutes);
   } else {
-    petSay('Nghỉ xong rồi. Mình tiếp tục nhé!');
+    petSay('Nghỉ xong rồi. Mình tiếp tục nhé!', { chat: false });
     stopFocus();
   }
 }
@@ -1301,7 +1301,7 @@ async function pollAgent() {
       el.agentChip.hidden = false;
       if (tool && tool !== lastAgentTool) {
         lastAgentTool = tool;
-        petSay('Đang chạy: ' + tool);
+        petSay('Đang chạy: ' + tool, { chat: false });
       }
     } else {
       el.agentLine.textContent = pick('agent: không rõ trạng thái', 'agent: unknown state');
@@ -1704,7 +1704,7 @@ function bindSheet() {
     writeStore({ chat: [] });
     if (el.lastReply) { el.lastReply.hidden = true; el.lastReply.textContent = ''; }
     renderChat();
-    petSay(pick('Mình quên hết rồi, bắt đầu lại nhé.', 'I forgot everything, let us start again.'));
+    petSay(pick('Mình quên hết rồi, bắt đầu lại nhé.', 'I forgot everything, let us start again.'), { chat: false });
   });
   el.storyBtn.addEventListener('click', async () => {
     const s = readStore();
@@ -2021,12 +2021,12 @@ function bindStage() {
     if (b.dataset.mood === 'stretch') {
       el.stage.classList.add('stretching');
       setTimeout(() => el.stage.classList.remove('stretching'), 700);
-      petSay(pick('Vươn vai một cái nào!', 'Time to stretch!'));
+      petSay(pick('Vươn vai một cái nào!', 'Time to stretch!'), { chat: false });
       hideMood();
       return;
     }
     model.setState(b.dataset.mood);
-    petSay(b.dataset.mood === 'attention' ? 'Mình vui lắm!' : b.dataset.mood === 'sleeping' ? 'Mình buồn ngủ…' : 'Hừm, mình đang hờn.');
+    petSay(b.dataset.mood === 'attention' ? 'Mình vui lắm!' : b.dataset.mood === 'sleeping' ? 'Mình buồn ngủ…' : 'Hừm, mình đang hờn.', { chat: false });
     hideMood();
   });
   const pos = ev => {
