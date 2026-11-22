@@ -113,3 +113,18 @@ export function greetingFor(hour, lang = 'vi') {
   if (hour >= 18 && hour < 22) return en ? 'Good evening! You did enough today.' : 'Chào buổi tối! Hôm nay bạn làm đủ rồi.';
   return en ? 'Still awake? I will stay with you.' : 'Còn thức à? Mình ngồi cùng bạn.';
 }
+
+export function mergeMemory(list, item) {
+  if (!item) return (list || []).slice(-10);
+  const out = (list || []).filter(old => {
+    if (old === item) return false;
+    if (item.startsWith('tên ') && old.startsWith('tên ')) return false;
+    for (const prefix of ['thích ', 'ghét ']) {
+      if (!item.startsWith(prefix)) continue;
+      const subject = item.slice(prefix.length);
+      if (old === 'thích ' + subject || old === 'ghét ' + subject) return false;
+    }
+    return true;
+  });
+  return [...out, item].slice(-10);
+}

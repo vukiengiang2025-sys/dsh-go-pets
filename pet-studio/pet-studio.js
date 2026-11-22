@@ -2,7 +2,7 @@ import { PetModel, normalizePack, STATES } from './pet-engine.js';
 import { buildPackFromFile, buildPackFromZip } from './pack-import.js';
 import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } from './pet-fx.js';
 import { shouldRemind, breakText } from './reminders.js';
-import { replyTo, storyFor, summaryFrom, moodFor, memoryFrom, greetingFor } from './pet-chat.js';
+import { replyTo, storyFor, summaryFrom, moodFor, memoryFrom, greetingFor, mergeMemory } from './pet-chat.js';
 import { todayKey, bumpStreak, questDone, clock, hostColor, batteryText } from './care.js';
 import { shareUrl, pickConfig, decodeConfig, backupOf, importableBackup } from './share.js';
 import { encodeGif, quantize } from './gif.js';
@@ -495,8 +495,9 @@ async function sendChat(text) {
   const s = readStore();
   const memory = memoryFrom(t);
   if (memory && !s.memories.includes(memory)) {
-    writeStore({ memories: [...s.memories, memory].slice(-10) });
-    s.memories = [...s.memories, memory].slice(-10);
+    const merged = mergeMemory(s.memories, memory);
+    writeStore({ memories: merged });
+    s.memories = merged;
     renderMemories();
     logEvent('pet nhớ: ' + memory);
   }
