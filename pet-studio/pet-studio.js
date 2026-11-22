@@ -1739,9 +1739,10 @@ function bindSheet() {
       return;
     }
     el.aiStatus.textContent = 'đang kiểm tra…';
+    const started = performance.now();
     try {
       const reply = await askAI(aiConfig(s), [{ role: 'user', content: 'Chào bạn, trả lời một câu ngắn.' }]);
-      el.aiStatus.textContent = 'OK: ' + reply.slice(0, 60);
+      el.aiStatus.textContent = 'OK (' + Math.round(performance.now() - started) + 'ms): ' + reply.slice(0, 60);
     } catch (err) {
       el.aiStatus.textContent = 'lỗi: ' + friendlyAIError(err);
     }
@@ -2141,7 +2142,7 @@ async function main() {
   try {
     await loadPack(id);
     const v = new URLSearchParams(location.search).get('v') || 'web';
-    el.version.textContent = 'v' + v;
+    el.version.textContent = v === 'web' ? 'bản web' : 'v' + v;
     const savedSettings = readStore();
     applyName(savedSettings.name || '');
     const palParam = new URLSearchParams(location.search).get('palette');
