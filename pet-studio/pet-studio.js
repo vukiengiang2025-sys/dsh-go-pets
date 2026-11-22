@@ -1818,6 +1818,10 @@ function bindSheet() {
     writeStore({ aiKey: '', aiTestAt: 0 });
     if (el.aiStatus) el.aiStatus.textContent = 'đã xoá key';
   });
+  el.brandPet.addEventListener('click', () => {
+    openSheet(true);
+    setTimeout(() => el.petNameInput && el.petNameInput.focus(), 300);
+  });
   el.aiKey.addEventListener('input', () => updateAiChip());
   el.aiChip.addEventListener('click', () => {
     el.aiOn.checked = !el.aiOn.checked;
