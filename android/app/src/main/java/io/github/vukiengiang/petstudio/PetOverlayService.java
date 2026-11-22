@@ -211,13 +211,14 @@ public class PetOverlayService extends Service {
         }
         int screenW = getResources().getDisplayMetrics().widthPixels;
         int screenH = getResources().getDisplayMetrics().heightPixels;
-        int maxX = Math.max(0, screenW - sizePx);
-        int maxY = Math.max(0, screenH - sizePx);
+        int margin = Math.round(36 * getResources().getDisplayMetrics().density);
+        int maxX = Math.max(margin, screenW - sizePx - margin);
+        int maxY = Math.max(margin, screenH - sizePx - margin);
         baseX += Math.round(velX * dt);
         baseY += Math.round(velY * dt);
-        if (baseX <= 0) { baseX = 0; velX = Math.abs(velX); }
+        if (baseX <= margin) { baseX = margin; velX = Math.abs(velX); }
         if (baseX >= maxX) { baseX = maxX; velX = -Math.abs(velX); }
-        if (baseY <= 0) { baseY = 0; velY = Math.abs(velY); }
+        if (baseY <= margin) { baseY = margin; velY = Math.abs(velY); }
         if (baseY >= maxY) { baseY = maxY; velY = -Math.abs(velY); }
         params.x = baseX;
         params.y = baseY;
