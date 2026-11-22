@@ -221,10 +221,10 @@ function renderSheet() {
   renderErrors();
   renderCare();
   el.stats.innerHTML =
-    '<span><b>' + (s.stats.poke || 0) + '</b> lần chọc</span>'
-    + '<span><b>' + (s.stats.tickle || 0) + '</b> lần cù</span>'
-    + '<span><b>' + minutes + '</b> phút bên pet</span>'
-    + '<span><b>' + seen + '</b> trạng thái đã thấy</span>';
+    '<span><b>' + (s.stats.poke || 0) + '</b> ' + pick('lần chọc', 'pokes') + '</span>'
+    + '<span><b>' + (s.stats.tickle || 0) + '</b> ' + pick('lần cù', 'tickles') + '</span>'
+    + '<span><b>' + minutes + '</b> ' + pick('phút bên pet', 'min with pet') + '</span>'
+    + '<span><b>' + seen + '</b> ' + pick('trạng thái đã thấy', 'states seen') + '</span>';
   el.journal.innerHTML = s.journal.map(e =>
     '<li><time>' + formatTime(e.t) + '</time><span>' + e.text + '</span></li>').join('');
   if (document.activeElement !== el.petNameInput) el.petNameInput.value = s.name || '';
@@ -370,7 +370,7 @@ function sendChat(text) {
   if (!t) return;
   pushChat('user', t);
   const s = readStore();
-  const reply = replyTo(t, {
+  const reply = replyTo(t, { lang: getLang(),
     petName: s.name || (pack && pack.name) || 'pet',
     memories: s.memories,
     you: 'bạn',
@@ -397,13 +397,13 @@ let focusTimer = 0;
 function renderCare() {
   if (!el.streakLine) return;
   const s = readStore();
-  el.streakLine.innerHTML = 'Chuỗi: <b>' + (s.streak.count || 0) + ' ngày</b>';
+  el.streakLine.innerHTML = pick('Chuỗi: ', 'Streak: ') + '<b>' + (s.streak.count || 0) + pick(' ngày</b>', ' days</b>');
   const roam = s.quest.date === todayKey() ? s.quest.roam || 0 : 0;
-  el.questLine.innerHTML = 'Đi dạo hôm nay: <b>' + Math.min(roam, 3) + '/3</b>'
+  el.questLine.innerHTML = pick('Đi dạo hôm nay: ', 'Walks today: ') + '<b>' + Math.min(roam, 3) + '/3</b>'
     + (questDone(roam, 3) ? ' ✓' : '');
   el.timerLine.textContent = focusMode === 'idle'
-    ? 'chưa chạy'
-    : (focusMode === 'focus' ? 'Tập trung ' : 'Nghỉ ') + clock(focusEnds - Date.now());
+    ? pick('chưa chạy', 'not running')
+    : (focusMode === 'focus' ? pick('Tập trung ', 'Focus ') : pick('Nghỉ ', 'Break ')) + clock(focusEnds - Date.now());
 }
 
 function stopFocus() {
@@ -463,7 +463,7 @@ async function initBattery() {
   try {
     const battery = await navigator.getBattery();
     const render = () => {
-      el.batteryChip.textContent = batteryText(battery.level, battery.charging);
+      el.batteryChip.textContent = batteryText(battery.level, battery.charging, getLang());
       el.batteryChip.hidden = false;
     };
     render();
@@ -480,7 +480,7 @@ function checkBreak() {
   if (!shouldRemind(s.lastBreak, Date.now(), s.breakMinutes)) return;
   writeStore({ lastBreak: Date.now() });
   model.setState('attention');
-  el.bubbleText.textContent = breakText(s.breakMinutes);
+  el.bubbleText.textContent = breakText(s.breakMinutes, getLang());
   el.bubbleAction.hidden = true;
   el.bubble.hidden = false;
   clearTimeout(bubbleTimer);
@@ -1074,7 +1074,7 @@ async function pollAgent() {
         petSay('Đang chạy: ' + tool);
       }
     } else {
-      el.agentLine.textContent = 'agent: không rõ trạng thái';
+      el.agentLine.textContent = pick('agent: không rõ trạng thái', 'agent: unknown state');
     }
   } catch (err) {
     el.agentLine.textContent = 'agent lỗi: ' + err.message;
@@ -1096,7 +1096,7 @@ function stopAgent() {
   agentTimer = 0;
   lastAgentTool = '';
   writeStore({ agentUrl: '' });
-  el.agentLine.textContent = 'chưa kết nối';
+  el.agentLine.textContent = pick('chưa kết nối', 'not connected');
   el.agentChip.hidden = true;
   document.documentElement.style.removeProperty('--accent');
 }
@@ -1388,10 +1388,10 @@ function bindSheet() {
   el.chatInput.addEventListener('keydown', ev => {
     if (ev.key === 'Enter') { sendChat(el.chatInput.value); el.chatInput.value = ''; }
   });
-  el.storyBtn.addEventListener('click', () => petSay(storyFor(new Date().getHours(), readStore().name || (pack && pack.name) || 'pet')));
+  el.storyBtn.addEventListener('click', () => petSay(storyFor(new Date().getHours(), readStore().name || (pack && pack.name) || 'pet', getLang())));
   el.summaryBtn.addEventListener('click', () => {
     const s = readStore();
-    petSay(summaryFrom(s.stats, s.memories));
+    petSay(summaryFrom(s.stats, s.memories, getLang()));
   });
   el.langSel.addEventListener('change', () => {
     writeStore({ lang: el.langSel.value });

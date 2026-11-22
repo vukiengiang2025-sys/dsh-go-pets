@@ -52,7 +52,8 @@ export function hostColor(name) {
   return 'hsl(' + (hash % 360) + ' 78% 62%)';
 }
 
-export function batteryText(level, charging) {
+export function batteryText(level, charging, lang = 'vi') {
   const pct = Math.round(Math.max(0, Math.min(1, Number(level) || 0)) * 100);
+  if (lang === 'en') return 'battery ' + pct + '% · ' + (charging ? 'charging' : 'on battery');
   return 'pin ' + pct + '% · ' + (charging ? 'đang sạc' : 'dùng pin');
 }
