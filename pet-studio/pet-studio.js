@@ -2,7 +2,7 @@ import { PetModel, normalizePack, STATES } from './pet-engine.js';
 import { buildPackFromFile, buildPackFromZip } from './pack-import.js';
 import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } from './pet-fx.js';
 import { shouldRemind, breakText } from './reminders.js';
-import { replyTo, storyFor, summaryFrom, moodFor } from './pet-chat.js';
+import { replyTo, storyFor, summaryFrom, moodFor, memoryFrom } from './pet-chat.js';
 import { todayKey, bumpStreak, questDone, clock, hostColor, batteryText } from './care.js';
 import { shareUrl, pickConfig, decodeConfig } from './share.js';
 import { encodeGif, quantize } from './gif.js';
@@ -398,6 +398,7 @@ function aiSystemPrompt(s) {
   return 'Bạn là ' + name + ', một pet nhỏ sống trên màn hình điện thoại. '
     + 'Trả lời ngắn (1-2 câu), ấm áp, tự nhiên, xưng "mình" và gọi người dùng là "bạn". '
     + 'Trả lời cùng ngôn ngữ với người dùng. Không bịa việc bạn không biết. '
+    + (model ? 'Trạng thái hiện tại của bạn: ' + stateText(model.state) + '. ' : '')
     + (s.memories && s.memories.length ? 'Bạn nhớ: ' + s.memories.join('; ') + '. ' : '');
 }
 
@@ -406,6 +407,13 @@ async function sendChat(text) {
   if (!t) return;
   pushChat('user', t);
   const s = readStore();
+  const memory = memoryFrom(t);
+  if (memory && !s.memories.includes(memory)) {
+    writeStore({ memories: [...s.memories, memory].slice(-10) });
+    s.memories = [...s.memories, memory].slice(-10);
+    renderMemories();
+    logEvent('pet nhớ: ' + memory);
+  }
   if (s.aiOn && s.aiEndpoint && s.aiModel) {
     if (el.aiStatus) el.aiStatus.textContent = 'đang gọi AI…';
     setStatus('AI đang trả lời…');

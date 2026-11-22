@@ -50,6 +50,11 @@ public class PetOverlayService extends Service {
     private int baseX;
     private int baseY;
     private boolean dragging;
+    private float velX;
+    private float velY;
+    private long lastStep;
+    private long lastImpulse;
+    private int sizePx;
     private final Handler floatHandler = new Handler(Looper.getMainLooper());
     private long lastFloatLog;
     private final Runnable floatTick = new Runnable() {
@@ -166,6 +171,12 @@ public class PetOverlayService extends Service {
                 .getInt("overlay_y", Math.round(200 * getResources().getDisplayMetrics().density));
         baseX = params.x;
         baseY = params.y;
+        sizePx = size;
+        float density = getResources().getDisplayMetrics().density;
+        velX = 45 * density * (Math.random() > 0.5 ? 1 : -1);
+        velY = 30 * density * (Math.random() > 0.5 ? 1 : -1);
+        lastStep = SystemClock.uptimeMillis();
+        lastImpulse = lastStep;
 
         try {
             windowManager.addView(root, params);
@@ -185,17 +196,35 @@ public class PetOverlayService extends Service {
         if (params == null || root == null || windowManager == null) return;
         boolean enabled = getSharedPreferences("petstudio-prefs", MODE_PRIVATE)
                 .getBoolean("overlay_float", true);
-        if (!enabled || dragging) return;
-        float t = SystemClock.uptimeMillis() / 1000f;
-        int rangeX = Math.round(14 * getResources().getDisplayMetrics().density);
-        int rangeY = Math.round(10 * getResources().getDisplayMetrics().density);
-        params.x = baseX + Math.round((float) Math.sin(t * 0.9f) * rangeX);
-        params.y = baseY + Math.round((float) Math.sin(t * 1.3f + 1f) * rangeY);
+        if (!enabled || dragging) {
+            lastStep = SystemClock.uptimeMillis();
+            return;
+        }
+        long now = SystemClock.uptimeMillis();
+        float dt = Math.min(0.08f, (now - lastStep) / 1000f);
+        lastStep = now;
+        if (now - lastImpulse > 4000 + Math.random() * 3000) {
+            lastImpulse = now;
+            float density = getResources().getDisplayMetrics().density;
+            velX = (float) ((Math.random() * 2 - 1) * 70 * density);
+            velY = (float) ((Math.random() * 2 - 1) * 55 * density);
+        }
+        int screenW = getResources().getDisplayMetrics().widthPixels;
+        int screenH = getResources().getDisplayMetrics().heightPixels;
+        int maxX = Math.max(0, screenW - sizePx);
+        int maxY = Math.max(0, screenH - sizePx);
+        baseX += Math.round(velX * dt);
+        baseY += Math.round(velY * dt);
+        if (baseX <= 0) { baseX = 0; velX = Math.abs(velX); }
+        if (baseX >= maxX) { baseX = maxX; velX = -Math.abs(velX); }
+        if (baseY <= 0) { baseY = 0; velY = Math.abs(velY); }
+        if (baseY >= maxY) { baseY = maxY; velY = -Math.abs(velY); }
+        params.x = baseX;
+        params.y = baseY;
         try {
             windowManager.updateViewLayout(root, params);
         } catch (Exception ignored) {
         }
-        long now = SystemClock.uptimeMillis();
         if (now - lastFloatLog > 2000) {
             lastFloatLog = now;
             Log.d(TAG, "float x=" + params.x + " y=" + params.y);

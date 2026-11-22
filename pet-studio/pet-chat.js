@@ -87,3 +87,11 @@ export function moodFor(text) {
   if (/(vui|hay quá|tuyệt|xong rồi|great|happy|done)/.test(t)) return 'attention';
   return null;
 }
+
+export function memoryFrom(text) {
+  const m = String(text || '').trim();
+  const match = m.match(/^(?:nhớ|ghi nhớ|remember)\s+(?:rằng|that)?\s*(.+)$/i);
+  if (!match) return null;
+  const value = match[1].trim();
+  return value ? value.slice(0, 60) : null;
+}
