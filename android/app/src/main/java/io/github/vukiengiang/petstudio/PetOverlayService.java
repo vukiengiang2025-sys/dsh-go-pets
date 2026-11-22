@@ -96,8 +96,8 @@ public class PetOverlayService extends Service {
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
         ImageView handle = new ImageView(this);
-        handle.setBackgroundColor(0x66202430);
-        handle.setAlpha(0.75f);
+        handle.setBackgroundResource(R.drawable.overlay_handle);
+        handle.setAlpha(0.6f);
         handle.setOnTouchListener((v, event) -> {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
@@ -118,9 +118,11 @@ public class PetOverlayService extends Service {
             }
         });
         FrameLayout.LayoutParams handleParams = new FrameLayout.LayoutParams(
-                Math.round(28 * getResources().getDisplayMetrics().density),
-                Math.round(28 * getResources().getDisplayMetrics().density));
-        handleParams.gravity = Gravity.TOP | Gravity.END;
+                Math.round(18 * getResources().getDisplayMetrics().density),
+                Math.round(18 * getResources().getDisplayMetrics().density));
+        handleParams.gravity = Gravity.BOTTOM | Gravity.END;
+        handleParams.setMargins(0, 0, Math.round(6 * getResources().getDisplayMetrics().density),
+                Math.round(6 * getResources().getDisplayMetrics().density));
         root.addView(handle, handleParams);
 
         params = new WindowManager.LayoutParams(
