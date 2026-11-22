@@ -224,6 +224,7 @@ label.check input { width: 18px; height: 18px; accent-color: var(--accent); }
 
 body.pip .bar, body.pip .panel, body.pip .foot { display: none !important; }
 body.pip main { padding: 0; max-width: none; height: 100vh; }
-body.pip .stage { max-height: none; height: 100vh; border: 0; border-radius: 0; }
-body.pip .pet { transform: translateY(-6px) !important; }
+body.pip .stage { max-height: none; height: 100vh; border: 0; border-radius: 0; place-items: center; }
+body.pip .pet { transform: none !important; }
+body.pip .ground { display: none; }
 body.pip .bubble { display: none !important; }
