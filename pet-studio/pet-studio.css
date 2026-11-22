@@ -291,3 +291,10 @@ body.pip .bubble { display: none !important; }
 .market-item button { background: #10141c; color: #e9eef7; border: 0; border-radius: 9px;
   padding: 7px 10px; font: inherit; font-size: 12px; }
 .market-item button:disabled { background: #c7d2e2; color: #5b6a80; }
+
+body.overlay { background: transparent !important; }
+body.overlay .bar, body.overlay .panel, body.overlay .foot, body.overlay .bubble { display: none !important; }
+body.overlay main { padding: 0; height: 100vh; max-width: none; }
+body.overlay .stage { height: 100vh; max-height: none; border: 0; background: transparent; border-radius: 0; }
+body.overlay .ground { display: none; }
+body.overlay .pet { transform: none !important; }

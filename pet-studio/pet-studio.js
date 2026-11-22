@@ -139,6 +139,8 @@ const el = {
   giftPack: document.getElementById('giftPack'),
   zipUrl: document.getElementById('zipUrl'),
   zipLoad: document.getElementById('zipLoad'),
+  overlayStart: document.getElementById('overlayStart'),
+  overlayStop: document.getElementById('overlayStop'),
   openMarket: document.getElementById('openMarket'),
   marketModal: document.getElementById('marketModal'),
   marketGrid: document.getElementById('marketGrid'),
@@ -1407,6 +1409,18 @@ function bindSheet() {
   el.shareConfig.addEventListener('click', shareConfig);
   el.shareQr.addEventListener('click', showQr);
   el.giftPack.addEventListener('click', exportGift);
+  el.overlayStart.addEventListener('click', () => {
+    if (window.AndroidPet && window.AndroidPet.startOverlay) {
+      const ok = window.AndroidPet.startOverlay();
+      setStatus(ok ? 'đã bật cửa sổ nổi' : 'cần cấp quyền hiển thị trên ứng dụng khác');
+    } else {
+      setStatus('chỉ chạy trong app Android');
+    }
+  });
+  el.overlayStop.addEventListener('click', () => {
+    if (window.AndroidPet && window.AndroidPet.stopOverlay) window.AndroidPet.stopOverlay();
+    setStatus('đã tắt cửa sổ nổi');
+  });
   el.openMarket.addEventListener('click', showMarket);
   el.marketClose.addEventListener('click', () => { el.marketModal.hidden = true; });
   el.openGallery.addEventListener('click', showGallery);
@@ -1734,6 +1748,15 @@ async function main() {
     const agentParam = new URLSearchParams(location.search).get('agent');
     if (agentParam === 'demo') startAgent('./agent.json');
     else if (agentParam && /^https?:/.test(agentParam)) startAgent(agentParam);
+    if (new URLSearchParams(location.search).get('overlay') === '1') {
+      document.body.classList.add('overlay');
+      document.addEventListener('click', () => {
+        if (window.AndroidOverlay && window.AndroidOverlay.openApp) window.AndroidOverlay.openApp();
+      });
+      if (window.AndroidPet && window.AndroidPet.startOverlay) {
+        setTimeout(() => window.AndroidPet.startOverlay(), 400);
+      }
+    }
     if (new URLSearchParams(location.search).get('market') === '1') {
       setTimeout(showMarket, 900);
     }

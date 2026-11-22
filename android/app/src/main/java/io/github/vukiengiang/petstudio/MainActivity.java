@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
+import android.provider.Settings;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
@@ -182,7 +183,7 @@ public class MainActivity extends Activity {
         if (savedInstanceState == null) {
             webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent()), chatOf(getIntent()),
                     pipOnLoad, introOf(getIntent()), exportOf(getIntent()), gifOf(getIntent()),
-                    agentOf(getIntent()), galleryOf(getIntent()), notifyOf(getIntent())));
+                    agentOf(getIntent()), galleryOf(getIntent()), notifyOf(getIntent()), overlayOf(getIntent())));
         } else {
             webView.restoreState(savedInstanceState);
         }
@@ -194,7 +195,7 @@ public class MainActivity extends Activity {
 
     private static String startUrl(@Nullable String pack, @Nullable String fx, @Nullable String chat,
                                    boolean pip, boolean intro, boolean export, boolean gif,
-                                   @Nullable String agent, boolean gallery, boolean notify) {
+                                   @Nullable String agent, boolean gallery, boolean notify, boolean overlay) {
         String url = START_URL;
         if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
             url += "&pack=" + pack;
@@ -225,6 +226,9 @@ public class MainActivity extends Activity {
         }
         if (notify) {
             url += "&notify=1";
+        }
+        if (overlay) {
+            url += "&overlay=1";
         }
         return url;
     }
@@ -261,13 +265,18 @@ public class MainActivity extends Activity {
         return intent != null && intent.getBooleanExtra("notify", false);
     }
 
+    private static boolean overlayOf(@Nullable Intent intent) {
+        return intent != null && intent.getBooleanExtra("overlay", false);
+    }
+
     @Override
     protected void onNewIntent(@NonNull Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
         if (webView != null) {
             webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent), false, introOf(intent),
-                    exportOf(intent), gifOf(intent), agentOf(intent), galleryOf(intent), notifyOf(intent)));
+                    exportOf(intent), gifOf(intent), agentOf(intent), galleryOf(intent), notifyOf(intent),
+                    overlayOf(intent)));
         }
     }
 
@@ -314,6 +323,27 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void saveZip(String base64, String name) {
             runOnUiThread(() -> savePngFile(base64, name, "application/zip"));
+        }
+
+        @JavascriptInterface
+        public boolean startOverlay() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(MainActivity.this)) {
+                try {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                } catch (Exception err) {
+                    Log.e(TAG, "overlay settings failed", err);
+                }
+                return false;
+            }
+            startService(new Intent(MainActivity.this, PetOverlayService.class));
+            return true;
+        }
+
+        @JavascriptInterface
+        public void stopOverlay() {
+            stopService(new Intent(MainActivity.this, PetOverlayService.class));
         }
 
         @JavascriptInterface
