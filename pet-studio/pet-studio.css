@@ -242,3 +242,7 @@ body.pip .bubble { display: none !important; }
 .intro-card ul { margin: 0 0 16px; padding-left: 18px; color: #b9c6d8; font-size: 13px; line-height: 1.6; }
 .intro-card button { width: 100%; background: var(--accent); color: #08111f; border: 0;
   border-radius: 12px; padding: 11px; font: inherit; font-weight: 600; }
+
+.agent-chip { margin: 6px 0 0; font-size: 12px; color: #8fd0ff;
+  background: rgba(99,179,255,.08); border: 1px solid rgba(99,179,255,.25);
+  border-radius: 9px; padding: 6px 9px; }

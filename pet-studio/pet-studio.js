@@ -114,6 +114,7 @@ const el = {
   agentStart: document.getElementById('agentStart'),
   agentStop: document.getElementById('agentStop'),
   agentLine: document.getElementById('agentLine'),
+  agentChip: document.getElementById('agentChip'),
   exportPng: document.getElementById('exportPng'),
   exportGif: document.getElementById('exportGif'),
 };
@@ -409,8 +410,12 @@ function applyStreak() {
 }
 
 function maybeIntro() {
-  const force = new URLSearchParams(location.search).get('intro') === '1';
+  const params = new URLSearchParams(location.search);
+  const demo = params.has('agent') || params.has('fx') || params.get('chat') === 'demo'
+    || params.get('export') === '1' || params.get('gif') === '1' || params.get('pip') === '1';
+  const force = params.get('intro') === '1';
   const s = readStore();
+  if (demo) return;
   if (!force && s.onboarded) return;
   el.intro.hidden = false;
 }
@@ -862,6 +867,7 @@ function exportGif() {
 }
 
 let agentTimer = 0;
+let lastAgentTool = '';
 
 async function pollAgent() {
   const s = readStore();
@@ -870,11 +876,25 @@ async function pollAgent() {
   try {
     const res = await fetch(url, { cache: 'no-store' });
     const data = await res.json();
-    const state = data && (data.state || data.status);
-    if (STATES.includes(state)) {
+    const rawState = data && (data.state || data.status);
+    const tool = data && typeof data.tool === 'string' ? data.tool.slice(0, 32) : '';
+    const subs = data && Number.isFinite(Number(data.subagents)) ? Number(data.subagents) : 0;
+    const host = data && typeof data.host === 'string' ? data.host.slice(0, 24) : '';
+    const state = subs > 0 ? 'juggling' : rawState;
+    if (STATES.includes(state) || state === 'juggling') {
       model.setState(state);
-      el.agentLine.textContent = 'agent: ' + state;
-      setStatus('agent: ' + state);
+      const bits = ['agent: ' + state];
+      if (tool) bits.push(tool);
+      if (subs > 0) bits.push(subs + ' subagent');
+      if (host) bits.push('@' + host);
+      const line = bits.join(' · ');
+      el.agentLine.textContent = line;
+      el.agentChip.textContent = line;
+      el.agentChip.hidden = false;
+      if (tool && tool !== lastAgentTool) {
+        lastAgentTool = tool;
+        petSay('Đang chạy: ' + tool);
+      }
     } else {
       el.agentLine.textContent = 'agent: không rõ trạng thái';
     }
@@ -896,8 +916,10 @@ function startAgent(url) {
 function stopAgent() {
   clearInterval(agentTimer);
   agentTimer = 0;
+  lastAgentTool = '';
   writeStore({ agentUrl: '' });
   el.agentLine.textContent = 'chưa kết nối';
+  el.agentChip.hidden = true;
 }
 
 function exportPng() {
