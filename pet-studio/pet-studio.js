@@ -92,6 +92,8 @@ const el = {
   autoSeason: document.getElementById('autoSeason'),
   importImage: document.getElementById('importImage'),
   importFile: document.getElementById('importFile'),
+  newPackName: document.getElementById('newPackName'),
+  newPackStates: document.getElementById('newPackStates'),
   importedList: document.getElementById('importedList'),
   fx: document.getElementById('fx'),
   pet: document.getElementById('pet'),
@@ -612,12 +614,26 @@ async function saveImported(built) {
   haptic(14);
 }
 
+const EDITOR_STATES = ['idle', 'thinking', 'working', 'attention', 'error', 'notification', 'sleeping', 'waking', 'roam'];
+
+function renderStatePicks() {
+  if (!el.newPackStates) return;
+  el.newPackStates.innerHTML = EDITOR_STATES.map(st =>
+    '<label><input type="checkbox" value="' + st + '"' + (st === 'idle' ? ' checked' : '') + '>'
+    + escapeHtml(stateText(st)) + '</label>').join('');
+}
+
 async function importImageFile(file) {
   if (!file) return;
   setStatus('đang xử lý ' + file.name + '…');
   haptic(10);
   try {
-    await saveImported(await buildPackFromFile(file));
+    const name = (el.newPackName && el.newPackName.value || '').trim();
+    const states = el.newPackStates
+      ? [...el.newPackStates.querySelectorAll('input:checked')].map(i => i.value)
+      : ['idle'];
+    await saveImported(await buildPackFromFile(file, { name, states }));
+    if (el.newPackName) el.newPackName.value = '';
   } catch (err) {
     console.error(err);
     setStatus('nhập ảnh lỗi: ' + err.message);
@@ -910,6 +926,7 @@ const EN_PALETTE = { goc: 'Original', bang: 'Ice', sanho: 'Coral', chanh: 'Lime'
 const EN_PROFILE = { work: 'Work', chill: 'Relax', night: 'Night' };
 
 function buildSettingsUI() {
+  renderStatePicks();
   el.paletteChips.innerHTML = Object.entries(PALETTES).map(([key, conf]) =>
     '<button data-palette="' + key + '">' + pick(conf.label, EN_PALETTE[key]) + '</button>').join('');
   el.profiles.innerHTML = Object.entries(PROFILES).map(([key, conf]) =>

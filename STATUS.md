@@ -2,8 +2,8 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **75 xong** (có trong APK)
-- 🟡 **2 một phần** (có nền tảng, thiếu phần còn lại)
+- ✅ **76 xong** (có trong APK)
+- 🟡 **1 một phần** (có nền tảng, thiếu phần còn lại)
 - ⏸ **23 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
@@ -13,7 +13,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 01 | Pack theo mùa | ✅ Mây Tuyết, Mây Tết + tự chọn |
 | 02 | Pack nghề nghiệp | ⏸ cần bộ art mới |
 | 03 | Động vật Việt Nam | ⏸ cần art |
-| 04 | Tạo pack trong app | 🟡 nhập ảnh/GIF/zip; chưa có trình sửa |
+| 04 | Tạo pack trong app | ✅ đặt tên + gán ảnh/GIF vào nhiều trạng thái |
 | 05 | Nhập GIF/APNG | ✅ |
 | 06 | Ảnh chân dung → pixel | ⏸ cần model/quantize thông minh |
 | 07 | Pack theo model AI | ⏸ cần art |

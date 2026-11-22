@@ -21,7 +21,7 @@ export function gridFor(count, frameWidth) {
   return { cols, rows };
 }
 
-export function buildPackMeta({ id, name, width, height, count, durations, contentBox, cols }) {
+export function buildPackMeta({ id, name, width, height, count, durations, contentBox, cols, states = ['idle'] }) {
   const frames = [];
   for (let i = 0; i < count; i++) {
     frames.push({ i, ms: durations[i] || 120 });
@@ -39,13 +39,11 @@ export function buildPackMeta({ id, name, width, height, count, durations, conte
     anchor: { x: Math.round(width / 2), baseline: contentBox.y + contentBox.h },
     contentBox,
     hitBoxes: { default: contentBox },
-    animations: {
-      idle: {
-        sheet: 'idle.png', frameW: width, frameH: height, cols,
-        box: { x: 0, y: 0, w: width, h: height }, frames, loop: true,
-      },
-    },
-    states: { idle: ['idle'] },
+    animations: Object.fromEntries(states.map(st => [st, {
+      sheet: 'idle.png', frameW: width, frameH: height, cols,
+      box: { x: 0, y: 0, w: width, h: height }, frames, loop: true,
+    }])),
+    states: Object.fromEntries(states.map(st => [st, [st]])),
     reactions: {},
     sleep: { afterMs: 60000 },
   };
@@ -94,7 +92,7 @@ export async function readFrames(file) {
   return [{ canvas, ms: 1000 }];
 }
 
-export async function buildPackFromFile(file) {
+export async function buildPackFromFile(file, options = {}) {
   const raw = await readFrames(file);
   const size = scaleToFit(raw[0].canvas.width, raw[0].canvas.height);
   const count = raw.length;
@@ -117,8 +115,9 @@ export async function buildPackFromFile(file) {
   const contentBox = alphaBox(first);
   const id = packIdFrom(file.name);
   const pack = buildPackMeta({
-    id, name: file.name.replace(/\.[a-z0-9]+$/i, ''), width: size.width, height: size.height,
-    count, durations, contentBox, cols,
+    id, name: options.name || file.name.replace(/\.[a-z0-9]+$/i, ''),
+    width: size.width, height: size.height, count, durations, contentBox, cols,
+    states: options.states && options.states.length ? options.states : ['idle'],
   });
   const blob = await new Promise(resolve => sheet.toBlob(resolve, 'image/png'));
   return { pack, files: { 'idle.png': blob }, frames: count };

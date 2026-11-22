@@ -322,3 +322,7 @@ html[lang="en"] .error-list:empty::before { content: "no errors yet"; }
   100% { transform: scale(1, 1); }
 }
 .stage.stretching .pet { animation: pet-stretch .65s ease !important; }
+
+.state-picks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 6px 0; }
+.state-picks label { display: flex; gap: 4px; align-items: center; font-size: 11px; color: #9fb0c8;
+  background: #0f1622; border: 1px solid var(--line); border-radius: 8px; padding: 5px 6px; }
