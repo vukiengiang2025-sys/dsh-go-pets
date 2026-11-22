@@ -3,7 +3,7 @@ import { buildPackFromFile, buildPackFromZip } from './pack-import.js';
 import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } from './pet-fx.js';
 import { shouldRemind, breakText } from './reminders.js';
 import { replyTo, storyFor, summaryFrom } from './pet-chat.js';
-import { todayKey, bumpStreak, questDone, clock } from './care.js';
+import { todayKey, bumpStreak, questDone, clock, hostColor, batteryText } from './care.js';
 import { shareUrl, pickConfig, decodeConfig } from './share.js';
 import { encodeGif, quantize } from './gif.js';
 import { buildZip } from './zip-write.js';
@@ -123,6 +123,7 @@ const el = {
   agentStop: document.getElementById('agentStop'),
   agentLine: document.getElementById('agentLine'),
   agentChip: document.getElementById('agentChip'),
+  batteryChip: document.getElementById('batteryChip'),
   exportPng: document.getElementById('exportPng'),
   exportGif: document.getElementById('exportGif'),
   shareQr: document.getElementById('shareQr'),
@@ -434,6 +435,22 @@ function maybeIntro() {
   if (demo) return;
   if (!force && s.onboarded) return;
   el.intro.hidden = false;
+}
+
+async function initBattery() {
+  if (!navigator.getBattery) return;
+  try {
+    const battery = await navigator.getBattery();
+    const render = () => {
+      el.batteryChip.textContent = batteryText(battery.level, battery.charging);
+      el.batteryChip.hidden = false;
+    };
+    render();
+    battery.addEventListener('levelchange', render);
+    battery.addEventListener('chargingchange', render);
+  } catch (err) {
+    console.warn('battery lỗi', err);
+  }
 }
 
 function checkBreak() {
@@ -961,6 +978,7 @@ async function pollAgent() {
       if (subs > 0) bits.push(subs + ' subagent');
       if (host) bits.push('@' + host);
       const line = bits.join(' · ');
+      if (host) document.documentElement.style.setProperty('--accent', hostColor(host));
       el.agentLine.textContent = line;
       el.agentChip.textContent = line;
       el.agentChip.hidden = false;
@@ -993,6 +1011,7 @@ function stopAgent() {
   writeStore({ agentUrl: '' });
   el.agentLine.textContent = 'chưa kết nối';
   el.agentChip.hidden = true;
+  document.documentElement.style.removeProperty('--accent');
 }
 
 function exportPng() {
@@ -1455,6 +1474,7 @@ async function main() {
   bindControls();
   bindSheet();
   bindPip();
+  initBattery();
   bindLifecycle();
   setInterval(checkBreak, 60000);
   setInterval(() => {

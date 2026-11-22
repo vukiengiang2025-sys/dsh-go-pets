@@ -44,3 +44,15 @@ export function clock(ms) {
   const s = total % 60;
   return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
 }
+
+export function hostColor(name) {
+  const text = String(name || '');
+  let hash = 0;
+  for (const ch of text) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return 'hsl(' + (hash % 360) + ' 78% 62%)';
+}
+
+export function batteryText(level, charging) {
+  const pct = Math.round(Math.max(0, Math.min(1, Number(level) || 0)) * 100);
+  return 'pin ' + pct + '% · ' + (charging ? 'đang sạc' : 'dùng pin');
+}
