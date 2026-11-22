@@ -2336,7 +2336,15 @@ async function main() {
     if (window.AndroidPet && window.AndroidPet.setOverlayFloat) {
       window.AndroidPet.setOverlayFloat(el.overlayFloat.checked);
     }
-    if (el.aiStatus) el.aiStatus.textContent = savedSettings.aiEndpoint ? 'đã lưu cấu hình' : 'chưa cấu hình';
+    if (el.aiStatus) {
+      const cfgSig = aiSig(aiConfig(savedSettings));
+      if (savedSettings.aiOn && !savedSettings.aiKey) el.aiStatus.textContent = 'đang bật nhưng thiếu key';
+      else if (testCacheValid(cfgSig, savedSettings.aiTestAt, Date.now())) {
+        el.aiStatus.textContent = 'OK (đã kiểm tra ' + Math.max(1, Math.round((Date.now() - savedSettings.aiTestAt) / 60000)) + ' phút trước)';
+      } else {
+        el.aiStatus.textContent = savedSettings.aiEndpoint ? 'đã lưu cấu hình' : 'chưa cấu hình';
+      }
+    }
     el.ambientMode.value = savedSettings.ambientMode || 'off';
     el.showFps.checked = !!savedSettings.showFps;
     el.errorLog.checked = !!savedSettings.errorLog;
