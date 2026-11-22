@@ -2348,6 +2348,11 @@ async function main() {
     if (new URLSearchParams(location.search).get('sheet') === '1') openSheet(true);
     applyStreak();
     maybeIntro();
+    const boot = document.getElementById('boot');
+    if (boot) {
+      boot.classList.add('gone');
+      setTimeout(() => boot.remove(), 350);
+    }
     const importDemo = new URLSearchParams(location.search).get('import');
     if (importDemo === 'demo') demoImport();
     else if (importDemo === 'zip') demoZipImport();
