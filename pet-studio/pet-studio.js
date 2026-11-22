@@ -151,6 +151,7 @@ const el = {
   overlayStart: document.getElementById('overlayStart'),
   overlaySize: document.getElementById('overlaySize'),
   overlayStop: document.getElementById('overlayStop'),
+  openAod: document.getElementById('openAod'),
   openMarket: document.getElementById('openMarket'),
   marketModal: document.getElementById('marketModal'),
   marketGrid: document.getElementById('marketGrid'),
@@ -1508,6 +1509,10 @@ function bindSheet() {
     } else {
       setStatus('chỉ chạy trong app Android');
     }
+  });
+  el.openAod.addEventListener('click', () => {
+    if (window.AndroidPet && window.AndroidPet.openAod) window.AndroidPet.openAod();
+    else setStatus(pick('chỉ chạy trong app Android', 'Android app only'));
   });
   el.overlaySize.addEventListener('change', () => {
     if (window.AndroidPet && window.AndroidPet.setOverlaySize) {

@@ -352,6 +352,11 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void openAod() {
+            runOnUiThread(() -> startActivity(new Intent(MainActivity.this, AodActivity.class)));
+        }
+
+        @JavascriptInterface
         public void stopOverlay() {
             stopService(new Intent(MainActivity.this, PetOverlayService.class));
         }
