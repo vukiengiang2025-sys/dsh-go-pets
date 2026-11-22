@@ -1,6 +1,6 @@
 # Chấm điểm chất lượng: 1000/1000
 
-> Cập nhật 4.62.0: 75 test, AI đa provider/tính cách/tiết kiệm token/đếm chi phí, overlay bay nhảy, AOD, live wallpaper.
+> Cập nhật 4.64.0: 77 test, AI đa provider/tính cách/tiết kiệm token/đếm chi phí, overlay bay nhảy, AOD, live wallpaper.
 > Cập nhật 2.9.0: 40 test (engine, pack, zip, GIF, QR, streak…), AAB + Espresso trong CI,
 > kèm [STATUS.md](STATUS.md) đối chiếu 100 ý tưởng (54 xong, 8 một phần, 38 hoãn).
 
