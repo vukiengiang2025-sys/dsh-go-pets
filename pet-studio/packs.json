@@ -21,6 +21,11 @@
       "name": "Mây Tết",
       "url": "../app/assets/pets/may-tet/pack.json",
       "season": "tet"
+    },
+    {
+      "id": "bo",
+      "name": "Bơ",
+      "url": "../app/assets/pets/bo/pack.json"
     }
   ]
 }
