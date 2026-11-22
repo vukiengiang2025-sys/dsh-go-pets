@@ -1,16 +1,44 @@
-// Gọi API chat completions kiểu OpenAI (DeepSeek, Groq, Ollama...).
+// Gọi API chat: OpenAI-compatible và Gemini.
 
-export function chatUrl(endpoint) {
+export const PRESETS = {
+  openai: { endpoint: 'https://api.openai.com/v1', model: 'gpt-4o-mini' },
+  deepseek: { endpoint: 'https://api.deepseek.com', model: 'deepseek-chat' },
+  gemini: { endpoint: 'https://generativelanguage.googleapis.com/v1beta', model: 'gemini-2.0-flash' },
+  groq: { endpoint: 'https://api.groq.com/openai/v1', model: 'llama-3.3-70b-versatile' },
+  ollama: { endpoint: 'http://10.0.2.2:11434/v1', model: 'llama3.2' },
+};
+
+export function chatUrl(endpoint, model = '', provider = 'openai') {
   const base = String(endpoint || '').trim().replace(/\/+$/, '');
   if (!base) throw new Error('thiếu endpoint');
+  if (provider === 'gemini') {
+    if (!model) throw new Error('thiếu model');
+    return base + '/models/' + encodeURIComponent(model) + ':generateContent';
+  }
   if (base.endsWith('/chat/completions')) return base;
   return base + '/chat/completions';
 }
 
-export function buildRequest({ endpoint, model, messages, maxTokens = 160 }) {
+export function buildRequest({ provider = 'openai', endpoint, model, messages, maxTokens = 160 }) {
   if (!model) throw new Error('thiếu model');
+  if (provider === 'gemini') {
+    return {
+      url: chatUrl(endpoint, model, 'gemini'),
+      init: {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: messages.map(m => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: m.content }],
+          })),
+          generationConfig: { temperature: 0.8, maxOutputTokens: maxTokens },
+        }),
+      },
+    };
+  }
   return {
-    url: chatUrl(endpoint),
+    url: chatUrl(endpoint, model, 'openai'),
     init: {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -25,7 +53,14 @@ export function buildRequest({ endpoint, model, messages, maxTokens = 160 }) {
   };
 }
 
-export function parseReply(json) {
+export function parseReply(json, provider = 'openai') {
+  if (provider === 'gemini') {
+    const parts = json && json.candidates && json.candidates[0]
+      && json.candidates[0].content && json.candidates[0].content.parts;
+    const text = Array.isArray(parts) ? parts.map(p => p.text || '').join('') : '';
+    if (!text.trim()) throw new Error('phản hồi không có nội dung');
+    return text.trim().slice(0, 300);
+  }
   const text = json && json.choices && json.choices[0]
     && json.choices[0].message && json.choices[0].message.content;
   if (!text) throw new Error('phản hồi không có nội dung');
@@ -33,14 +68,25 @@ export function parseReply(json) {
 }
 
 export async function askAI(config, messages, fetchImpl = null) {
+  const provider = config.provider || 'openai';
   const { url, init } = buildRequest({
+    provider,
     endpoint: config.endpoint,
     model: config.model,
     messages,
   });
+  let target = url;
+  const headers = { ...init.headers };
+  if (provider === 'gemini') {
+    if (config.key) target += '?key=' + encodeURIComponent(config.key);
+  } else if (config.key) {
+    headers.Authorization = 'Bearer ' + config.key;
+  }
+
   const bridge = typeof window !== 'undefined' && window.AndroidPet && window.AndroidPet.aiRequest;
   if (bridge && !fetchImpl) {
-    const raw = bridge(url, config.key ? 'Bearer ' + config.key : '', init.body);
+    const auth = headers.Authorization || '';
+    const raw = bridge(target, auth, init.body);
     let envelope;
     try {
       envelope = JSON.parse(raw);
@@ -54,15 +100,14 @@ export async function askAI(config, messages, fetchImpl = null) {
     } catch (err) {
       throw new Error('phản hồi không phải JSON');
     }
-    return parseReply(json);
+    return parseReply(json, provider);
   }
+
   const doFetch = fetchImpl || fetch;
-  const headers = { ...init.headers };
-  if (config.key) headers.Authorization = 'Bearer ' + config.key;
-  const res = await doFetch(url, { ...init, headers });
+  const res = await doFetch(target, { ...init, headers });
   if (!res.ok) {
     const body = await res.text().catch(() => '');
     throw new Error('HTTP ' + res.status + (body ? ': ' + body.slice(0, 120) : ''));
   }
-  return parseReply(await res.json());
+  return parseReply(await res.json(), provider);
 }

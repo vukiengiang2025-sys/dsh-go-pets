@@ -169,6 +169,14 @@
     </div>
 
     <div class="field">AI cho pet (tuỳ chọn)
+      <select id="aiProvider">
+        <option value="openai">OpenAI</option>
+        <option value="deepseek">DeepSeek</option>
+        <option value="gemini">Google Gemini</option>
+        <option value="groq">Groq</option>
+        <option value="ollama">Ollama (máy chủ nội bộ)</option>
+        <option value="custom">Khác</option>
+      </select>
       <input id="aiEndpoint" placeholder="https://api.deepseek.com">
       <input id="aiModel" placeholder="model, vd: deepseek-chat">
       <input id="aiKey" type="password" placeholder="API key (chỉ lưu trên máy)">

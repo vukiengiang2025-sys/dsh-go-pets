@@ -10,7 +10,7 @@ import { buildZip } from './zip-write.js';
 import { verifyChecksums } from './pack-integrity.js';
 import { applyLanguage, pick, stateText, getLang } from './i18n.js';
 import { upsertHost, removeHost } from './agent-hosts.js';
-import { askAI } from './ai.js';
+import { askAI, PRESETS } from './ai.js';
 import { seasonFor, SEASON_PACK } from './season.js';
 import qrcode from './vendor/qrcode.mjs';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
@@ -57,7 +57,7 @@ const DEFAULT_STORE = {
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
   ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi', agentHosts: [], overlayFloat: true,
-  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false,
+  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai',
 };
 
 const el = {
@@ -130,6 +130,7 @@ const el = {
   agentStop: document.getElementById('agentStop'),
   agentLine: document.getElementById('agentLine'),
   agentChip: document.getElementById('agentChip'),
+  aiProvider: document.getElementById('aiProvider'),
   aiEndpoint: document.getElementById('aiEndpoint'),
   aiModel: document.getElementById('aiModel'),
   aiKey: document.getElementById('aiKey'),
@@ -389,7 +390,7 @@ function petSay(text) {
 }
 
 function aiConfig(s) {
-  return { endpoint: s.aiEndpoint || '', model: s.aiModel || '', key: s.aiKey || '' };
+  return { provider: s.aiProvider || 'openai', endpoint: s.aiEndpoint || '', model: s.aiModel || '', key: s.aiKey || '' };
 }
 
 function aiSystemPrompt(s) {
@@ -1599,6 +1600,18 @@ function bindSheet() {
     if (!node) return;
     node.addEventListener('input', () => writeStore({ [key]: node.value.trim() }));
   });
+  el.aiProvider.addEventListener('change', () => {
+    const provider = el.aiProvider.value;
+    const preset = PRESETS[provider];
+    if (preset) {
+      el.aiEndpoint.value = preset.endpoint;
+      el.aiModel.value = preset.model;
+      writeStore({ aiProvider: provider, aiEndpoint: preset.endpoint, aiModel: preset.model });
+    } else {
+      writeStore({ aiProvider: provider });
+    }
+    if (el.aiStatus) el.aiStatus.textContent = 'đã chọn ' + provider;
+  });
   el.aiOn.addEventListener('change', () => {
     writeStore({ aiOn: el.aiOn.checked });
     if (el.aiStatus) el.aiStatus.textContent = el.aiOn.checked ? 'đã bật' : 'đã tắt';
@@ -2025,6 +2038,7 @@ async function main() {
     buildSettingsUI();
     renderHosts();
     renderCollection();
+    el.aiProvider.value = savedSettings.aiProvider || 'openai';
     el.aiEndpoint.value = savedSettings.aiEndpoint || '';
     el.aiModel.value = savedSettings.aiModel || '';
     el.aiKey.value = savedSettings.aiKey || '';
