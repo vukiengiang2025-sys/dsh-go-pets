@@ -49,7 +49,7 @@ Repo, APK và CI vẫn đang ở trạng thái chạy được.
 ## Hạn chế đã biết
 
 - **PiP**: vào được nhưng WebView hiện khung đen trên emulator; đã ẩn nút sau cờ thử nghiệm.
-- **Overlay**: kéo bằng chấm nhỏ góc dưới; chưa đổi kích thước, chưa nhớ vị trí sau khi tắt.
+- **Overlay**: kéo bằng chấm nhỏ góc dưới; nhớ vị trí và cỡ (120/150/200) qua lần mở sau.
 - **FPS**: chip có nhưng chưa chụp được ảnh xác nhận số.
 - **Widget/thông báo**: đã đăng ký và có log; muốn thấy trên máy thật phải tự thêm widget.
 - **Khoá ký** nằm công khai trong repo: cài tay thì tiện, **không** dùng phát hành CH Play.
