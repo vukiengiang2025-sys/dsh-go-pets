@@ -2,6 +2,7 @@ import { PetModel, normalizePack, STATES } from './pet-engine.js';
 import { buildPackFromFile, buildPackFromZip } from './pack-import.js';
 import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } from './pet-fx.js';
 import { shouldRemind, breakText } from './reminders.js';
+import { replyTo, storyFor, summaryFrom } from './pet-chat.js';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
 
 const FALLBACK_PACKS = [
@@ -42,6 +43,7 @@ const DEFAULT_STORE = {
   stats: { poke: 0, tickle: 0, drag: 0, seconds: 0, states: {} },
   journal: [], simple: false, autoTheme: false,
   speech: false, speechRate: 1, voiceName: '', breakReminder: false, breakMinutes: 45, lastBreak: 0,
+  chat: [], memories: [],
 };
 
 const el = {
@@ -85,6 +87,14 @@ const el = {
   testSpeech: document.getElementById('testSpeech'),
   breakOn: document.getElementById('breakOn'),
   breakMinutes: document.getElementById('breakMinutes'),
+  chatLog: document.getElementById('chatLog'),
+  chatInput: document.getElementById('chatInput'),
+  chatSend: document.getElementById('chatSend'),
+  storyBtn: document.getElementById('storyBtn'),
+  summaryBtn: document.getElementById('summaryBtn'),
+  memoryList: document.getElementById('memoryList'),
+  memoryInput: document.getElementById('memoryInput'),
+  memoryAdd: document.getElementById('memoryAdd'),
 };
 const ctx = el.canvas.getContext('2d');
 
@@ -149,6 +159,8 @@ function renderSheet() {
   const s = readStore();
   const minutes = Math.round((s.stats.seconds || 0) / 60);
   const seen = Object.keys(s.stats.states || {}).length;
+  renderChat();
+  renderMemories();
   el.stats.innerHTML =
     '<span><b>' + (s.stats.poke || 0) + '</b> lần chọc</span>'
     + '<span><b>' + (s.stats.tickle || 0) + '</b> lần cù</span>'
@@ -253,6 +265,69 @@ function applySpeechSettings() {
   el.breakOn.checked = !!s.breakReminder;
   el.breakMinutes.value = s.breakMinutes || 45;
   if (el.voiceSelect.options.length > 1) el.voiceSelect.value = s.voiceName || '';
+}
+
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
+function renderChat() {
+  if (!el.chatLog) return;
+  const s = readStore();
+  el.chatLog.innerHTML = s.chat.slice(-8).map(m =>
+    '<p class="' + m.role + '">' + escapeHtml(m.text) + '</p>').join('');
+  el.chatLog.scrollTop = el.chatLog.scrollHeight;
+}
+
+function renderMemories() {
+  if (!el.memoryList) return;
+  const s = readStore();
+  el.memoryList.innerHTML = s.memories.map((text, i) =>
+    '<li><span>' + escapeHtml(text) + '</span><button data-memory="' + i + '">Bỏ</button></li>').join('');
+}
+
+function pushChat(role, text) {
+  const s = readStore();
+  s.chat = [...s.chat, { role, text, t: Date.now() }].slice(-20);
+  writeStore({ chat: s.chat });
+  renderChat();
+}
+
+function petSay(text) {
+  pushChat('pet', text);
+  if (!el.quiet.checked) {
+    el.bubbleText.textContent = text;
+    el.bubbleAction.hidden = true;
+    el.bubble.hidden = false;
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(hideBubble, 6000);
+  }
+  speak(text);
+}
+
+function sendChat(text) {
+  const t = (text || '').trim();
+  if (!t) return;
+  pushChat('user', t);
+  const s = readStore();
+  const reply = replyTo(t, {
+    petName: s.name || (pack && pack.name) || 'pet',
+    memories: s.memories,
+    you: 'bạn',
+  });
+  petSay(reply);
+  logEvent('trò chuyện với pet');
+}
+
+function addMemory() {
+  const text = (el.memoryInput.value || '').trim().slice(0, 60);
+  if (!text) return;
+  const s = readStore();
+  if (s.memories.includes(text)) return;
+  writeStore({ memories: [...s.memories, text].slice(-10) });
+  el.memoryInput.value = '';
+  renderMemories();
+  petSay('Mình nhớ rồi: ' + text);
 }
 
 function checkBreak() {
@@ -685,6 +760,25 @@ function bindSheet() {
     el.breakMinutes.value = minutes;
     writeStore({ breakMinutes: minutes });
   });
+  el.chatSend.addEventListener('click', () => { sendChat(el.chatInput.value); el.chatInput.value = ''; });
+  el.chatInput.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter') { sendChat(el.chatInput.value); el.chatInput.value = ''; }
+  });
+  el.storyBtn.addEventListener('click', () => petSay(storyFor(new Date().getHours(), readStore().name || (pack && pack.name) || 'pet')));
+  el.summaryBtn.addEventListener('click', () => {
+    const s = readStore();
+    petSay(summaryFrom(s.stats, s.memories));
+  });
+  el.memoryAdd.addEventListener('click', addMemory);
+  el.memoryInput.addEventListener('keydown', ev => { if (ev.key === 'Enter') addMemory(); });
+  el.memoryList.addEventListener('click', ev => {
+    const b = ev.target.closest('button[data-memory]');
+    if (!b) return;
+    const s = readStore();
+    s.memories.splice(Number(b.dataset.memory), 1);
+    writeStore({ memories: s.memories });
+    renderMemories();
+  });
   el.importImage.addEventListener('click', () => el.importFile.click());
   el.importFile.addEventListener('change', async () => {
     const file = el.importFile.files && el.importFile.files[0];
@@ -922,6 +1016,9 @@ async function main() {
     const importDemo = new URLSearchParams(location.search).get('import');
     if (importDemo === 'demo') demoImport();
     else if (importDemo === 'zip') demoZipImport();
+    if (new URLSearchParams(location.search).get('chat') === 'demo') {
+      setTimeout(() => sendChat('xin chào'), 800);
+    }
     const initial = new URLSearchParams(location.search).get('state');
     if (initial && STATES.includes(initial)) model.setState(initial);
     const fxParam = new URLSearchParams(location.search).get('fx');

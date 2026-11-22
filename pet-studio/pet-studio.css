@@ -211,3 +211,13 @@ label.check input { width: 18px; height: 18px; accent-color: var(--accent); }
 .rate input { flex: 1; accent-color: var(--accent); }
 .minutes { width: 88px !important; }
 .unit { font-size: 12.5px; color: var(--muted); }
+
+.chat { display: grid; gap: 6px; max-height: 150px; overflow: auto; }
+.chat p { margin: 0; padding: 7px 10px; border-radius: 10px; font-size: 12.5px; max-width: 90%; }
+.chat p.user { justify-self: end; background: #1d3350; color: #dbe9ff; }
+.chat p.pet { justify-self: start; background: var(--panel); border: 1px solid var(--line); color: var(--text); }
+.memories { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.memories li { display: flex; justify-content: space-between; gap: 8px; align-items: center;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px;
+  font-size: 12.5px; }
+.memories:empty::before { content: "chưa có gì"; color: #6c7a90; font-size: 12.5px; }
