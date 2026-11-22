@@ -22,6 +22,7 @@ Mã nguồn chức năng **Pets** — thú cưng trạng thái — của [dsh-go
 - CI còn build **AAB** (1,18 MB) và chạy **Espresso** trên emulator (1 test: WebView mở đúng Pet Studio).
 - APK được GitHub Actions build lại mỗi khi `android/`, `pet-studio/` hoặc pet pack thay đổi; xem [android/README.md](android/README.md).
 - Bản phát hành ký bằng khoá cố định trong repo (cài đè được, không phải gỡ app); phát hành store thì thay keystore.
+- Thay đổi gần đây: [CHANGELOG.md](CHANGELOG.md).
 - Bàn giao & việc tiếp theo: [HANDOVER.md](HANDOVER.md).
 - **Chat AI tuỳ chọn** (OpenAI/DeepSeek/Gemini/Groq/Ollama, key lưu trên máy), **pet nổi tự bay nhảy**, **AOD màn hình đêm**, **hình nền động**, menu vòng, “Dạy đi”.
 - Trạng thái 100 ý tưởng: [STATUS.md](STATUS.md) — 84 xong, 1 một phần, 15 hoãn.
