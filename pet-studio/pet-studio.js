@@ -2,7 +2,7 @@ import { PetModel, normalizePack, STATES } from './pet-engine.js';
 import { buildPackFromFile, buildPackFromZip } from './pack-import.js';
 import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } from './pet-fx.js';
 import { shouldRemind, breakText } from './reminders.js';
-import { replyTo, storyFor, summaryFrom, moodFor, memoryFrom } from './pet-chat.js';
+import { replyTo, storyFor, summaryFrom, moodFor, memoryFrom, greetingFor } from './pet-chat.js';
 import { todayKey, bumpStreak, questDone, clock, hostColor, batteryText } from './care.js';
 import { shareUrl, pickConfig, decodeConfig } from './share.js';
 import { encodeGif, quantize } from './gif.js';
@@ -70,6 +70,7 @@ const el = {
   status: document.getElementById('status'),
   packInfo: document.getElementById('packInfo'),
   brandPet: document.getElementById('brandPet'),
+  aiChip: document.getElementById('aiChip'),
   quickInput: document.getElementById('quickInput'),
   quickSend: document.getElementById('quickSend'),
   lastReply: document.getElementById('lastReply'),
@@ -397,6 +398,15 @@ function petSay(text) {
     bubbleTimer = setTimeout(hideBubble, 6000);
   }
   speak(text);
+}
+
+function maybeDailyGreet() {
+  const s = readStore();
+  if (s.aiOn && s.aiGreet) return;
+  const day = todayKey();
+  if (s.lastGreetDay === day) return;
+  writeStore({ lastGreetDay: day });
+  setTimeout(() => petSay(greetingFor(new Date().getHours(), getLang())), 1200);
 }
 
 function maybeAIGreet() {
@@ -1785,6 +1795,10 @@ function bindSheet() {
   });
   el.aiOn.addEventListener('change', () => {
     writeStore({ aiOn: el.aiOn.checked });
+    if (el.aiChip) {
+      el.aiChip.hidden = !el.aiOn.checked;
+      el.aiChip.textContent = 'AI · ' + (el.aiModel.value || 'bật');
+    }
     if (el.aiStatus) el.aiStatus.textContent = el.aiOn.checked ? 'đã bật' : 'đã tắt';
   });
   el.aiRetest.addEventListener('click', () => {
@@ -2238,12 +2252,17 @@ async function main() {
     renderCollection();
     renderExperiment();
     maybeAIGreet();
+    maybeDailyGreet();
     el.aiPersona.value = savedSettings.aiPersona || 'gentle';
     el.aiProvider.value = savedSettings.aiProvider || 'openai';
     el.aiEndpoint.value = savedSettings.aiEndpoint || '';
     el.aiModel.value = savedSettings.aiModel || '';
     el.aiKey.value = savedSettings.aiKey || '';
     el.aiOn.checked = !!savedSettings.aiOn;
+    if (el.aiChip) {
+      el.aiChip.hidden = !el.aiOn.checked;
+      el.aiChip.textContent = 'AI · ' + (savedSettings.aiModel || 'bật');
+    }
     el.aiGreet.checked = !!savedSettings.aiGreet;
     el.overlayFloat.checked = savedSettings.overlayFloat !== false;
     if (window.AndroidPet && window.AndroidPet.setOverlayFloat) {
