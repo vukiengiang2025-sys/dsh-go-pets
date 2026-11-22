@@ -8,8 +8,15 @@ export const PRESETS = {
   ollama: { endpoint: 'http://10.0.2.2:11434/v1', model: 'llama3.2' },
 };
 
+export function normalizeEndpoint(endpoint) {
+  let url = String(endpoint || '').trim();
+  if (!url) return '';
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  return url.replace(/\/+$/, '');
+}
+
 export function chatUrl(endpoint, model = '', provider = 'openai') {
-  const base = String(endpoint || '').trim().replace(/\/+$/, '');
+  const base = normalizeEndpoint(endpoint);
   if (!base) throw new Error('thiếu endpoint');
   if (provider === 'gemini') {
     if (!model) throw new Error('thiếu model');

@@ -1,6 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { chatUrl, buildRequest, parseReply, askAI, PRESETS, aiSig, testCacheValid } from './ai.js';
+import { chatUrl, buildRequest, parseReply, askAI, PRESETS, aiSig, testCacheValid, normalizeEndpoint } from './ai.js';
+
+test('normalizeEndpoint thêm https và bỏ /', () => {
+  assert.equal(normalizeEndpoint('api.deepseek.com/'), 'https://api.deepseek.com');
+  assert.equal(normalizeEndpoint(' https://x/v1/ '), 'https://x/v1');
+  assert.equal(normalizeEndpoint(''), '');
+});
 
 test('chatUrl chuẩn hoá endpoint openai', () => {
   assert.equal(chatUrl('https://api.deepseek.com/'), 'https://api.deepseek.com/chat/completions');
