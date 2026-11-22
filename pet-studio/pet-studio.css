@@ -467,3 +467,5 @@ body.loading .stage canvas { opacity: .55; transition: opacity .2s; }
 .ai-chip { font-size: 11px; color: #b8ffcf; background: rgba(70,220,130,.12);
   border: 1px solid rgba(70,220,130,.3); padding: 3px 8px; border-radius: 999px; }
 .ai-chip[hidden] { display: none; }
+
+.ai-chip { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
