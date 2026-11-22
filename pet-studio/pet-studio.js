@@ -1,5 +1,5 @@
 import { PetModel, normalizePack, STATES } from './pet-engine.js';
-import { buildPackFromFile } from './pack-import.js';
+import { buildPackFromFile, buildPackFromZip } from './pack-import.js';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
 
 const FALLBACK_PACKS = [
@@ -280,26 +280,41 @@ function sheetNames(json) {
   return [...new Set(Object.values(json.animations || {}).map(a => a.sheet))];
 }
 
+async function saveImported(built) {
+  await saveLocalPack({
+    id: built.pack.id, created: Date.now(),
+    pack: built.pack, files: built.files, frames: built.frames,
+  });
+  logEvent('nhập pet ' + built.pack.name);
+  await loadPacks();
+  renderPackOptions();
+  writeStore({ pack: built.pack.id });
+  await loadPack(built.pack.id);
+  setStatus('đã nhập ' + built.pack.name + ' · ' + built.frames + ' khung');
+  haptic(14);
+}
+
 async function importImageFile(file) {
   if (!file) return;
   setStatus('đang xử lý ' + file.name + '…');
   haptic(10);
   try {
-    const built = await buildPackFromFile(file);
-    await saveLocalPack({
-      id: built.pack.id, created: Date.now(),
-      pack: built.pack, files: built.files, frames: built.frames,
-    });
-    logEvent('nhập pet ' + built.pack.name);
-    await loadPacks();
-    renderPackOptions();
-    writeStore({ pack: built.pack.id });
-    await loadPack(built.pack.id);
-    setStatus('đã nhập ' + built.pack.name + ' · ' + built.frames + ' khung');
-    haptic(14);
+    await saveImported(await buildPackFromFile(file));
   } catch (err) {
     console.error(err);
-    setStatus('nhập lỗi: ' + err.message);
+    setStatus('nhập ảnh lỗi: ' + err.message);
+  }
+}
+
+async function importZipFile(file) {
+  if (!file) return;
+  setStatus('đang mở ' + file.name + '…');
+  haptic(10);
+  try {
+    await saveImported(await buildPackFromZip(await file.arrayBuffer()));
+  } catch (err) {
+    console.error(err);
+    setStatus('nhập zip lỗi: ' + err.message);
   }
 }
 
@@ -316,6 +331,18 @@ async function removeImported(id) {
     el.pack.value = first.id;
     writeStore({ pack: first.id });
     await loadPack(first.id);
+  }
+}
+
+async function demoZipImport() {
+  try {
+    setStatus('đang mở zip mẫu…');
+    const res = await fetch('./test-fixtures/mini-pack.zip');
+    if (!res.ok) throw new Error('không tải được zip mẫu');
+    await saveImported(await buildPackFromZip(await res.arrayBuffer()));
+  } catch (err) {
+    console.error(err);
+    setStatus('zip mẫu lỗi: ' + err.message);
   }
 }
 
@@ -478,7 +505,12 @@ function bindSheet() {
   el.importFile.addEventListener('change', async () => {
     const file = el.importFile.files && el.importFile.files[0];
     el.importFile.value = '';
-    if (file) await importImageFile(file);
+    if (!file) return;
+    if (/\.zip$/i.test(file.name) || (file.type || '').includes('zip')) {
+      await importZipFile(file);
+    } else {
+      await importImageFile(file);
+    }
   });
   el.importedList.addEventListener('click', ev => {
     const b = ev.target.closest('button[data-remove]');
@@ -636,7 +668,9 @@ async function main() {
       if (readStore().autoTheme) applyPalette(paletteForNow());
     }, 600000);
     if (new URLSearchParams(location.search).get('sheet') === '1') openSheet(true);
-    if (new URLSearchParams(location.search).get('import') === 'demo') demoImport();
+    const importDemo = new URLSearchParams(location.search).get('import');
+    if (importDemo === 'demo') demoImport();
+    else if (importDemo === 'zip') demoZipImport();
     const initial = new URLSearchParams(location.search).get('state');
     if (initial && STATES.includes(initial)) model.setState(initial);
     requestAnimationFrame(draw);

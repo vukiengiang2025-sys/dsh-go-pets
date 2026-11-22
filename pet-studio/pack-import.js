@@ -1,5 +1,7 @@
-// Dựng pack.json + sheet từ một ảnh/GIF/APNG. Không phụ thuộc DOM ở phần meta
-// để test được bằng Node; phần đọc ảnh cần trình duyệt.
+// Dựng pack.json + sheet từ một ảnh/GIF/APNG hoặc từ zip có sẵn. Phần meta và
+// phần đọc zip không phụ thuộc DOM để test được bằng Node.
+
+import { readZip, ZIP_LIMITS } from './zip-read.js';
 
 export const MAX_SIDE = 256;
 export const MAX_FRAMES = 24;
@@ -138,4 +140,42 @@ export function alphaBox(canvas) {
   }
   if (x1 < 0) return { x: 0, y: 0, w: width, h: height };
   return { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+}
+
+export async function buildPackFromZip(buffer) {
+  const entries = await readZip(buffer);
+  const candidates = [...entries.keys()].filter(n => n === 'pack.json'
+    || (n.endsWith('/pack.json') && n.split('/').length === 2 && !n.startsWith('.')));
+  if (!candidates.length) throw new Error('zip không có pack.json ở gốc hoặc trong một thư mục');
+  if (candidates.length > 1) throw new Error('zip có nhiều pack.json, chỉ để một');
+  const packPath = candidates[0];
+  const dir = packPath.includes('/') ? packPath.slice(0, packPath.lastIndexOf('/') + 1) : '';
+  const jsonBytes = entries.get(packPath);
+  if (jsonBytes.length > ZIP_LIMITS.packJson) throw new Error('pack.json quá lớn');
+  let pack;
+  try {
+    pack = JSON.parse(new TextDecoder().decode(jsonBytes));
+  } catch {
+    throw new Error('pack.json không phải JSON hợp lệ');
+  }
+  if (!pack || pack.schema !== 1) throw new Error('pack.json thiếu "schema": 1');
+  const animations = pack.animations || {};
+  const sheets = [...new Set(Object.values(animations).map(a => a.sheet))];
+  if (!sheets.length) throw new Error('pack không có animation nào');
+  if (sheets.length > 64) throw new Error('pack có quá nhiều ảnh');
+  const files = {};
+  for (const name of sheets) {
+    if (typeof name !== 'string' || name.includes('/') || name.includes('\\')) {
+      throw new Error('tên ảnh không hợp lệ: ' + name);
+    }
+    const data = entries.get(dir + name) || entries.get(name);
+    if (!data) throw new Error('thiếu ảnh ' + name);
+    if (data.length < 8 || data[0] !== 0x89 || data[1] !== 0x50 || data[2] !== 0x4e || data[3] !== 0x47) {
+      throw new Error('ảnh không phải PNG: ' + name);
+    }
+    files[name] = new Blob([data], { type: 'image/png' });
+  }
+  const safeId = /^[a-z0-9][a-z0-9-]{0,47}$/.test(pack.id || '') ? pack.id : packIdFrom(pack.id || pack.name || 'zip');
+  pack.id = safeId;
+  return { pack, files, frames: sheets.length };
 }

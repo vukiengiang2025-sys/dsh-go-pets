@@ -1,0 +1,1 @@
+{"schema": 1, "id": "mini", "name": "Mini", "canvas": {"w": 4, "h": 4}, "contentBox": {"x": 0, "y": 0, "w": 4, "h": 4}, "animations": {"idle": {"sheet": "idle.png", "frameW": 4, "frameH": 4, "cols": 1, "box": {"x": 0, "y": 0, "w": 4, "h": 4}, "frames": [{"i": 0, "ms": 200}]}}, "states": {"idle": ["idle"]}}
