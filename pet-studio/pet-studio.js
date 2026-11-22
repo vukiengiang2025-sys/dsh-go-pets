@@ -10,7 +10,7 @@ import { buildZip } from './zip-write.js';
 import { verifyChecksums } from './pack-integrity.js';
 import { applyLanguage, pick, stateText, getLang } from './i18n.js';
 import { upsertHost, removeHost } from './agent-hosts.js';
-import { askAI, PRESETS } from './ai.js';
+import { askAI, PRESETS, friendlyAIError } from './ai.js';
 import { seasonFor, SEASON_PACK } from './season.js';
 import qrcode from './vendor/qrcode.mjs';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
@@ -109,6 +109,7 @@ const el = {
   chatInput: document.getElementById('chatInput'),
   chatSend: document.getElementById('chatSend'),
   storyBtn: document.getElementById('storyBtn'),
+  clearChat: document.getElementById('clearChat'),
   summaryBtn: document.getElementById('summaryBtn'),
   memoryList: document.getElementById('memoryList'),
   memoryInput: document.getElementById('memoryInput'),
@@ -433,8 +434,9 @@ async function sendChat(text) {
       return;
     } catch (err) {
       console.error(err);
-      if (el.aiStatus) el.aiStatus.textContent = 'lỗi: ' + err.message;
-      setStatus('AI lỗi, dùng trả lời offline');
+      const friendly = friendlyAIError(err);
+      if (el.aiStatus) el.aiStatus.textContent = 'lỗi: ' + friendly;
+      setStatus('AI lỗi (' + friendly + '), dùng trả lời offline');
     }
   }
   const reply = replyTo(t, { lang: getLang(),
@@ -1558,6 +1560,11 @@ function bindSheet() {
   el.chatInput.addEventListener('keydown', ev => {
     if (ev.key === 'Enter') { sendChat(el.chatInput.value); el.chatInput.value = ''; }
   });
+  el.clearChat.addEventListener('click', () => {
+    writeStore({ chat: [] });
+    renderChat();
+    petSay(pick('Mình quên hết rồi, bắt đầu lại nhé.', 'I forgot everything, let us start again.'));
+  });
   el.storyBtn.addEventListener('click', () => petSay(storyFor(new Date().getHours(), readStore().name || (pack && pack.name) || 'pet', getLang())));
   el.summaryBtn.addEventListener('click', () => {
     const s = readStore();
@@ -1635,7 +1642,7 @@ function bindSheet() {
       const reply = await askAI(aiConfig(s), [{ role: 'user', content: 'Chào bạn, trả lời một câu ngắn.' }]);
       el.aiStatus.textContent = 'OK: ' + reply.slice(0, 60);
     } catch (err) {
-      el.aiStatus.textContent = 'lỗi: ' + err.message;
+      el.aiStatus.textContent = 'lỗi: ' + friendlyAIError(err);
     }
   });
   el.agentStart.addEventListener('click', () => startAgent((el.agentUrl.value || '').trim()));

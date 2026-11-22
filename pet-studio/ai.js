@@ -111,3 +111,12 @@ export async function askAI(config, messages, fetchImpl = null) {
   }
   return parseReply(await res.json(), provider);
 }
+
+export function friendlyAIError(err) {
+  const msg = String((err && err.message) || err || '');
+  if (/401|403/.test(msg)) return 'Key sai hoặc không có quyền';
+  if (/429/.test(msg)) return 'Bị giới hạn tần suất, thử lại sau';
+  if (/HTTP 5\d\d/.test(msg)) return 'Máy chủ AI đang lỗi, thử lại';
+  if (/Failed to fetch|NetworkError|ENOTFOUND|timeout/i.test(msg)) return 'Không kết nối được tới API';
+  return msg;
+}
