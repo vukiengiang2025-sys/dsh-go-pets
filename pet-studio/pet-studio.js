@@ -724,6 +724,9 @@ function bindPip() {
   }
   const bridge = window.AndroidPet;
   if (!bridge || typeof bridge.isPipSupported !== 'function' || !bridge.isPipSupported()) return;
+  // Cửa sổ PiP còn thử nghiệm: WebView có thể hiện khung đen trên một số máy.
+  // Chỉ hiện nút khi mở bằng ?pipbtn=1 để thử.
+  if (new URLSearchParams(location.search).get('pipbtn') !== '1') return;
   el.pipBtn.hidden = false;
   el.pipBtn.addEventListener('click', () => bridge.enterPip());
 }
