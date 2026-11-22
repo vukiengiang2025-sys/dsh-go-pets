@@ -7,7 +7,7 @@ nền tảng Android → cộng đồng → kỹ thuật → sản phẩm.
 
 | Nhóm | Ý tưởng | Gộp gì | Trạng thái |
 |---|---|---|---|
-| **G. Cá nhân hoá** | 61–70 | tên, màu, cỡ (09, 63), hồ sơ, thống kê, nhật ký, sao lưu, chế độ đơn giản, theme theo giờ (69≈62), ngôn ngữ | đang làm |
+| **G. Cá nhân hoá** | 61–70 | tên, màu, cỡ (09, 63), hồ sơ, thống kê, nhật ký, sao lưu, chế độ đơn giản, theme theo giờ (69≈62), ngôn ngữ | xong 61–69, 70 để đợt i18n |
 | **A. Nhân vật & pack** | 01–10, 79, 80 | pack theo mùa/nghề/động vật, tạo pack trong app (04), nhập GIF/APNG (05), pack đồng nghiệp (07), sáng/đêm (08), mini (09), bộ sưu tập (10), template (79), preset (80) | chờ |
 | **B. Biểu cảm** | 11–20 | chớp mắt, nhìn theo tay, nghe, gõ phím, pin, hạt, crossfade, nhịp thở, vươn vai, buồn ngủ | chờ |
 | **C. Tương tác** | 21–30 | vuốt ve, nhấc/thả, ném, chạm đúp, vẽ đường, bánh xe, lực rung, ba ngón, menu cảm xúc, trốn | chờ (tickle đã có) |
