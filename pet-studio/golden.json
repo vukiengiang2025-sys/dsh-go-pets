@@ -177,6 +177,68 @@
         "hash": "7e6962e504c3fdfd37b941b58872fd5fdfd54ba689f4de388b97e8614e42124e"
       }
     },
+    "may-night": {
+      "done.png": {
+        "w": 195,
+        "h": 36,
+        "hash": "0668b7bc12f72057c02f8ae2d9a17c6004cad80eed3358831a2d85293c520986"
+      },
+      "drag.png": {
+        "w": 78,
+        "h": 26,
+        "hash": "a5fb610f5f3e88eb9738b495722016fc7da4fce4a53ba8eb4858cbcc0884c911"
+      },
+      "error.png": {
+        "w": 123,
+        "h": 34,
+        "hash": "5a5e483cf272aa5b00f97d9fa6ed8cf8015120d8d5f5d77ceadb30495f2b8958"
+      },
+      "idle.png": {
+        "w": 156,
+        "h": 30,
+        "hash": "58b44195885bcf2d60d0f131b9d96f95820a242afb9c5bacc4ba7655b401298e"
+      },
+      "notification.png": {
+        "w": 117,
+        "h": 33,
+        "hash": "f22f636827c3b9d5040aba07eeee465126c7de61fec4c28592aa3812a3acb405"
+      },
+      "poke.png": {
+        "w": 123,
+        "h": 26,
+        "hash": "d4976bb05de8676d4778c00efb87694aadbbafb50d093b7ae6ee2593eb576ef5"
+      },
+      "roam.png": {
+        "w": 78,
+        "h": 27,
+        "hash": "2f4c213c46708773bf1bc4a4f48f804c948c0edf79c78260934d90aafb3c1ab9"
+      },
+      "sleeping.png": {
+        "w": 160,
+        "h": 39,
+        "hash": "bcf69f2cb755941411f81af03777c5585334173ce3ed95eefcac58bc57851a8d"
+      },
+      "thinking.png": {
+        "w": 156,
+        "h": 33,
+        "hash": "7b1d8de5af94b2282617dba6d86184a28e006f8a220efc0f5cac170ef17e748b"
+      },
+      "tickle.png": {
+        "w": 82,
+        "h": 27,
+        "hash": "bca16d8a699a160ca52333c72db04bf423456c27827689c735ef4665baf6b883"
+      },
+      "waking.png": {
+        "w": 156,
+        "h": 32,
+        "hash": "472de7304b56d6d3f0b38992d66ad22dbcda5a5474fe42d3c6e747ae5948726f"
+      },
+      "working.png": {
+        "w": 78,
+        "h": 27,
+        "hash": "af02f546c475c8f1a6f1b0e83514267ed3f8a98300a994e5d3787b2a44a93a05"
+      }
+    },
     "may-snow": {
       "done.png": {
         "w": 195,

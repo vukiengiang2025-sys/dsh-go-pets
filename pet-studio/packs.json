@@ -26,6 +26,11 @@
       "id": "bo",
       "name": "Bơ",
       "url": "../app/assets/pets/bo/pack.json"
+    },
+    {
+      "id": "may-night",
+      "name": "Mây Đêm",
+      "url": "../app/assets/pets/may-night/pack.json"
     }
   ]
 }

@@ -2,8 +2,8 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **71 xong** (có trong APK)
-- 🟡 **6 một phần** (có nền tảng, thiếu phần còn lại)
+- ✅ **72 xong** (có trong APK)
+- 🟡 **5 một phần** (có nền tảng, thiếu phần còn lại)
 - ⏸ **23 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
@@ -17,7 +17,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 05 | Nhập GIF/APNG | ✅ |
 | 06 | Ảnh chân dung → pixel | ⏸ cần model/quantize thông minh |
 | 07 | Pack theo model AI | ⏸ cần art |
-| 08 | Sáng/đêm | 🟡 có mùa + màu theo giờ, chưa tách pack |
+| 08 | Sáng/đêm | ✅ pack Mây Đêm riêng |
 | 09 | Mini mode | ✅ thêm cỡ 24 dp |
 | 10 | Bộ sưu tập | ✅ lưới 9 trạng thái, đánh dấu đã thấy |
 | 79 | Template pack | ⏸ |
