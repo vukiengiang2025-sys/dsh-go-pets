@@ -49,7 +49,7 @@ const DEFAULT_STORE = {
   pack: null, size: '64', quiet: false, palette: 'goc', name: '',
   stats: { poke: 0, tickle: 0, drag: 0, seconds: 0, states: {} },
   journal: [], simple: false, autoTheme: false,
-  speech: false, speechRate: 1, voiceName: '', breakReminder: false, breakMinutes: 45, lastBreak: 0,
+  speech: false, speechRate: 1, voiceName: '', voiceByPack: {}, breakReminder: false, breakMinutes: 45, lastBreak: 0,
   chat: [], memories: [],
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
@@ -534,6 +534,10 @@ function renderImported() {
 
 async function loadPack(id) {
   const entry = packs.find(p => p.id === id) || packs[0];
+  const voiceMap = readStore().voiceByPack || {};
+  const nextVoice = voiceMap[entry.id] || '';
+  writeStore({ voiceName: nextVoice });
+  if (el.voiceSelect) el.voiceSelect.value = nextVoice;
   objectUrls.forEach(url => URL.revokeObjectURL(url));
   objectUrls = [];
   let json;
@@ -1376,7 +1380,12 @@ function bindSheet() {
   });
   el.speechOn.addEventListener('change', () => writeStore({ speech: el.speechOn.checked }));
   el.speechRate.addEventListener('input', () => writeStore({ speechRate: Number(el.speechRate.value) || 1 }));
-  el.voiceSelect.addEventListener('change', () => writeStore({ voiceName: el.voiceSelect.value }));
+  el.voiceSelect.addEventListener('change', () => {
+    const s = readStore();
+    const map = { ...(s.voiceByPack || {}) };
+    map[pack ? pack.id : 'default'] = el.voiceSelect.value;
+    writeStore({ voiceName: el.voiceSelect.value, voiceByPack: map });
+  });
   el.testSpeech.addEventListener('click', () => speak('Xin chào, mình là pet của bạn.', true));
   el.breakOn.addEventListener('change', () => {
     const on = el.breakOn.checked;

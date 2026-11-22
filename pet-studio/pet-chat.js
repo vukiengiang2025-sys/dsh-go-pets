@@ -19,6 +19,9 @@ export function replyTo(text, ctx = {}) {
   const en = ctx.lang === 'en';
   if (!raw) return en ? "You haven't said anything yet." : 'Bạn chưa nói gì cả.';
   const t = raw.toLowerCase();
+  if (/^(ừ+|uh+|hmm+|ok|oke|vâng|dạ|\.\.\.+\?*|\?+)$/.test(t)) {
+    return en ? 'Tell me a little more — what is on your mind?' : 'Kể mình nghe thêm chút đi — bạn đang nghĩ gì?';
+  }
   const you = ctx.you || (en ? 'you' : 'bạn');
   const pet = ctx.petName || (en ? 'me' : 'mình');
 

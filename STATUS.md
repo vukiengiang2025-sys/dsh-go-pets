@@ -2,9 +2,9 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **62 xong** (có trong APK)
-- 🟡 **10 một phần** (có nền tảng, thiếu phần còn lại)
-- ⏸ **28 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
+- ✅ **64 xong** (có trong APK)
+- 🟡 **9 một phần** (có nền tảng, thiếu phần còn lại)
+- ⏸ **27 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
 
@@ -60,8 +60,8 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 31 | Chat ngắn | ✅ theo luật, offline |
 | 32 | Tóm tắt việc | ✅ |
 | 33 | TTS | ✅ Web Speech |
-| 34 | Giọng riêng từng pack | 🟡 chọn giọng chung |
-| 35 | Hỏi lại khi mơ hồ | ⏸ |
+| 34 | Giọng riêng từng pack | ✅ mỗi pack nhớ giọng riêng |
+| 35 | Hỏi lại khi mơ hồ | ✅ câu ngắn/“ừ” được hỏi lại |
 | 36 | Ghi nhớ | ✅ sổ nhớ |
 | 37 | Nhắc nghỉ | ✅ |
 | 38 | Kể chuyện | ✅ |
