@@ -18,7 +18,7 @@ Mã nguồn chức năng **Pets** — thú cưng trạng thái — của [dsh-go
 **[Tải PetStudio.apk](https://github.com/vukiengiang2025-sys/dsh-go-pets/releases/download/android-latest/PetStudio.apk)** — Android 7.0+, chạy offline, không xin quyền nào.
 
 - Mở APK để cài (máy có thể hỏi "Cài từ nguồn không xác định" — bật cho trình quản lý tệp).
-- 2 pet (**Mây**, **DSH Bot**) + **nhập pet riêng từ ảnh/GIF/APNG/WebP/zip** ngay trong app, 9 trạng thái, chuyển cảnh mượt, hạt cảm xúc, vuốt ve, ném pet, chạm đúp mở cài đặt, đọc thành tiếng khi có việc, nhắc đứng dậy mỗi N phút, chat ngắn + sổ nhớ + kể chuyện + tóm tắt, bong bóng "Chờ bạn" có nút **Đã xử lý**, nhớ pack/cỡ/im lặng, onboarding, chuỗi ngày, nhiệm vụ đi dạo, Pomodoro 25/5, chia sẻ cấu hình bằng link, xuất ảnh pet, widget màn hình chính hiện pet + trạng thái, nhấn giữ icon có shortcut mở thẳng từng pet.
+- 2 pet (**Mây**, **DSH Bot**) + **nhập pet riêng từ ảnh/GIF/APNG/WebP/zip** ngay trong app, 9 trạng thái, chuyển cảnh mượt, hạt cảm xúc, vuốt ve, ném pet, chạm đúp mở cài đặt, đọc thành tiếng khi có việc, nhắc đứng dậy mỗi N phút, chat ngắn + sổ nhớ + kể chuyện + tóm tắt, bong bóng "Chờ bạn" có nút **Đã xử lý**, nhớ pack/cỡ/im lặng, onboarding, chuỗi ngày, nhiệm vụ đi dạo, Pomodoro 25/5, chia sẻ cấu hình bằng link, xuất ảnh/GIF, kết nối agent qua endpoint HTTP (tuỳ chọn), widget màn hình chính hiện pet + trạng thái, nhấn giữ icon có shortcut mở thẳng từng pet.
 - APK được GitHub Actions build lại mỗi khi `android/`, `pet-studio/` hoặc pet pack thay đổi; xem [android/README.md](android/README.md).
 - Bản phát hành ký bằng khoá cố định trong repo (cài đè được, không phải gỡ app); phát hành store thì thay keystore.
 - Điểm chất lượng tự chấm: **1000/1000** — chi tiết và bằng chứng ở [QUALITY.md](QUALITY.md).

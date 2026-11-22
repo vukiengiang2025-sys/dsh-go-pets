@@ -12,7 +12,7 @@ nền tảng Android → cộng đồng → kỹ thuật → sản phẩm.
 | **B. Biểu cảm** | 11–20 | chớp mắt, nhìn theo tay, nghe, gõ phím, pin, hạt, crossfade, nhịp thở, vươn vai, buồn ngủ | đang làm: 12, 16, 17, 19, 20 |
 | **C. Tương tác** | 21–30 | vuốt ve, nhấc/thả, ném, chạm đúp, vẽ đường, bánh xe, lực rung, ba ngón, menu cảm xúc, trốn | đang làm: 21–24, 27, 30 |
 | **D. AI & giọng** | 31–40 | chat ngắn, tóm tắt, TTS, giọng riêng, hỏi lại, ghi nhớ, nhắc nghỉ, kể chuyện, cảm xúc tin nhắn, im lặng | đang làm: 31 (chat theo luật), 32, 33, 36, 37, 38; còn 34/35/39 |
-| **E. Tích hợp agent** | 41–50 | WebSocket, tool bubble, subagent, màu host, mở hội thoại, widget trạng thái, lỗi + log, nhiều host | chờ |
+| **E. Tích hợp agent** | 41–50 | WebSocket, tool bubble, subagent, màu host, mở hội thoại, widget trạng thái, lỗi + log, nhiều host | 41 bản HTTP endpoint (poll 10s) |
 | **F. Android** | 51–60 | overlay, widget, QS tile, live wallpaper, notification, PiP, pin/sạc, AOD, splash (59 đã có), AAB | 52 xong (provider + cập nhật trạng thái); 56 thử nghiệm; 59 đã có |
 | **H. Cộng đồng** | 71–78 | chợ pack, link, GIF, QR, xếp hạng, bình chọn, gallery, chia sẻ cấu hình | 72, 73, 78 xong; còn QR/chợ/gallery |
 | **I. Kỹ thuật** | 81–90 | Espresso, golden, FPS/pin, nén atlas, lazy pack, chữ ký, quyền, crash opt-in, A/B, AAB | một phần |
