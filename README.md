@@ -18,7 +18,7 @@ Mã nguồn chức năng **Pets** — thú cưng trạng thái — của [dsh-go
 **[Tải PetStudio.apk](https://github.com/vukiengiang2025-sys/dsh-go-pets/releases/download/android-latest/PetStudio.apk)** — Android 7.0+, chạy offline, không xin quyền nào.
 
 - Mở APK để cài (máy có thể hỏi "Cài từ nguồn không xác định" — bật cho trình quản lý tệp).
-- 2 pet (**Mây**, **DSH Bot**) + **nhập pet riêng từ ảnh/GIF/APNG/WebP/zip** ngay trong app, 9 trạng thái, chuyển cảnh mượt, hạt cảm xúc, vuốt ve, ném pet, chạm đúp mở cài đặt, đọc thành tiếng khi có việc, nhắc đứng dậy mỗi N phút, chat ngắn + sổ nhớ + kể chuyện + tóm tắt, bong bóng "Chờ bạn" có nút **Đã xử lý**, nhớ pack/cỡ/im lặng, nhấn giữ icon có shortcut mở thẳng từng pet.
+- 2 pet (**Mây**, **DSH Bot**) + **nhập pet riêng từ ảnh/GIF/APNG/WebP/zip** ngay trong app, 9 trạng thái, chuyển cảnh mượt, hạt cảm xúc, vuốt ve, ném pet, chạm đúp mở cài đặt, đọc thành tiếng khi có việc, nhắc đứng dậy mỗi N phút, chat ngắn + sổ nhớ + kể chuyện + tóm tắt, bong bóng "Chờ bạn" có nút **Đã xử lý**, nhớ pack/cỡ/im lặng, widget màn hình chính hiện pet + trạng thái, nhấn giữ icon có shortcut mở thẳng từng pet.
 - APK được GitHub Actions build lại mỗi khi `android/`, `pet-studio/` hoặc pet pack thay đổi; xem [android/README.md](android/README.md).
 - Bản phát hành ký bằng khoá cố định trong repo (cài đè được, không phải gỡ app); phát hành store thì thay keystore.
 - Điểm chất lượng tự chấm: **1000/1000** — chi tiết và bằng chứng ở [QUALITY.md](QUALITY.md).
@@ -51,7 +51,7 @@ Pet pack = một zip + `pack.json` + các ảnh PNG dạng lưới khung hình. 
 | **Pet mẫu "Mây"** (nhân vật tự vẽ, CC BY 4.0) | `app/assets/pets/may/`, `art/may/` | 13 + 18 |
 | **Pet "DSH Bot"** (tách từ sheet của bạn, CC BY 4.0) | `app/assets/pets/dsh-bot/`, `art/dsh-bot/` | 11 + 20 |
 | **Pet Studio** — web app chơi thử pack | `pet-studio/` | 7 |
-| **App Android** — WebView + asset loader, icon, shortcut | `android/` | 20 |
+| **App Android** — WebView + asset loader, icon, shortcut, widget | `android/` | 24 |
 | **CI build APK** | `.github/workflows/android.yml` | 1 |
 
 ## Pet mẫu: Mây
