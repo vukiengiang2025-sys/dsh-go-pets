@@ -72,6 +72,7 @@ const el = {
   brandPet: document.getElementById('brandPet'),
   quickInput: document.getElementById('quickInput'),
   quickSend: document.getElementById('quickSend'),
+  lastReply: document.getElementById('lastReply'),
   pack: document.getElementById('pack'),
   size: document.getElementById('size'),
   quiet: document.getElementById('quiet'),
@@ -500,6 +501,7 @@ async function sendChat(text) {
   });
   pushChat('pet', reply);
   petSay(reply);
+  if (el.lastReply) { el.lastReply.textContent = reply; el.lastReply.hidden = false; }
   const mood = moodFor(t);
   if (mood) {
     setTimeout(() => model.setState(mood), 700);
