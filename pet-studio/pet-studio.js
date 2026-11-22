@@ -142,6 +142,7 @@ const el = {
   zipLoad: document.getElementById('zipLoad'),
   langSel: document.getElementById('lang'),
   overlayStart: document.getElementById('overlayStart'),
+  overlaySize: document.getElementById('overlaySize'),
   overlayStop: document.getElementById('overlayStop'),
   openMarket: document.getElementById('openMarket'),
   marketModal: document.getElementById('marketModal'),
@@ -1428,6 +1429,12 @@ function bindSheet() {
       setStatus(ok ? 'đã bật cửa sổ nổi' : 'cần cấp quyền hiển thị trên ứng dụng khác');
     } else {
       setStatus('chỉ chạy trong app Android');
+    }
+  });
+  el.overlaySize.addEventListener('change', () => {
+    if (window.AndroidPet && window.AndroidPet.setOverlaySize) {
+      window.AndroidPet.setOverlaySize(Number(el.overlaySize.value));
+      setStatus(pick('đã đổi cỡ cửa sổ nổi', 'floating window size updated'));
     }
   });
   el.overlayStop.addEventListener('click', () => {

@@ -342,6 +342,16 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void setOverlaySize(int dp) {
+            int clamped = Math.max(100, Math.min(260, dp));
+            getSharedPreferences("petstudio-prefs", MODE_PRIVATE).edit()
+                    .putInt("overlay_size", clamped).apply();
+            stopService(new Intent(MainActivity.this, PetOverlayService.class));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(MainActivity.this)) return;
+            startService(new Intent(MainActivity.this, PetOverlayService.class));
+        }
+
+        @JavascriptInterface
         public void stopOverlay() {
             stopService(new Intent(MainActivity.this, PetOverlayService.class));
         }

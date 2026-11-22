@@ -60,7 +60,8 @@ public class PetOverlayService extends Service {
         }
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         startAsForeground();
-        int size = Math.round(140 * getResources().getDisplayMetrics().density);
+        int dp = getSharedPreferences("petstudio-prefs", MODE_PRIVATE).getInt("overlay_size", 150);
+        int size = Math.round(Math.max(100, Math.min(260, dp)) * getResources().getDisplayMetrics().density);
 
         root = new FrameLayout(this);
         root.setBackgroundColor(Color.TRANSPARENT);
@@ -113,6 +114,13 @@ public class PetOverlayService extends Service {
                         windowManager.updateViewLayout(root, params);
                     }
                     return true;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    getSharedPreferences("petstudio-prefs", MODE_PRIVATE).edit()
+                            .putInt("overlay_x", params.x)
+                            .putInt("overlay_y", params.y)
+                            .apply();
+                    return true;
                 default:
                     return true;
             }
@@ -134,8 +142,9 @@ public class PetOverlayService extends Service {
                         | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 PixelFormat.TRANSLUCENT);
         params.gravity = Gravity.TOP | Gravity.START;
-        params.x = 24;
-        params.y = Math.round(200 * getResources().getDisplayMetrics().density);
+        params.x = getSharedPreferences("petstudio-prefs", MODE_PRIVATE).getInt("overlay_x", 24);
+        params.y = getSharedPreferences("petstudio-prefs", MODE_PRIVATE)
+                .getInt("overlay_y", Math.round(200 * getResources().getDisplayMetrics().density));
 
         try {
             windowManager.addView(root, params);
@@ -147,7 +156,7 @@ public class PetOverlayService extends Service {
 
         String url = "https://" + DOMAIN + "/www/pet-studio/index.html?v=" + BuildConfig.VERSION_NAME + "&overlay=1";
         webView.loadUrl(url);
-        Log.d(TAG, "overlay shown");
+        Log.d(TAG, "overlay shown size=" + dp + " x=" + params.x + " y=" + params.y);
     }
 
     private void startAsForeground() {
