@@ -2,7 +2,7 @@
 
 ## Hiện tại
 
-- App **Pet Studio 4.27.0** (versionCode 70), Android 7.0+, offline mặc định; chat AI tuỳ chọn.
+- App **Pet Studio 4.62.0** (versionCode 118), Android 7.0+, offline mặc định; chat AI tuỳ chọn.
 - APK: https://github.com/vukiengiang2025-sys/dsh-go-pets/releases/download/android-latest/PetStudio.apk
 - Bản trong máy: /sdcard/Download/DSH-Go/PetStudio.apk
 - 4 pet: Mây, Mây Tuyết, Mây Tết, DSH Bot + nhập ảnh/GIF/zip/link.

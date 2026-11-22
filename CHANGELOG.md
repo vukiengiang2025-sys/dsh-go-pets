@@ -1,5 +1,33 @@
 # Thay đổi gần đây
 
+## 4.62.0
+- Pet tự nhớ sở thích/tên/sinh nhật từ chat.
+- Tên bạn trong Cài đặt; AI gọi tên.
+
+## 4.61.x
+- Nút Có gì mới; kiểm tra AI không gọi khi thiếu key.
+
+## 4.60.x
+- Tự thử lại 1 lần khi lỗi mạng; thiếu key thì trả lời offline.
+- Chip tên pet mở đổi tên nhanh.
+
+## 4.59.x
+- Cảnh báo token >=100k; hiện trạng thái kiểm tra AI đã cache.
+
+## 4.58.x
+- Trả lời ngắn 70 token (tiết kiệm); chạm bộ đếm để đặt lại.
+
+## 4.57.0
+- Splash khởi động.
+
+## 4.54-4.56
+- Bong bóng gần pet, sửa tương phản nhóm B; ép nhóm ?ab=; chip cảnh báo thiếu key.
+
+## 4.48-4.53
+- Chuẩn hoá endpoint, lazy sheet fix, không render khi gõ, đếm token.
+
+
+
 ## 4.47.1
 - Nut xoa API key da luu.
 
