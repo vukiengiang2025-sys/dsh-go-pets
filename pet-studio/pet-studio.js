@@ -1334,7 +1334,8 @@ function renderExperiment() {
     s.installId = newSeed();
     writeStore({ installId: s.installId });
   }
-  const variant = assignVariant(s.installId);
+  const forced = (new URLSearchParams(location.search).get('ab') || '').toLowerCase();
+  const variant = forced === 'a' || forced === 'b' ? forced.toUpperCase() : assignVariant(s.installId);
   document.body.classList.remove('ab-a', 'ab-b');
   document.body.classList.add('ab-' + variant.toLowerCase());
   if (el.experimentLine) el.experimentLine.textContent = 'Thử nghiệm giao diện: nhóm ' + variant;
