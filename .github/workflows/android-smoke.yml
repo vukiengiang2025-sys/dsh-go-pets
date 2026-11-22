@@ -53,6 +53,7 @@ jobs:
           emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
           script: |
             set -e
+            adb() { timeout 30 command adb "$@"; }
             adb uninstall io.github.vukiengiang.petstudio || true
             gradle -p android connectedDebugAndroidTest --no-daemon --stacktrace
             adb install PetStudio.apk
