@@ -416,6 +416,8 @@ function maybeAIGreet() {
   }, 1600);
 }
 
+let aiBusy = false;
+
 function aiConfig(s) {
   return { provider: s.aiProvider || 'openai', endpoint: s.aiEndpoint || '', model: s.aiModel || '', key: s.aiKey || '' };
 }
@@ -443,6 +445,9 @@ async function sendChat(text) {
     logEvent('pet nhớ: ' + memory);
   }
   if (s.aiOn && s.aiEndpoint && s.aiModel) {
+    if (aiBusy) { setStatus(pick('đang chờ AI trả lời…', 'waiting for AI…')); return; }
+    aiBusy = true;
+    if (el.quickSend) el.quickSend.disabled = true;
     if (el.aiStatus) el.aiStatus.textContent = 'đang gọi AI…';
     setStatus('AI đang trả lời…');
     model.setState('thinking');
@@ -460,9 +465,13 @@ async function sendChat(text) {
       if (mood) setTimeout(() => model.setState(mood), 400);
       else setTimeout(() => model.setState('attention'), 300);
       logEvent('chat AI: ' + s.aiModel);
+      aiBusy = false;
+      if (el.quickSend) el.quickSend.disabled = false;
       return;
     } catch (err) {
       console.error(err);
+      aiBusy = false;
+      if (el.quickSend) el.quickSend.disabled = false;
       const friendly = friendlyAIError(err);
       if (el.aiStatus) el.aiStatus.textContent = 'lỗi: ' + friendly;
       setStatus('AI lỗi (' + friendly + '), dùng trả lời offline');

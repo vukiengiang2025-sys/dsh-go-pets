@@ -4,7 +4,7 @@
   --panel: #171d28;
   --line: #243044;
   --text: #e9eef7;
-  --muted: #93a0b5;
+  --muted: #a3b2c7;
   --accent: #63b3ff;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -431,3 +431,7 @@ body.loading .stage::after {
 }
 body.loading .stage canvas { opacity: .55; transition: opacity .2s; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+
+.hint, .foot, .care-line { color: #9fb0c8 !important; }
+.quick-chat button:disabled { opacity: .5; }
