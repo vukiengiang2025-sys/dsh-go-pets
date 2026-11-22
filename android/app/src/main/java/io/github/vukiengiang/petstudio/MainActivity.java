@@ -44,6 +44,9 @@ import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewClientCompat;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -341,6 +344,54 @@ public class MainActivity extends Activity {
             }
             startService(new Intent(MainActivity.this, PetOverlayService.class));
             return true;
+        }
+
+        @JavascriptInterface
+        public String aiRequest(String url, String auth, String body) {
+            HttpURLConnection conn = null;
+            try {
+                if (url == null || !(url.startsWith("https://")
+                        || url.startsWith("http://10.0.2.2") || url.startsWith("http://127.0.0.1"))) {
+                    return "{\"ok\":false,\"status\":0,\"body\":\"chỉ cho phép https\"}";
+                }
+                conn = (HttpURLConnection) new URL(url).openConnection();
+                conn.setRequestMethod("POST");
+                conn.setConnectTimeout(20000);
+                conn.setReadTimeout(30000);
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Content-Type", "application/json");
+                if (auth != null && !auth.isEmpty()) conn.setRequestProperty("Authorization", auth);
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write((body == null ? "{}" : body).getBytes("UTF-8"));
+                }
+                int code = conn.getResponseCode();
+                InputStream in = code >= 400 ? conn.getErrorStream() : conn.getInputStream();
+                ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                if (in != null) {
+                    byte[] chunk = new byte[8192];
+                    int read;
+                    while ((read = in.read(chunk)) > 0) buf.write(chunk, 0, read);
+                    in.close();
+                }
+                JSONObject out = new JSONObject();
+                out.put("ok", code >= 200 && code < 300);
+                out.put("status", code);
+                out.put("body", buf.toString("UTF-8"));
+                return out.toString();
+            } catch (Exception err) {
+                Log.e(TAG, "aiRequest failed", err);
+                try {
+                    JSONObject out = new JSONObject();
+                    out.put("ok", false);
+                    out.put("status", 0);
+                    out.put("body", String.valueOf(err.getMessage()));
+                    return out.toString();
+                } catch (Exception ignored) {
+                    return "{\"ok\":false,\"status\":0,\"body\":\"error\"}";
+                }
+            } finally {
+                if (conn != null) conn.disconnect();
+            }
         }
 
         @JavascriptInterface

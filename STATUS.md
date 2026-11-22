@@ -57,7 +57,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 
 | # | Ý tưởng | Trạng thái |
 |---|---|---|
-| 31 | Chat ngắn | ✅ theo luật, offline |
+| 31 | Chat ngắn | ✅ offline + gọi API AI tuỳ chọn |
 | 32 | Tóm tắt việc | ✅ |
 | 33 | TTS | ✅ Web Speech |
 | 34 | Giọng riêng từng pack | ✅ mỗi pack nhớ giọng riêng |

@@ -32,15 +32,34 @@ export function parseReply(json) {
   return String(text).trim().slice(0, 300);
 }
 
-export async function askAI(config, messages, fetchImpl = fetch) {
+export async function askAI(config, messages, fetchImpl = null) {
   const { url, init } = buildRequest({
     endpoint: config.endpoint,
     model: config.model,
     messages,
   });
+  const bridge = typeof window !== 'undefined' && window.AndroidPet && window.AndroidPet.aiRequest;
+  if (bridge && !fetchImpl) {
+    const raw = bridge(url, config.key ? 'Bearer ' + config.key : '', init.body);
+    let envelope;
+    try {
+      envelope = JSON.parse(raw);
+    } catch (err) {
+      throw new Error('bridge trả về không hợp lệ');
+    }
+    if (!envelope.ok) throw new Error('HTTP ' + envelope.status + ': ' + String(envelope.body || '').slice(0, 120));
+    let json;
+    try {
+      json = JSON.parse(envelope.body);
+    } catch (err) {
+      throw new Error('phản hồi không phải JSON');
+    }
+    return parseReply(json);
+  }
+  const doFetch = fetchImpl || fetch;
   const headers = { ...init.headers };
   if (config.key) headers.Authorization = 'Bearer ' + config.key;
-  const res = await fetchImpl(url, { ...init, headers });
+  const res = await doFetch(url, { ...init, headers });
   if (!res.ok) {
     const body = await res.text().catch(() => '');
     throw new Error('HTTP ' + res.status + (body ? ': ' + body.slice(0, 120) : ''));
