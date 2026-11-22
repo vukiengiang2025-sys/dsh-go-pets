@@ -87,7 +87,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 
 | # | Ý tưởng | Trạng thái |
 |---|---|---|
-| 51 | Overlay ngoài app | ✅ cửa sổ nổi cơ bản (chưa kéo thả/foreground service) |
+| 51 | Overlay ngoài app | ✅ cửa sổ nổi, kéo thả, foreground service |
 | 52 | Widget | ✅ |
 | 53 | Quick Settings tile | ✅ bật/tắt im lặng |
 | 54 | Live wallpaper | ⏸ |
