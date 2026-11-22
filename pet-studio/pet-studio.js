@@ -8,6 +8,7 @@ import { shareUrl, pickConfig, decodeConfig } from './share.js';
 import { encodeGif, quantize } from './gif.js';
 import { buildZip } from './zip-write.js';
 import { applyLanguage, pick, stateText, getLang } from './i18n.js';
+import { upsertHost, removeHost } from './agent-hosts.js';
 import { seasonFor, SEASON_PACK } from './season.js';
 import qrcode from './vendor/qrcode.mjs';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
@@ -53,7 +54,7 @@ const DEFAULT_STORE = {
   chat: [], memories: [],
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
-  ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi',
+  ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi', agentHosts: [],
 };
 
 const el = {
@@ -124,6 +125,8 @@ const el = {
   agentStop: document.getElementById('agentStop'),
   agentLine: document.getElementById('agentLine'),
   agentChip: document.getElementById('agentChip'),
+  agentHosts: document.getElementById('agentHosts'),
+  saveHost: document.getElementById('saveHost'),
   batteryChip: document.getElementById('batteryChip'),
   fpsChip: document.getElementById('fpsChip'),
   moodMenu: document.getElementById('moodMenu'),
@@ -1095,6 +1098,15 @@ async function pollAgent() {
   }
 }
 
+function renderHosts() {
+  if (!el.agentHosts) return;
+  const hosts = readStore().agentHosts || [];
+  el.agentHosts.innerHTML = hosts.map(url =>
+    '<div class="host-row"><span>' + escapeHtml(url) + '</span>'
+    + '<div class="row"><button data-use="' + escapeHtml(url) + '">' + pick('Dùng', 'Use') + '</button>'
+    + '<button data-del="' + escapeHtml(url) + '">' + pick('Xoá', 'Delete') + '</button></div></div>').join('');
+}
+
 function startAgent(url) {
   stopAgent();
   if (!url) return;
@@ -1433,6 +1445,25 @@ function bindSheet() {
     if (window.AndroidPet && window.AndroidPet.openUrl) window.AndroidPet.openUrl(url);
     else window.open(url, '_blank');
   });
+  el.saveHost.addEventListener('click', () => {
+    const url = (el.agentUrl.value || '').trim();
+    writeStore({ agentHosts: upsertHost(readStore().agentHosts || [], url) });
+    renderHosts();
+    setStatus(pick('đã lưu host', 'host saved'));
+  });
+  el.agentHosts.addEventListener('click', ev => {
+    const use = ev.target.closest('[data-use]');
+    const del = ev.target.closest('[data-del]');
+    if (use) {
+      const url = use.dataset.use;
+      el.agentUrl.value = url;
+      writeStore({ agentUrl: url });
+      startAgent(url);
+    } else if (del) {
+      writeStore({ agentHosts: removeHost(readStore().agentHosts || [], del.dataset.del) });
+      renderHosts();
+    }
+  });
   el.agentStart.addEventListener('click', () => startAgent((el.agentUrl.value || '').trim()));
   el.agentStop.addEventListener('click', stopAgent);
   el.shareConfig.addEventListener('click', shareConfig);
@@ -1755,6 +1786,7 @@ async function main() {
     el.langSel.value = lang === 'en' ? 'en' : 'vi';
     applyLanguage(el.langSel.value);
     buildSettingsUI();
+    renderHosts();
     el.ambientMode.value = savedSettings.ambientMode || 'off';
     el.showFps.checked = !!savedSettings.showFps;
     el.errorLog.checked = !!savedSettings.errorLog;

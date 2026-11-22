@@ -303,3 +303,9 @@ html[lang="en"] .journal:empty::before { content: "nothing yet"; }
 html[lang="en"] .imported:empty::before { content: "no pets imported yet"; }
 html[lang="en"] .memories:empty::before { content: "nothing yet"; }
 html[lang="en"] .error-list:empty::before { content: "no errors yet"; }
+
+.host-list { display: grid; gap: 6px; margin-top: 8px; }
+.host-row { display: flex; gap: 8px; align-items: center; justify-content: space-between;
+  background: #0f1622; border: 1px solid var(--line); border-radius: 9px; padding: 6px 8px; }
+.host-row span { font-size: 11px; color: #9fb0c8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.host-row button { padding: 4px 8px; font-size: 11px; }

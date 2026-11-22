@@ -2,9 +2,9 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **66 xong** (có trong APK)
+- ✅ **67 xong** (có trong APK)
 - 🟡 **9 một phần** (có nền tảng, thiếu phần còn lại)
-- ⏸ **25 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
+- ⏸ **24 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
 
@@ -81,7 +81,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 47 | Mở hội thoại | ⏸ cần deep link DSH |
 | 48 | Widget trạng thái | ✅ |
 | 49 | Lỗi kèm log | ✅ bong bóng lỗi có nút Xem log |
-| 50 | Nhiều host | ⏸ một URL |
+| 50 | Nhiều host | ✅ lưu tới 6 endpoint, đổi nhanh |
 
 ## F. Android (10)
 
@@ -156,7 +156,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 99 | Widget đôi | ✅ pet + đồng hồ, cập nhật mỗi phút |
 | 100 | Roadmap công khai | ✅ nút mở ROADMAP |
 
-## Vì sao 25 ý tưởng còn hoãn
+## Vì sao 24 ý tưởng còn hoãn
 
 1. **Cần backend/tài khoản**: chợ pack, xếp hạng, bình chọn, ủng hộ, crash report.
 2. **Cần quyền hệ thống Android**: overlay, live wallpaper, AOD, notification tuỳ biến — mỗi thứ là một service + luồng xin quyền, dễ bị ROM chặn.
