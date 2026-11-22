@@ -74,7 +74,13 @@ export function parseReply(json, provider = 'openai') {
   return String(text).trim().slice(0, 300);
 }
 
-export async function askAI(config, messages, fetchImpl = null) {
+function retryable(err) {
+  const msg = String((err && err.message) || err || '');
+  if (/401|403|429/.test(msg)) return false;
+  return /Failed to fetch|NetworkError|ENOTFOUND|abort|timeout|HTTP 5\d\d/i.test(msg);
+}
+
+async function askOnce(config, messages, fetchImpl) {
   const provider = config.provider || 'openai';
   const { url, init } = buildRequest({
     provider,
@@ -175,4 +181,14 @@ export function testCacheValid(sig, at, now, minutes = 5) {
 
 export function estimateTokens(text) {
   return Math.max(1, Math.ceil(String(text || '').length / 4));
+}
+
+export async function askAI(config, messages, fetchImpl = null) {
+  try {
+    return await askOnce(config, messages, fetchImpl);
+  } catch (err) {
+    if (!retryable(err)) throw err;
+    await new Promise(resolve => setTimeout(resolve, 700));
+    return askOnce(config, messages, fetchImpl);
+  }
 }
