@@ -53,7 +53,7 @@ jobs:
           rm -rf android/app/src/main/assets/www
           mkdir -p android/app/src/main/assets/www/app/assets/pets
           cp -r pet-studio android/app/src/main/assets/www/pet-studio
-          cp -r app/assets/pets/may app/assets/pets/dsh-bot android/app/src/main/assets/www/app/assets/pets/
+          cp -r app/assets/pets/* android/app/src/main/assets/www/app/assets/pets/
           du -sh android/app/src/main/assets/www
 
       - name: Build release APK
