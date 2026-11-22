@@ -10,7 +10,7 @@ import { buildZip } from './zip-write.js';
 import { verifyChecksums } from './pack-integrity.js';
 import { applyLanguage, pick, stateText, getLang } from './i18n.js';
 import { upsertHost, removeHost } from './agent-hosts.js';
-import { askAI, PRESETS, friendlyAIError, buildSystemPrompt, PERSONAS } from './ai.js';
+import { askAI, PRESETS, friendlyAIError, buildSystemPrompt, PERSONAS, shouldGreet } from './ai.js';
 import { assignVariant, newSeed } from './ab.js';
 import { seasonFor, SEASON_PACK } from './season.js';
 import qrcode from './vendor/qrcode.mjs';
@@ -58,7 +58,7 @@ const DEFAULT_STORE = {
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
   ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi', agentHosts: [], overlayFloat: true,
-  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai', aiPersona: 'gentle', installId: '',
+  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai', aiPersona: 'gentle', aiGreet: false, lastOpen: 0, installId: '',
 };
 
 const el = {
@@ -138,6 +138,7 @@ const el = {
   aiModel: document.getElementById('aiModel'),
   aiKey: document.getElementById('aiKey'),
   aiOn: document.getElementById('aiOn'),
+  aiGreet: document.getElementById('aiGreet'),
   aiTest: document.getElementById('aiTest'),
   aiStatus: document.getElementById('aiStatus'),
   agentHosts: document.getElementById('agentHosts'),
@@ -391,6 +392,25 @@ function petSay(text) {
     bubbleTimer = setTimeout(hideBubble, 6000);
   }
   speak(text);
+}
+
+function maybeAIGreet() {
+  const s = readStore();
+  const now = Date.now();
+  const greet = s.aiOn && s.aiGreet && s.aiEndpoint && s.aiModel && shouldGreet(s.lastOpen, now);
+  writeStore({ lastOpen: now });
+  if (!greet) return;
+  setTimeout(async () => {
+    try {
+      const reply = await askAI(aiConfig(s), [
+        { role: 'system', content: aiSystemPrompt(s) },
+        { role: 'user', content: 'Chào người dùng một câu thật ngắn, dựa trên thời gian trong ngày và trạng thái của bạn.' },
+      ]);
+      petSay(reply);
+    } catch (err) {
+      console.warn('greet failed', err);
+    }
+  }, 1600);
 }
 
 function aiConfig(s) {
@@ -1689,6 +1709,9 @@ function bindSheet() {
     }
     if (el.aiStatus) el.aiStatus.textContent = 'đã chọn ' + provider;
   });
+  el.aiGreet.addEventListener('change', () => {
+    writeStore({ aiGreet: el.aiGreet.checked });
+  });
   el.aiOn.addEventListener('change', () => {
     writeStore({ aiOn: el.aiOn.checked });
     if (el.aiStatus) el.aiStatus.textContent = el.aiOn.checked ? 'đã bật' : 'đã tắt';
@@ -2116,12 +2139,14 @@ async function main() {
     renderHosts();
     renderCollection();
     renderExperiment();
+    maybeAIGreet();
     el.aiPersona.value = savedSettings.aiPersona || 'gentle';
     el.aiProvider.value = savedSettings.aiProvider || 'openai';
     el.aiEndpoint.value = savedSettings.aiEndpoint || '';
     el.aiModel.value = savedSettings.aiModel || '';
     el.aiKey.value = savedSettings.aiKey || '';
     el.aiOn.checked = !!savedSettings.aiOn;
+    el.aiGreet.checked = !!savedSettings.aiGreet;
     el.overlayFloat.checked = savedSettings.overlayFloat !== false;
     if (window.AndroidPet && window.AndroidPet.setOverlayFloat) {
       window.AndroidPet.setOverlayFloat(el.overlayFloat.checked);

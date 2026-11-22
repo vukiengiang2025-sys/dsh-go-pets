@@ -1,5 +1,8 @@
 # Thay đổi gần đây
 
+## 4.27.0
+- AI chào khi mở app sau 2 giờ (tuỳ chọn), dựa trên giờ + trạng thái + ký ức.
+
 ## 4.26.0
 - Giao diện 2.0: nền gradient, thẻ bo tròn, section trong Cài đặt, nút trạng thái gọn hơn.
 - AI thông minh hơn: chọn tính cách (dịu dàng/hài hước/lười), prompt có giờ + trạng thái + ký ức.

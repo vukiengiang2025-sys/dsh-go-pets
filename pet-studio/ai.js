@@ -138,3 +138,8 @@ export function buildSystemPrompt({ name = 'pet', persona = 'gentle', memories =
     + (state ? 'Trạng thái hiện tại của bạn: ' + state + '. ' : '')
     + (memories.length ? 'Bạn nhớ: ' + memories.slice(-5).join('; ') + '. ' : '');
 }
+
+export function shouldGreet(lastOpen, now, hours = 2) {
+  if (!lastOpen) return false;
+  return now - lastOpen >= hours * 3600 * 1000;
+}
