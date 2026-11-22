@@ -309,3 +309,8 @@ html[lang="en"] .error-list:empty::before { content: "no errors yet"; }
   background: #0f1622; border: 1px solid var(--line); border-radius: 9px; padding: 6px 8px; }
 .host-row span { font-size: 11px; color: #9fb0c8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .host-row button { padding: 4px 8px; font-size: 11px; }
+
+.collection { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.collection span { font-size: 11px; color: #6c7a90; background: #0f1622; border: 1px solid var(--line);
+  border-radius: 8px; padding: 6px; text-align: center; }
+.collection span.got { color: #c8f7d0; border-color: #2f6b46; background: #12241a; }

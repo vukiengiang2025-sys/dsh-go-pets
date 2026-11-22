@@ -133,6 +133,7 @@ const el = {
   showFps: document.getElementById('showFps'),
   errorLog: document.getElementById('errorLog'),
   errorList: document.getElementById('errorList'),
+  stateCollection: document.getElementById('stateCollection'),
   exportPng: document.getElementById('exportPng'),
   exportGif: document.getElementById('exportGif'),
   shareQr: document.getElementById('shareQr'),
@@ -1098,6 +1099,14 @@ async function pollAgent() {
   }
 }
 
+function renderCollection() {
+  if (!el.stateCollection) return;
+  const seen = readStore().stats.states || {};
+  el.stateCollection.innerHTML = STATES.map(st =>
+    '<span class="' + (seen[st] ? 'got' : '') + '">'
+    + (seen[st] ? '✓ ' : '• ') + escapeHtml(stateText(st)) + '</span>').join('');
+}
+
 function renderHosts() {
   if (!el.agentHosts) return;
   const hosts = readStore().agentHosts || [];
@@ -1787,6 +1796,7 @@ async function main() {
     applyLanguage(el.langSel.value);
     buildSettingsUI();
     renderHosts();
+    renderCollection();
     el.ambientMode.value = savedSettings.ambientMode || 'off';
     el.showFps.checked = !!savedSettings.showFps;
     el.errorLog.checked = !!savedSettings.errorLog;
