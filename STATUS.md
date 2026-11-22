@@ -2,9 +2,9 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **54 xong** (có trong APK)
+- ✅ **55 xong** (có trong APK)
 - 🟡 **8 một phần** (có nền tảng, thiếu phần còn lại)
-- ⏸ **38 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
+- ⏸ **37 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
 
@@ -123,7 +123,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 74 | QR | ✅ |
 | 75 | Xếp hạng | ⏸ |
 | 76 | Bình chọn | ⏸ |
-| 77 | Gallery ảnh/GIF | ⏸ |
+| 77 | Gallery ảnh/GIF | ✅ MediaStore 12 mục |
 | 78 | Chia sẻ cấu hình | ✅ |
 
 ## I. Kỹ thuật (10)
@@ -156,7 +156,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 99 | Widget đôi | ⏸ |
 | 100 | Roadmap công khai | ✅ nút mở ROADMAP |
 
-## Vì sao 38 ý tưởng còn hoãn
+## Vì sao 37 ý tưởng còn hoãn
 
 1. **Cần backend/tài khoản**: chợ pack, xếp hạng, bình chọn, ủng hộ, crash report.
 2. **Cần quyền hệ thống Android**: overlay, live wallpaper, AOD, notification tuỳ biến — mỗi thứ là một service + luồng xin quyền, dễ bị ROM chặn.
