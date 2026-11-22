@@ -42,6 +42,18 @@
         </service>
 
         <receiver
+            android:name=".PetClockWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_clock_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_clock_info" />
+        </receiver>
+
+        <receiver
             android:name=".PetWidgetProvider"
             android:exported="false">
             <intent-filter>
