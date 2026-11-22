@@ -499,7 +499,7 @@ async function sendChat(text) {
     renderMemories();
     logEvent('pet nhớ: ' + memory);
   }
-  if (s.aiOn && s.aiEndpoint && s.aiModel) {
+  if (s.aiOn && s.aiEndpoint && s.aiModel && s.aiKey) {
     if (aiBusy) {
       aiIgnore = true;
       aiBusy = false;
@@ -545,6 +545,7 @@ async function sendChat(text) {
       setStatus('AI lỗi (' + friendly + '), dùng trả lời offline');
     }
   }
+  if (s.aiOn && !s.aiKey) setStatus(pick('AI thiếu key, trả lời offline', 'AI is missing a key, answering offline'));
   const reply = replyTo(t, { lang: getLang(),
     petName: s.name || (pack && pack.name) || 'pet',
     memories: s.memories,
