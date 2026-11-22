@@ -413,3 +413,5 @@ button { border-radius: 10px; }
 .states::-webkit-scrollbar { display: none; }
 .states button { min-height: 40px; padding: 0 10px; border-radius: 12px; }
 @media (min-width: 720px) { .states { flex-wrap: wrap; } }
+
+.sheet-head { position: sticky; top: 0; z-index: 3; background: linear-gradient(180deg,#101827,#0e1520); border-bottom: 1px solid rgba(120,150,190,.14); }

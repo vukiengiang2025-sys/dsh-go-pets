@@ -1,5 +1,10 @@
 # Thay đổi gần đây
 
+## 4.29.0
+- Footer hiện đúng phiên bản APK (native truyền v).
+- Header Cài đặt dính khi cuộn.
+- AI gửi ít lịch sử hơn và giới hạn 120 token để tiết kiệm chi phí.
+
 ## 4.28.0
 - Header sticky, chip tên pet cạnh logo, bỏ dòng debug frame.
 - Nút trạng thái 3x3 gọn hơn, giữ thấy đủ 9 trạng thái.

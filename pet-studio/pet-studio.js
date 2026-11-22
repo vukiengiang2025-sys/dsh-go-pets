@@ -447,7 +447,7 @@ async function sendChat(text) {
     try {
       const history = [
         { role: 'system', content: aiSystemPrompt(s) },
-        ...s.chat.slice(-6).map(m => ({ role: m.role === 'pet' ? 'assistant' : 'user', content: m.text })),
+        ...s.chat.slice(-4).map(m => ({ role: m.role === 'pet' ? 'assistant' : 'user', content: m.text })),
       ];
       const reply = await askAI(aiConfig(s), history);
       pushChat('pet', reply);
@@ -2125,7 +2125,7 @@ async function main() {
 
   try {
     await loadPack(id);
-    const v = new URLSearchParams(location.search).get('v') || '1.0.0';
+    const v = new URLSearchParams(location.search).get('v') || 'web';
     el.version.textContent = 'v' + v;
     const savedSettings = readStore();
     applyName(savedSettings.name || '');

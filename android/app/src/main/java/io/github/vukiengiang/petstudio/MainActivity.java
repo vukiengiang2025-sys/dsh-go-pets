@@ -245,6 +245,7 @@ public class MainActivity extends Activity {
         if (overlay) {
             url += "&overlay=1";
         }
+        if (!url.contains("v=")) url += "&v=" + BuildConfig.VERSION_NAME;
         return url;
     }
 

@@ -19,7 +19,7 @@ export function chatUrl(endpoint, model = '', provider = 'openai') {
   return base + '/chat/completions';
 }
 
-export function buildRequest({ provider = 'openai', endpoint, model, messages, maxTokens = 160 }) {
+export function buildRequest({ provider = 'openai', endpoint, model, messages, maxTokens = 120 }) {
   if (!model) throw new Error('thiếu model');
   if (provider === 'gemini') {
     return {
