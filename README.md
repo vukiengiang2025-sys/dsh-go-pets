@@ -22,6 +22,7 @@ Mã nguồn chức năng **Pets** — thú cưng trạng thái — của [dsh-go
 - CI còn build **AAB** (1,18 MB) và chạy **Espresso** trên emulator (1 test: WebView mở đúng Pet Studio).
 - APK được GitHub Actions build lại mỗi khi `android/`, `pet-studio/` hoặc pet pack thay đổi; xem [android/README.md](android/README.md).
 - Bản phát hành ký bằng khoá cố định trong repo (cài đè được, không phải gỡ app); phát hành store thì thay keystore.
+- Trạng thái 100 ý tưởng: [STATUS.md](STATUS.md) — 54 xong, 8 một phần, 38 hoãn.
 - Điểm chất lượng tự chấm: **1000/1000** — chi tiết và bằng chứng ở [QUALITY.md](QUALITY.md).
 
 ## Pets làm gì

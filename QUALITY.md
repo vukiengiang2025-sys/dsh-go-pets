@@ -1,5 +1,8 @@
 # Chấm điểm chất lượng: 1000/1000
 
+> Cập nhật 2.9.0: 40 test (engine, pack, zip, GIF, QR, streak…), AAB + Espresso trong CI,
+> kèm [STATUS.md](STATUS.md) đối chiếu 100 ý tưởng (54 xong, 8 một phần, 38 hoãn).
+
 Thang điểm tự đặt cho app Android **Pet Studio** (commit cuối xem ở lịch sử repo).
 Mỗi mục chỉ tính điểm khi có bằng chứng kiểm tra được: CI xanh, log `aapt2`/
 `apksigner`, ảnh chụp từ emulator, hoặc test tự động.
