@@ -637,6 +637,9 @@ function renderImported() {
 
 async function loadPack(id) {
   const entry = packs.find(p => p.id === id) || packs[0];
+  document.body.classList.add('loading');
+  setTimeout(() => document.body.classList.remove('loading'), 8000);
+  setStatus(pick('đang tải ' + entry.id + '…', 'loading ' + entry.id + '…'));
   const voiceMap = readStore().voiceByPack || {};
   const nextVoice = voiceMap[entry.id] || '';
   writeStore({ voiceName: nextVoice });
@@ -687,6 +690,7 @@ async function loadPack(id) {
   if (el.brandPet) el.brandPet.textContent = (saved.name || pack.name || pack.id);
   renderImported();
   layout();
+  document.body.classList.remove('loading');
 }
 
 function sheetNames(json) {

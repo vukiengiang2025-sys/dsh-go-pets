@@ -421,3 +421,13 @@ button { border-radius: 10px; }
 .quick-chat input { flex: 1; min-height: 40px; }
 .quick-chat button { padding: 0 16px; border: 0; border-radius: 10px;
   background: var(--accent, #6ea8ff); color: #07101d; font-weight: 800; font-size: 13px; }
+
+
+body.loading .stage::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 26px; height: 26px;
+  margin: -13px 0 0 -13px; border-radius: 50%;
+  border: 3px solid rgba(120,150,190,.25); border-top-color: #6ea8ff;
+  animation: spin .8s linear infinite;
+}
+body.loading .stage canvas { opacity: .55; transition: opacity .2s; }
+@keyframes spin { to { transform: rotate(360deg); } }
