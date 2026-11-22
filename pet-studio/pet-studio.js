@@ -1,4 +1,6 @@
 import { PetModel, normalizePack, STATES } from './pet-engine.js';
+import { buildPackFromFile } from './pack-import.js';
+import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
 
 const FALLBACK_PACKS = [
   { id: 'may', name: 'Mây', url: '../app/assets/pets/may/pack.json' },
@@ -69,10 +71,16 @@ const el = {
   resetAll: document.getElementById('resetAll'),
   simpleMode: document.getElementById('simpleMode'),
   autoTheme: document.getElementById('autoTheme'),
+  importImage: document.getElementById('importImage'),
+  importFile: document.getElementById('importFile'),
+  importedList: document.getElementById('importedList'),
 };
 const ctx = el.canvas.getContext('2d');
 
+let builtinPacks = FALLBACK_PACKS;
+let localPacks = [];
 let packs = FALLBACK_PACKS;
+let objectUrls = [];
 let pack = null;
 let model = null;
 let images = {};
@@ -195,31 +203,139 @@ async function loadPacks() {
     const res = await fetch('./packs.json', { cache: 'no-cache' });
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data.packs) && data.packs.length) packs = data.packs;
+      if (Array.isArray(data.packs) && data.packs.length) builtinPacks = data.packs;
     }
   } catch { /* dùng danh sách mặc định */ }
+  try {
+    const records = await listLocalPacks();
+    localPacks = records.map(rec => ({
+      id: rec.id,
+      name: (rec.pack && rec.pack.name) || rec.id,
+      local: true,
+      frames: rec.frames || 0,
+    }));
+  } catch (err) {
+    console.warn('không đọc được pack đã nhập', err);
+    localPacks = [];
+  }
+  packs = [...builtinPacks, ...localPacks];
+}
+
+function renderPackOptions() {
+  el.pack.innerHTML = packs.map(p =>
+    '<option value="' + p.id + '">' + (p.local ? '★ ' : '') + p.name + '</option>').join('');
+  if (model) el.pack.value = pack ? pack.id : el.pack.value;
+}
+
+function renderImported() {
+  if (!el.importedList) return;
+  el.importedList.innerHTML = localPacks.map(p =>
+    '<li><span>' + p.name + '</span>'
+    + '<button data-remove="' + p.id + '">Xoá</button></li>').join('');
 }
 
 async function loadPack(id) {
   const entry = packs.find(p => p.id === id) || packs[0];
-  const res = await fetch(entry.url);
-  if (!res.ok) throw new Error('không tải được ' + entry.url);
-  pack = normalizePack(await res.json());
-  const base = new URL(entry.url, location.href);
+  objectUrls.forEach(url => URL.revokeObjectURL(url));
+  objectUrls = [];
+  let json;
+  const sheetSrc = {};
+  if (entry.local) {
+    const rec = await getLocalPack(entry.id);
+    if (!rec || !rec.pack) throw new Error('pack đã nhập bị thiếu');
+    json = rec.pack;
+    for (const name of sheetNames(json)) {
+      const blob = rec.files && rec.files[name];
+      if (!blob) throw new Error('thiếu ảnh ' + name);
+      const url = URL.createObjectURL(blob);
+      objectUrls.push(url);
+      sheetSrc[name] = url;
+    }
+  } else {
+    const res = await fetch(entry.url);
+    if (!res.ok) throw new Error('không tải được ' + entry.url);
+    json = await res.json();
+    const base = new URL(entry.url, location.href);
+    for (const name of sheetNames(json)) sheetSrc[name] = new URL(name, base).href;
+  }
+  pack = normalizePack(json);
   images = {};
-  const sheets = [...new Set(Object.values(pack.animations).map(a => a.sheet))];
-  await Promise.all(sheets.map(name => new Promise((resolve, reject) => {
+  await Promise.all(sheetNames(pack).map(name => new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => { images[name] = img; resolve(); };
     img.onerror = () => reject(new Error('thiếu ảnh ' + name));
-    img.src = new URL(name, base).href;
+    img.src = sheetSrc[name];
   })));
   const saved = readStore();
   model = new PetModel(pack, { quiet: saved.quiet ?? false });
   model.on(onState);
   el.packInfo.textContent = (pack.name || pack.id) + ' · ' + pack.canvas.w + '×' + pack.canvas.h
     + ' · ' + Object.keys(pack.animations).length + ' animation';
+  el.pack.value = pack.id;
+  renderImported();
   layout();
+}
+
+function sheetNames(json) {
+  return [...new Set(Object.values(json.animations || {}).map(a => a.sheet))];
+}
+
+async function importImageFile(file) {
+  if (!file) return;
+  setStatus('đang xử lý ' + file.name + '…');
+  haptic(10);
+  try {
+    const built = await buildPackFromFile(file);
+    await saveLocalPack({
+      id: built.pack.id, created: Date.now(),
+      pack: built.pack, files: built.files, frames: built.frames,
+    });
+    logEvent('nhập pet ' + built.pack.name);
+    await loadPacks();
+    renderPackOptions();
+    writeStore({ pack: built.pack.id });
+    await loadPack(built.pack.id);
+    setStatus('đã nhập ' + built.pack.name + ' · ' + built.frames + ' khung');
+    haptic(14);
+  } catch (err) {
+    console.error(err);
+    setStatus('nhập lỗi: ' + err.message);
+  }
+}
+
+async function removeImported(id) {
+  if (!confirm('Xoá pet đã nhập này?')) return;
+  await deleteLocalPack(id);
+  logEvent('xoá pet đã nhập');
+  const wasCurrent = pack && pack.id === id;
+  await loadPacks();
+  renderPackOptions();
+  renderImported();
+  if (wasCurrent) {
+    const first = builtinPacks[0];
+    el.pack.value = first.id;
+    writeStore({ pack: first.id });
+    await loadPack(first.id);
+  }
+}
+
+async function demoImport() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 96;
+  const g = canvas.getContext('2d');
+  const grad = g.createRadialGradient(48, 52, 8, 48, 52, 44);
+  grad.addColorStop(0, '#7fd0ff');
+  grad.addColorStop(1, '#1a6fd4');
+  g.fillStyle = grad;
+  g.beginPath(); g.arc(48, 52, 38, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#0b1a2e';
+  g.beginPath(); g.arc(37, 46, 5, 0, Math.PI * 2); g.arc(59, 46, 5, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#fff';
+  g.beginPath(); g.arc(35, 44, 1.8, 0, Math.PI * 2); g.arc(57, 44, 1.8, 0, Math.PI * 2); g.fill();
+  g.strokeStyle = '#0b1a2e'; g.lineWidth = 2.5;
+  g.beginPath(); g.arc(48, 58, 8, 0.2, Math.PI - 0.2); g.stroke();
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  await importImageFile(new File([blob], 'demo-pet.png', { type: 'image/png' }));
 }
 
 function layout() {
@@ -358,6 +474,16 @@ function bindSheet() {
     applyAutoTheme(on, readStore().palette);
     logEvent(on ? 'bật đổi màu theo giờ' : 'tắt đổi màu theo giờ');
   });
+  el.importImage.addEventListener('click', () => el.importFile.click());
+  el.importFile.addEventListener('change', async () => {
+    const file = el.importFile.files && el.importFile.files[0];
+    el.importFile.value = '';
+    if (file) await importImageFile(file);
+  });
+  el.importedList.addEventListener('click', ev => {
+    const b = ev.target.closest('button[data-remove]');
+    if (b) removeImported(b.dataset.remove);
+  });
   el.copyBackup.addEventListener('click', copyBackup);
   el.importBackup.addEventListener('click', importBackup);
   el.resetAll.addEventListener('click', resetAll);
@@ -476,8 +602,7 @@ function bindLifecycle() {
 
 async function main() {
   await loadPacks();
-  el.pack.innerHTML = packs.map(p =>
-    '<option value="' + p.id + '">' + p.name + '</option>').join('');
+  renderPackOptions();
 
   const saved = readStore();
   const param = new URLSearchParams(location.search).get('pack');
@@ -511,6 +636,7 @@ async function main() {
       if (readStore().autoTheme) applyPalette(paletteForNow());
     }, 600000);
     if (new URLSearchParams(location.search).get('sheet') === '1') openSheet(true);
+    if (new URLSearchParams(location.search).get('import') === 'demo') demoImport();
     const initial = new URLSearchParams(location.search).get('state');
     if (initial && STATES.includes(initial)) model.setState(initial);
     requestAnimationFrame(draw);

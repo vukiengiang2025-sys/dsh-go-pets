@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Web app tests
-        run: node --test pet-studio/pet-engine.test.mjs
+        run: node --test pet-studio/*.test.mjs
 
       - uses: actions/setup-java@v4
         with:

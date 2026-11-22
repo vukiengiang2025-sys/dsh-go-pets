@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.webkit.ConsoleMessage;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -34,8 +36,11 @@ public class MainActivity extends Activity {
     private static final String START_URL = "https://" + DOMAIN + "/www/pet-studio/index.html?v=" + BuildConfig.VERSION_NAME;
     private static final String ERROR_URL = "https://" + DOMAIN + "/error.html";
 
+    private static final int REQ_FILE = 1001;
+
     private WebView webView;
     private WebViewAssetLoader assetLoader;
+    private ValueCallback<Uri[]> filePathCallback;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -109,6 +114,26 @@ public class MainActivity extends Activity {
                 Log.d(TAG, message.message() + " @" + message.lineNumber());
                 return true;
             }
+
+            @Override
+            public boolean onShowFileChooser(@NonNull WebView view,
+                                             @NonNull ValueCallback<Uri[]> callback,
+                                             @NonNull FileChooserParams params) {
+                if (filePathCallback != null) {
+                    filePathCallback.onReceiveValue(null);
+                }
+                filePathCallback = callback;
+                try {
+                    Intent intent = params.createIntent();
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    startActivityForResult(intent, REQ_FILE);
+                    return true;
+                } catch (Exception err) {
+                    Log.e(TAG, "file chooser failed", err);
+                    filePathCallback = null;
+                    return false;
+                }
+            }
         });
 
         if (savedInstanceState == null) {
@@ -137,6 +162,19 @@ public class MainActivity extends Activity {
         if (webView != null) {
             webView.loadUrl(startUrl(packOf(intent)));
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQ_FILE) {
+            if (filePathCallback != null) {
+                filePathCallback.onReceiveValue(
+                        WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                filePathCallback = null;
+            }
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
