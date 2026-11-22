@@ -157,6 +157,7 @@
         <button id="openAod">Màn hình đêm</button>
         <button id="openWallpaper">Hình nền động</button>
       </div>
+      <label class="check"><input type="checkbox" id="overlayFloat" checked> Pet tự bay nhảy</label>
       <div class="row">
         <label class="muted-small" for="overlaySize">Cỡ cửa sổ nổi</label>
         <select id="overlaySize">
@@ -165,6 +166,15 @@
           <option value="200">Lớn · 200</option>
         </select>
       </div>
+    </div>
+
+    <div class="field">AI cho pet (tuỳ chọn)
+      <input id="aiEndpoint" placeholder="https://api.deepseek.com">
+      <input id="aiModel" placeholder="model, vd: deepseek-chat">
+      <input id="aiKey" type="password" placeholder="API key (chỉ lưu trên máy)">
+      <label class="check"><input type="checkbox" id="aiOn"> Dùng AI để trả lời chat</label>
+      <div class="row"><button id="aiTest">Kiểm tra AI</button></div>
+      <div class="care-line" id="aiStatus">chưa cấu hình</div>
     </div>
 
     <div class="field">Kết nối agent (tuỳ chọn)

@@ -344,6 +344,12 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void setOverlayFloat(boolean on) {
+            getSharedPreferences("petstudio-prefs", MODE_PRIVATE).edit()
+                    .putBoolean("overlay_float", on).apply();
+        }
+
+        @JavascriptInterface
         public void setOverlaySize(int dp) {
             int clamped = Math.max(100, Math.min(260, dp));
             getSharedPreferences("petstudio-prefs", MODE_PRIVATE).edit()

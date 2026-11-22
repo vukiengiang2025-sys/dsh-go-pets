@@ -10,6 +10,7 @@ import { buildZip } from './zip-write.js';
 import { verifyChecksums } from './pack-integrity.js';
 import { applyLanguage, pick, stateText, getLang } from './i18n.js';
 import { upsertHost, removeHost } from './agent-hosts.js';
+import { askAI } from './ai.js';
 import { seasonFor, SEASON_PACK } from './season.js';
 import qrcode from './vendor/qrcode.mjs';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
@@ -55,7 +56,8 @@ const DEFAULT_STORE = {
   chat: [], memories: [],
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
-  ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi', agentHosts: [],
+  ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi', agentHosts: [], overlayFloat: true,
+  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false,
 };
 
 const el = {
@@ -128,6 +130,12 @@ const el = {
   agentStop: document.getElementById('agentStop'),
   agentLine: document.getElementById('agentLine'),
   agentChip: document.getElementById('agentChip'),
+  aiEndpoint: document.getElementById('aiEndpoint'),
+  aiModel: document.getElementById('aiModel'),
+  aiKey: document.getElementById('aiKey'),
+  aiOn: document.getElementById('aiOn'),
+  aiTest: document.getElementById('aiTest'),
+  aiStatus: document.getElementById('aiStatus'),
   agentHosts: document.getElementById('agentHosts'),
   saveHost: document.getElementById('saveHost'),
   batteryChip: document.getElementById('batteryChip'),
@@ -150,6 +158,7 @@ const el = {
   langSel: document.getElementById('lang'),
   overlayStart: document.getElementById('overlayStart'),
   overlaySize: document.getElementById('overlaySize'),
+  overlayFloat: document.getElementById('overlayFloat'),
   overlayStop: document.getElementById('overlayStop'),
   openAod: document.getElementById('openAod'),
   openWallpaper: document.getElementById('openWallpaper'),
@@ -379,16 +388,52 @@ function petSay(text) {
   speak(text);
 }
 
-function sendChat(text) {
+function aiConfig(s) {
+  return { endpoint: s.aiEndpoint || '', model: s.aiModel || '', key: s.aiKey || '' };
+}
+
+function aiSystemPrompt(s) {
+  const name = s.name || (pack && pack.name) || 'pet';
+  return 'Bạn là ' + name + ', một pet nhỏ sống trên màn hình điện thoại. '
+    + 'Trả lời ngắn (1-2 câu), ấm áp, tự nhiên, xưng "mình" và gọi người dùng là "bạn". '
+    + 'Trả lời cùng ngôn ngữ với người dùng. Không bịa việc bạn không biết. '
+    + (s.memories && s.memories.length ? 'Bạn nhớ: ' + s.memories.join('; ') + '. ' : '');
+}
+
+async function sendChat(text) {
   const t = (text || '').trim();
   if (!t) return;
   pushChat('user', t);
   const s = readStore();
+  if (s.aiOn && s.aiEndpoint && s.aiModel) {
+    if (el.aiStatus) el.aiStatus.textContent = 'đang gọi AI…';
+    setStatus('AI đang trả lời…');
+    try {
+      const history = [
+        { role: 'system', content: aiSystemPrompt(s) },
+        ...s.chat.slice(-6).map(m => ({ role: m.role === 'pet' ? 'assistant' : 'user', content: m.text })),
+      ];
+      const reply = await askAI(aiConfig(s), history);
+      pushChat('pet', reply);
+      petSay(reply);
+      if (el.aiStatus) el.aiStatus.textContent = 'AI trả lời OK';
+      setStatus(pick('sẵn sàng', 'ready'));
+      const mood = moodFor(t);
+      if (mood) setTimeout(() => model.setState(mood), 700);
+      logEvent('chat AI: ' + s.aiModel);
+      return;
+    } catch (err) {
+      console.error(err);
+      if (el.aiStatus) el.aiStatus.textContent = 'lỗi: ' + err.message;
+      setStatus('AI lỗi, dùng trả lời offline');
+    }
+  }
   const reply = replyTo(t, { lang: getLang(),
     petName: s.name || (pack && pack.name) || 'pet',
     memories: s.memories,
     you: 'bạn',
   });
+  pushChat('pet', reply);
   petSay(reply);
   const mood = moodFor(t);
   if (mood) {
@@ -1549,6 +1594,29 @@ function bindSheet() {
       renderHosts();
     }
   });
+  ['aiEndpoint', 'aiModel', 'aiKey'].forEach(key => {
+    const node = el[key];
+    if (!node) return;
+    node.addEventListener('input', () => writeStore({ [key]: node.value.trim() }));
+  });
+  el.aiOn.addEventListener('change', () => {
+    writeStore({ aiOn: el.aiOn.checked });
+    if (el.aiStatus) el.aiStatus.textContent = el.aiOn.checked ? 'đã bật' : 'đã tắt';
+  });
+  el.aiTest.addEventListener('click', async () => {
+    const s = readStore();
+    if (!s.aiEndpoint || !s.aiModel) {
+      el.aiStatus.textContent = 'cần endpoint và model';
+      return;
+    }
+    el.aiStatus.textContent = 'đang kiểm tra…';
+    try {
+      const reply = await askAI(aiConfig(s), [{ role: 'user', content: 'Chào bạn, trả lời một câu ngắn.' }]);
+      el.aiStatus.textContent = 'OK: ' + reply.slice(0, 60);
+    } catch (err) {
+      el.aiStatus.textContent = 'lỗi: ' + err.message;
+    }
+  });
   el.agentStart.addEventListener('click', () => startAgent((el.agentUrl.value || '').trim()));
   el.agentStop.addEventListener('click', stopAgent);
   el.shareConfig.addEventListener('click', shareConfig);
@@ -1569,6 +1637,13 @@ function bindSheet() {
   el.openAod.addEventListener('click', () => {
     if (window.AndroidPet && window.AndroidPet.openAod) window.AndroidPet.openAod();
     else setStatus(pick('chỉ chạy trong app Android', 'Android app only'));
+  });
+  el.overlayFloat.addEventListener('change', () => {
+    writeStore({ overlayFloat: el.overlayFloat.checked });
+    if (window.AndroidPet && window.AndroidPet.setOverlayFloat) {
+      window.AndroidPet.setOverlayFloat(el.overlayFloat.checked);
+    }
+    setStatus(el.overlayFloat.checked ? pick('pet sẽ tự bay nhảy', 'pet will float around') : pick('đã tắt bay nhảy', 'floating off'));
   });
   el.overlaySize.addEventListener('change', () => {
     if (window.AndroidPet && window.AndroidPet.setOverlaySize) {
@@ -1950,6 +2025,15 @@ async function main() {
     buildSettingsUI();
     renderHosts();
     renderCollection();
+    el.aiEndpoint.value = savedSettings.aiEndpoint || '';
+    el.aiModel.value = savedSettings.aiModel || '';
+    el.aiKey.value = savedSettings.aiKey || '';
+    el.aiOn.checked = !!savedSettings.aiOn;
+    el.overlayFloat.checked = savedSettings.overlayFloat !== false;
+    if (window.AndroidPet && window.AndroidPet.setOverlayFloat) {
+      window.AndroidPet.setOverlayFloat(el.overlayFloat.checked);
+    }
+    if (el.aiStatus) el.aiStatus.textContent = savedSettings.aiEndpoint ? 'đã lưu cấu hình' : 'chưa cấu hình';
     el.ambientMode.value = savedSettings.ambientMode || 'off';
     el.showFps.checked = !!savedSettings.showFps;
     el.errorLog.checked = !!savedSettings.errorLog;

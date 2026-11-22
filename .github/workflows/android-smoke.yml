@@ -126,6 +126,9 @@ jobs:
             adb shell input keyevent KEYCODE_HOME
             sleep 3
             adb exec-out screencap -p > app-float.png
+            sleep 2
+            adb exec-out screencap -p > app-float2.png
+            adb logcat -d -s PetOverlay | grep 'float x=' | tail -3 || true
             adb shell dumpsys window | grep -i "petstudio" | head -5 || true
             adb shell am force-stop io.github.vukiengiang.petstudio
             sleep 2
@@ -158,6 +161,7 @@ jobs:
             app-agent.png
             app-gallery.png
             app-float.png
+            app-float2.png
             app-aod.png
             app-tile.png
             app-tet.png

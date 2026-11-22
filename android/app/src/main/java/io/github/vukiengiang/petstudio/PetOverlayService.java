@@ -10,7 +10,10 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
@@ -44,6 +47,18 @@ public class PetOverlayService extends Service {
     private float dragY;
     private int startX;
     private int startY;
+    private int baseX;
+    private int baseY;
+    private boolean dragging;
+    private final Handler floatHandler = new Handler(Looper.getMainLooper());
+    private long lastFloatLog;
+    private final Runnable floatTick = new Runnable() {
+        @Override
+        public void run() {
+            floatStep();
+            floatHandler.postDelayed(this, 40);
+        }
+    };
 
     @Nullable
     @Override
@@ -102,6 +117,7 @@ public class PetOverlayService extends Service {
         handle.setOnTouchListener((v, event) -> {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
+                    dragging = true;
                     dragX = event.getRawX();
                     dragY = event.getRawY();
                     startX = params.x;
@@ -116,9 +132,12 @@ public class PetOverlayService extends Service {
                     return true;
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
+                    dragging = false;
+                    baseX = params.x;
+                    baseY = params.y;
                     getSharedPreferences("petstudio-prefs", MODE_PRIVATE).edit()
-                            .putInt("overlay_x", params.x)
-                            .putInt("overlay_y", params.y)
+                            .putInt("overlay_x", baseX)
+                            .putInt("overlay_y", baseY)
                             .apply();
                     return true;
                 default:
@@ -145,6 +164,8 @@ public class PetOverlayService extends Service {
         params.x = getSharedPreferences("petstudio-prefs", MODE_PRIVATE).getInt("overlay_x", 24);
         params.y = getSharedPreferences("petstudio-prefs", MODE_PRIVATE)
                 .getInt("overlay_y", Math.round(200 * getResources().getDisplayMetrics().density));
+        baseX = params.x;
+        baseY = params.y;
 
         try {
             windowManager.addView(root, params);
@@ -156,7 +177,29 @@ public class PetOverlayService extends Service {
 
         String url = "https://" + DOMAIN + "/www/pet-studio/index.html?v=" + BuildConfig.VERSION_NAME + "&overlay=1";
         webView.loadUrl(url);
+        floatHandler.post(floatTick);
         Log.d(TAG, "overlay shown size=" + dp + " x=" + params.x + " y=" + params.y);
+    }
+
+    private void floatStep() {
+        if (params == null || root == null || windowManager == null) return;
+        boolean enabled = getSharedPreferences("petstudio-prefs", MODE_PRIVATE)
+                .getBoolean("overlay_float", true);
+        if (!enabled || dragging) return;
+        float t = SystemClock.uptimeMillis() / 1000f;
+        int rangeX = Math.round(14 * getResources().getDisplayMetrics().density);
+        int rangeY = Math.round(10 * getResources().getDisplayMetrics().density);
+        params.x = baseX + Math.round((float) Math.sin(t * 0.9f) * rangeX);
+        params.y = baseY + Math.round((float) Math.sin(t * 1.3f + 1f) * rangeY);
+        try {
+            windowManager.updateViewLayout(root, params);
+        } catch (Exception ignored) {
+        }
+        long now = SystemClock.uptimeMillis();
+        if (now - lastFloatLog > 2000) {
+            lastFloatLog = now;
+            Log.d(TAG, "float x=" + params.x + " y=" + params.y);
+        }
     }
 
     private void startAsForeground() {
@@ -185,6 +228,7 @@ public class PetOverlayService extends Service {
 
     @Override
     public void onDestroy() {
+        floatHandler.removeCallbacks(floatTick);
         if (webView != null) {
             webView.loadUrl("about:blank");
             webView.destroy();
