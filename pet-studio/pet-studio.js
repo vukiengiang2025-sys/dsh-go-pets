@@ -1804,6 +1804,11 @@ function bindSheet() {
       renderHosts();
     }
   });
+  el.aiUsage.addEventListener('click', () => {
+    if (!confirm(pick('Đặt lại bộ đếm gọi AI và token?', 'Reset the AI call/token counter?'))) return;
+    writeStore({ aiCalls: 0, aiTokens: 0 }, { render: false });
+    renderAiUsage();
+  });
   el.aiClearKey.addEventListener('click', () => {
     if (!confirm(pick('Xoá API key đã lưu?', 'Delete the saved API key?'))) return;
     el.aiKey.value = '';
