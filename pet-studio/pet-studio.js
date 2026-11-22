@@ -1890,6 +1890,10 @@ function bindSheet() {
       el.aiStatus.textContent = 'cần endpoint và model';
       return;
     }
+    if (!s.aiKey) {
+      el.aiStatus.textContent = 'cần API key';
+      return;
+    }
     el.aiStatus.textContent = 'đang kiểm tra…';
     const started = performance.now();
     try {
