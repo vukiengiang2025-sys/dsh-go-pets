@@ -2,7 +2,7 @@ import { PetModel, normalizePack, STATES } from './pet-engine.js';
 import { buildPackFromFile, buildPackFromZip } from './pack-import.js';
 import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } from './pet-fx.js';
 import { shouldRemind, breakText } from './reminders.js';
-import { replyTo, storyFor, summaryFrom } from './pet-chat.js';
+import { replyTo, storyFor, summaryFrom, moodFor } from './pet-chat.js';
 import { todayKey, bumpStreak, questDone, clock, hostColor, batteryText } from './care.js';
 import { shareUrl, pickConfig, decodeConfig } from './share.js';
 import { encodeGif, quantize } from './gif.js';
@@ -25,7 +25,7 @@ const STATE_LABEL = {
 
 const BUBBLES = {
   attention: { vi: 'Xong rồi! Nghỉ chút nhé.', en: 'All done! Take a break.' },
-  error: { vi: 'Có gì đó hỏng rồi…', en: 'Something went wrong…' },
+  error: { vi: 'Có gì đó hỏng rồi…', en: 'Something went wrong…', actionVi: 'Xem log', actionEn: 'View log', viewLog: true },
   notification: { vi: 'Có việc đang chờ bạn.', en: "There's something waiting for you.", actionVi: 'Đã xử lý', actionEn: 'Mark handled' },
 };
 
@@ -286,6 +286,7 @@ function showBubble(state) {
   const action = pick(conf.actionVi, conf.actionEn);
   el.bubbleAction.hidden = !action;
   el.bubbleAction.textContent = action || '';
+  el.bubbleAction.dataset.viewLog = conf.viewLog ? '1' : '';
   el.bubble.hidden = false;
   speak(conf.text);
   clearTimeout(bubbleTimer);
@@ -377,6 +378,11 @@ function sendChat(text) {
     you: 'bạn',
   });
   petSay(reply);
+  const mood = moodFor(t);
+  if (mood) {
+    setTimeout(() => model.setState(mood), 700);
+    logEvent('cảm xúc theo tin nhắn: ' + mood);
+  }
   logEvent('trò chuyện với pet');
 }
 
@@ -1663,6 +1669,12 @@ function bindControls() {
   });
   el.demo.addEventListener('change', () => el.demo.checked ? startDemo() : stopDemo());
   el.bubbleAction.addEventListener('click', () => {
+    if (el.bubbleAction.dataset.viewLog === '1') {
+      openSheet();
+      setTimeout(() => el.errorList && el.errorList.scrollIntoView({ block: 'center' }), 250);
+      hideBubble();
+      return;
+    }
     model.clearNotification();
     model.setState('idle');
     hideBubble();

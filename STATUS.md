@@ -2,9 +2,9 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **64 xong** (có trong APK)
+- ✅ **66 xong** (có trong APK)
 - 🟡 **9 một phần** (có nền tảng, thiếu phần còn lại)
-- ⏸ **27 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
+- ⏸ **25 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
 
@@ -65,7 +65,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 36 | Ghi nhớ | ✅ sổ nhớ |
 | 37 | Nhắc nghỉ | ✅ |
 | 38 | Kể chuyện | ✅ |
-| 39 | Cảm xúc tin nhắn | ⏸ cần model |
+| 39 | Cảm xúc tin nhắn | ✅ buồn/vui đổi trạng thái pet |
 | 40 | Im lặng | ✅ |
 
 ## E. Tích hợp agent (10)
@@ -80,7 +80,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 46 | Màu host | ✅ |
 | 47 | Mở hội thoại | ⏸ cần deep link DSH |
 | 48 | Widget trạng thái | ✅ |
-| 49 | Lỗi kèm log | ⏸ |
+| 49 | Lỗi kèm log | ✅ bong bóng lỗi có nút Xem log |
 | 50 | Nhiều host | ⏸ một URL |
 
 ## F. Android (10)

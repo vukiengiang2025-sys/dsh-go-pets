@@ -80,3 +80,10 @@ export function summaryFrom(stats = {}, memories = [], lang = 'vi') {
   if (memories.length) parts.push('Mình còn nhớ ' + memories.length + ' điều bạn dặn.');
   return parts.join(' ');
 }
+
+export function moodFor(text) {
+  const t = String(text || '').toLowerCase();
+  if (/(mệt|buồn|stress|căng|chán|tired|sad|exhausted)/.test(t)) return 'sleeping';
+  if (/(vui|hay quá|tuyệt|xong rồi|great|happy|done)/.test(t)) return 'attention';
+  return null;
+}
