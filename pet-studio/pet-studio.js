@@ -121,6 +121,7 @@ const el = {
   memoryList: document.getElementById('memoryList'),
   memoryInput: document.getElementById('memoryInput'),
   memoryAdd: document.getElementById('memoryAdd'),
+  memoryClear: document.getElementById('memoryClear'),
   intro: document.getElementById('intro'),
   introStart: document.getElementById('introStart'),
   streakLine: document.getElementById('streakLine'),
@@ -2023,6 +2024,12 @@ function bindSheet() {
     el.intro.hidden = true;
     writeStore({ onboarded: true });
     logEvent('bắt đầu dùng app');
+  });
+  el.memoryClear.addEventListener('click', () => {
+    if (!confirm(pick('Xoá toàn bộ ký ức của pet?', "Delete all of the pet's memories?"))) return;
+    writeStore({ memories: [] });
+    renderMemories();
+    setStatus(pick('đã xoá ký ức', 'memories cleared'));
   });
   el.memoryAdd.addEventListener('click', addMemory);
   el.memoryInput.addEventListener('keydown', ev => { if (ev.key === 'Enter') addMemory(); });
