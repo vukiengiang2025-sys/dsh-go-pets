@@ -1146,7 +1146,11 @@ function importBackup() {
     const data = JSON.parse(el.backupBox.value);
     if (!data || typeof data !== 'object') throw new Error('không phải JSON');
     const allowed = {};
-    for (const key of ['pack', 'size', 'quiet', 'palette', 'name', 'profile', 'stats', 'journal']) {
+    const keys = ['pack', 'size', 'quiet', 'palette', 'name', 'userName', 'profile', 'stats', 'journal',
+      'chat', 'memories', 'speech', 'speechRate', 'voiceName', 'breakReminder', 'breakMinutes',
+      'autoTheme', 'autoSeason', 'simple', 'ambientMode', 'ambientVolume', 'overlayFloat',
+      'aiProvider', 'aiEndpoint', 'aiModel', 'aiPersona'];
+    for (const key of keys) {
       if (key in data) allowed[key] = data[key];
     }
     writeStore(allowed);
