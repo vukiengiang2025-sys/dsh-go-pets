@@ -719,6 +719,16 @@ async function loadPack(id) {
   document.body.classList.remove('loading');
   const cost = Math.round(performance.now() - loadStarted);
   if (cost > 600) logEvent('tải ' + entry.id + ' mất ' + cost + 'ms');
+  setTimeout(() => {
+    try {
+      const names = new Set();
+      Object.values(pack.states || {}).forEach(list => (list || []).forEach(name => {
+        const anim = pack.animations[name];
+        if (anim && anim.sheet) names.add(anim.sheet);
+      }));
+      names.forEach(name => ensureSheet(name));
+    } catch (err) { console.warn('preload lỗi', err); }
+  }, 1500);
 }
 
 function sheetNames(json) {

@@ -8,8 +8,8 @@ android {
         applicationId 'io.github.vukiengiang.petstudio'
         minSdk 24
         targetSdk 34
-        versionCode 84
-        versionName '4.40.0'
+        versionCode 85
+        versionName '4.41.0'
         resConfigs 'vi', 'en'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
