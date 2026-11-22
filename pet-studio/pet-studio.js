@@ -867,6 +867,11 @@ function onState() {
     writeStore({ quest });
     renderCare();
   }
+  if (document.hidden && window.AndroidPet && window.AndroidPet.notify
+      && (st === 'attention' || st === 'error' || st === 'notification')) {
+    const text = st === 'attention' ? 'Xong việc rồi!' : st === 'error' ? 'Có lỗi xảy ra' : 'Có việc đang chờ bạn';
+    try { window.AndroidPet.notify('Pet Studio', text); } catch (err) { console.warn(err); }
+  }
   if (st === 'attention') { spawnFx('sparkles'); squash = 0.86; logEvent('pet vừa xong việc'); }
   else if (st === 'sleeping') { spawnFx('zzz'); logEvent('pet đi ngủ'); }
   else if (st === 'error') { squash = 0.9; logEvent('pet gặp lỗi'); }
@@ -1632,6 +1637,13 @@ async function main() {
     const agentParam = new URLSearchParams(location.search).get('agent');
     if (agentParam === 'demo') startAgent('./agent.json');
     else if (agentParam && /^https?:/.test(agentParam)) startAgent(agentParam);
+    if (new URLSearchParams(location.search).get('notify') === '1') {
+      setTimeout(() => {
+        if (window.AndroidPet && window.AndroidPet.notify) {
+          window.AndroidPet.notify('Pet Studio', 'Thông báo thử nghiệm');
+        }
+      }, 800);
+    }
     if (new URLSearchParams(location.search).get('boom') === '1') {
       writeStore({ errorLog: true });
       setTimeout(() => { throw new Error('lỗi thử nghiệm từ ?boom=1'); }, 1200);

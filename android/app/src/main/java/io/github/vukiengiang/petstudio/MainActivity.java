@@ -2,6 +2,9 @@ package io.github.vukiengiang.petstudio;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PictureInPictureParams;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -62,6 +65,7 @@ public class MainActivity extends Activity {
     private WebViewAssetLoader assetLoader;
     private ValueCallback<Uri[]> filePathCallback;
     private boolean pipOnLoad;
+    private static final String CHANNEL_ID = "pet-studio";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -107,6 +111,11 @@ public class MainActivity extends Activity {
 
         pipOnLoad = getIntent() != null && getIntent().getBooleanExtra("pip", false);
         webView.addJavascriptInterface(new PipBridge(), "AndroidPet");
+        createNotificationChannel();
+        if (Build.VERSION.SDK_INT >= 33
+                && checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 2001);
+        }
 
         webView.setWebViewClient(new WebViewClientCompat() {
             @Override
@@ -172,7 +181,7 @@ public class MainActivity extends Activity {
         if (savedInstanceState == null) {
             webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent()), chatOf(getIntent()),
                     pipOnLoad, introOf(getIntent()), exportOf(getIntent()), gifOf(getIntent()),
-                    agentOf(getIntent()), galleryOf(getIntent())));
+                    agentOf(getIntent()), galleryOf(getIntent()), notifyOf(getIntent())));
         } else {
             webView.restoreState(savedInstanceState);
         }
@@ -184,7 +193,7 @@ public class MainActivity extends Activity {
 
     private static String startUrl(@Nullable String pack, @Nullable String fx, @Nullable String chat,
                                    boolean pip, boolean intro, boolean export, boolean gif,
-                                   @Nullable String agent, boolean gallery) {
+                                   @Nullable String agent, boolean gallery, boolean notify) {
         String url = START_URL;
         if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
             url += "&pack=" + pack;
@@ -212,6 +221,9 @@ public class MainActivity extends Activity {
         }
         if (gallery) {
             url += "&gallery=1";
+        }
+        if (notify) {
+            url += "&notify=1";
         }
         return url;
     }
@@ -244,13 +256,17 @@ public class MainActivity extends Activity {
         return intent != null && intent.getBooleanExtra("gallery", false);
     }
 
+    private static boolean notifyOf(@Nullable Intent intent) {
+        return intent != null && intent.getBooleanExtra("notify", false);
+    }
+
     @Override
     protected void onNewIntent(@NonNull Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
         if (webView != null) {
             webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent), false, introOf(intent),
-                    exportOf(intent), gifOf(intent), agentOf(intent), galleryOf(intent)));
+                    exportOf(intent), gifOf(intent), agentOf(intent), galleryOf(intent), notifyOf(intent)));
         }
     }
 
@@ -297,6 +313,11 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void saveZip(String base64, String name) {
             runOnUiThread(() -> savePngFile(base64, name, "application/zip"));
+        }
+
+        @JavascriptInterface
+        public void notify(String title, String text) {
+            runOnUiThread(() -> postNotification(title, text));
         }
 
         @JavascriptInterface
@@ -362,6 +383,40 @@ public class MainActivity extends Activity {
         } catch (Exception err) {
             Log.e(TAG, "readUpTo failed", err);
             return null;
+        }
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        if (manager == null) return;
+        NotificationChannel channel = new NotificationChannel(
+                CHANNEL_ID, "Pet Studio", NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setDescription("Pet báo xong việc hoặc có việc đang chờ");
+        manager.createNotificationChannel(channel);
+    }
+
+    private void postNotification(String title, String text) {
+        try {
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            if (manager == null) return;
+            Intent open = new Intent(this, MainActivity.class);
+            PendingIntent pi = PendingIntent.getActivity(this, 0, open,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                    ? new Notification.Builder(this, CHANNEL_ID)
+                    : new Notification.Builder(this);
+            Notification notification = builder
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(title == null ? "Pet Studio" : title)
+                    .setContentText(text == null ? "" : text)
+                    .setContentIntent(pi)
+                    .setAutoCancel(true)
+                    .build();
+            manager.notify((int) (System.currentTimeMillis() % 100000), notification);
+            Log.d(TAG, "posted notification " + title);
+        } catch (Exception err) {
+            Log.e(TAG, "notify failed", err);
         }
     }
 
