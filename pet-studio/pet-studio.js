@@ -1835,6 +1835,12 @@ function bindSheet() {
   document.addEventListener('pointerdown', ev => {
     if (!el.wheel.hidden && !el.wheel.contains(ev.target) && ev.target !== el.openWheel) closeWheel();
   });
+  document.querySelectorAll('.sheet-nav [data-goto]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.goto);
+      if (target) target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
+  });
   el.openMarket.addEventListener('click', showMarket);
   el.marketClose.addEventListener('click', () => { el.marketModal.hidden = true; });
   el.templatePack.addEventListener('click', async () => {

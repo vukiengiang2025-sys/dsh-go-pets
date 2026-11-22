@@ -91,10 +91,17 @@
 <section class="sheet" id="sheet" hidden aria-label="Cài đặt pet">
   <header class="sheet-head">
     <h2>Cài đặt pet</h2>
+    <div class="sheet-nav">
+      <button data-goto="sec-chung">Chung</button>
+      <button data-goto="sec-voice">Giọng</button>
+      <button data-goto="sec-ai">AI</button>
+      <button data-goto="sec-care">Chăm sóc</button>
+      <button data-goto="sec-data">Dữ liệu</button>
+    </div>
     <button id="closeSheet">Đóng</button>
   </header>
   <div class="sheet-body">
-    <h3 class="sheet-h">Chung</h3>
+    <h3 class="sheet-h" id="sec-chung">Chung</h3>
     <label class="field">Ngôn ngữ
       <select id="lang">
         <option value="vi">Tiếng Việt</option>
@@ -132,7 +139,7 @@
     <div class="error-list" id="errorList"></div>
 
     <label class="check"><input type="checkbox" id="speechOn"> Đọc thành tiếng khi có việc</label>
-    <h3 class="sheet-h">Giọng nói &amp; âm thanh</h3>
+    <h3 class="sheet-h" id="sec-voice">Giọng nói &amp; âm thanh</h3>
     <div class="field">Giọng đọc
       <select id="voiceSelect"><option value="">Giọng mặc định</option></select>
       <label class="rate">Tốc độ <input type="range" id="speechRate" min="0.7" max="1.4" step="0.1" value="1"></label>
@@ -175,7 +182,7 @@
       </div>
     </div>
 
-    <h3 class="sheet-h">AI &amp; agent</h3>
+    <h3 class="sheet-h" id="sec-ai">AI &amp; agent</h3>
     <div class="field">AI cho pet (tuỳ chọn)
       <select id="aiPersona">
         <option value="gentle">Tính cách: dịu dàng</option>
@@ -210,7 +217,7 @@
       <div class="care-line" id="agentLine">chưa kết nối</div>
     </div>
 
-    <h3 class="sheet-h">Chăm sóc</h3>
+    <h3 class="sheet-h" id="sec-care">Chăm sóc</h3>
     <div class="field">Chăm sóc
       <div class="care-line" id="streakLine">Chuỗi: —</div>
       <div class="care-line" id="questLine">Đi dạo hôm nay: 0/3</div>
@@ -261,7 +268,7 @@
 
     <div class="care-line" id="experimentLine"></div>
 
-    <h3 class="sheet-h">Dữ liệu &amp; chia sẻ</h3>
+    <h3 class="sheet-h" id="sec-data">Dữ liệu &amp; chia sẻ</h3>
     <div class="field">Chia sẻ
       <div class="row">
         <button id="shareConfig">Chép liên kết cấu hình</button>

@@ -439,3 +439,10 @@ body.loading .stage canvas { opacity: .55; transition: opacity .2s; }
 
 .controls { flex-wrap: wrap; }
 @media (max-width: 360px) { .bar { padding-left: 10px; padding-right: 10px; } .states button { font-size: 11.5px; } }
+
+
+.sheet-nav { display: flex; gap: 6px; overflow-x: auto; padding: 8px 0 4px; scrollbar-width: none; }
+.sheet-nav::-webkit-scrollbar { display: none; }
+.sheet-nav button { flex: 0 0 auto; padding: 6px 10px; border-radius: 999px; font-size: 11.5px;
+  background: rgba(110,168,255,.08); border: 1px solid rgba(110,168,255,.2); color: #a9c6ff; }
+.sheet-h { scroll-margin-top: 58px; }
