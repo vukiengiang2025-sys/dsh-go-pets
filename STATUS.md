@@ -2,9 +2,9 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **76 xong** (có trong APK)
+- ✅ **78 xong** (có trong APK)
 - 🟡 **1 một phần** (có nền tảng, thiếu phần còn lại)
-- ⏸ **23 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
+- ⏸ **21 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
 
@@ -20,7 +20,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 08 | Sáng/đêm | ✅ pack Mây Đêm riêng |
 | 09 | Mini mode | ✅ thêm cỡ 24 dp |
 | 10 | Bộ sưu tập | ✅ lưới 9 trạng thái, đánh dấu đã thấy |
-| 79 | Template pack | ⏸ |
+| 79 | Template pack | ✅ tải pack mẫu .zip trong chợ |
 | 80 | Preset đóng sẵn | ✅ 4 pet |
 
 ## B. Biểu cảm (10)
@@ -49,7 +49,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 25 | Vẽ đường | ⏸ |
 | 26 | Bánh xe tiện ích | ⏸ cần UI vòng |
 | 27 | Rung theo lực | ✅ |
-| 28 | Cử chỉ ba ngón | ⏸ WebView khó phân biệt |
+| 28 | Cử chỉ ba ngón | ✅ ba ngón bật/tắt im lặng |
 | 29 | Menu cảm xúc | ✅ giữ lâu → Vui/Buồn ngủ/Hờn |
 | 30 | Pet trốn | ✅ |
 
@@ -156,7 +156,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 99 | Widget đôi | ✅ pet + đồng hồ, cập nhật mỗi phút |
 | 100 | Roadmap công khai | ✅ nút mở ROADMAP |
 
-## Vì sao 23 ý tưởng còn hoãn
+## Vì sao 21 ý tưởng còn hoãn
 
 1. **Cần backend/tài khoản**: chợ pack, xếp hạng, bình chọn, ủng hộ, crash report.
 2. **Cần quyền hệ thống Android**: overlay, live wallpaper, AOD, notification tuỳ biến — mỗi thứ là một service + luồng xin quyền, dễ bị ROM chặn.

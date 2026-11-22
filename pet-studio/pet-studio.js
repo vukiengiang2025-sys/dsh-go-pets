@@ -155,6 +155,7 @@ const el = {
   marketModal: document.getElementById('marketModal'),
   marketGrid: document.getElementById('marketGrid'),
   marketClose: document.getElementById('marketClose'),
+  templatePack: document.getElementById('templatePack'),
   openGallery: document.getElementById('openGallery'),
   galleryModal: document.getElementById('galleryModal'),
   galleryGrid: document.getElementById('galleryGrid'),
@@ -1520,6 +1521,27 @@ function bindSheet() {
   });
   el.openMarket.addEventListener('click', showMarket);
   el.marketClose.addEventListener('click', () => { el.marketModal.hidden = true; });
+  el.templatePack.addEventListener('click', async () => {
+    try {
+      const res = await fetch('./template-pack.zip');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const bytes = new Uint8Array(await res.arrayBuffer());
+      const b64 = bytesToBase64(bytes);
+      if (window.AndroidPet && window.AndroidPet.saveZip) {
+        window.AndroidPet.saveZip(b64, 'pack-mau.zip');
+        setStatus(pick('đã lưu pack mẫu vào Download/DSH-Go', 'template saved to Download/DSH-Go'));
+      } else {
+        const a = document.createElement('a');
+        a.href = 'data:application/zip;base64,' + b64;
+        a.download = 'pack-mau.zip';
+        a.click();
+      }
+      logEvent('tải pack mẫu');
+    } catch (err) {
+      console.error(err);
+      setStatus('tải pack mẫu lỗi: ' + err.message);
+    }
+  });
   el.openGallery.addEventListener('click', showGallery);
   el.galleryClose.addEventListener('click', () => { el.galleryModal.hidden = true; });
   el.qrClose.addEventListener('click', () => { el.qrModal.hidden = true; });
@@ -1591,6 +1613,17 @@ function bindStage() {
   let down = null;
   let clicks = [];
   let holdTimer = 0;
+
+  el.stage.addEventListener('touchstart', ev => {
+    if (!ev.touches || ev.touches.length !== 3) return;
+    ev.preventDefault();
+    el.quiet.checked = !el.quiet.checked;
+    writeStore({ quiet: el.quiet.checked });
+    if (model) model.quiet = el.quiet.checked;
+    haptic(18);
+    setStatus(pick(el.quiet.checked ? 'ba ngón: im lặng' : 'ba ngón: bật tiếng',
+      el.quiet.checked ? 'three fingers: quiet' : 'three fingers: sound on'));
+  }, { passive: false });
 
   function hideMood() { el.moodMenu.hidden = true; }
   el.moodMenu.addEventListener('click', ev => {
