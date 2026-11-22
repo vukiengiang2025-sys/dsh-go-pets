@@ -136,6 +136,8 @@ const el = {
   qrUrl: document.getElementById('qrUrl'),
   qrSave: document.getElementById('qrSave'),
   giftPack: document.getElementById('giftPack'),
+  zipUrl: document.getElementById('zipUrl'),
+  zipLoad: document.getElementById('zipLoad'),
   openGallery: document.getElementById('openGallery'),
   galleryModal: document.getElementById('galleryModal'),
   galleryGrid: document.getElementById('galleryGrid'),
@@ -591,6 +593,30 @@ async function importImageFile(file) {
   } catch (err) {
     console.error(err);
     setStatus('nhập ảnh lỗi: ' + err.message);
+  }
+}
+
+async function importZipUrl(url) {
+  const target = (url || '').trim();
+  if (!target || !/^(https?:\/\/|\.{0,2}\/)/.test(target)) {
+    setStatus('link phải là https:// hoặc đường dẫn trong app');
+    return;
+  }
+  setStatus('đang tải pack…');
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 20000);
+    const res = await fetch(target, { signal: controller.signal, cache: 'no-store' });
+    clearTimeout(timer);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const length = Number(res.headers.get('content-length') || 0);
+    if (length > 8 * 1024 * 1024) throw new Error('tệp quá lớn');
+    const buffer = await res.arrayBuffer();
+    if (buffer.byteLength > 8 * 1024 * 1024) throw new Error('tệp quá lớn');
+    await saveImported(await buildPackFromZip(buffer));
+  } catch (err) {
+    console.error(err);
+    setStatus('tải pack lỗi: ' + err.message);
   }
 }
 
@@ -1338,6 +1364,8 @@ function bindSheet() {
     writeStore({ memories: s.memories });
     renderMemories();
   });
+  el.zipLoad.addEventListener('click', () => importZipUrl(el.zipUrl.value));
+  el.zipUrl.addEventListener('keydown', ev => { if (ev.key === 'Enter') importZipUrl(el.zipUrl.value); });
   el.importImage.addEventListener('click', () => el.importFile.click());
   el.importFile.addEventListener('change', async () => {
     const file = el.importFile.files && el.importFile.files[0];
@@ -1607,6 +1635,9 @@ async function main() {
     if (new URLSearchParams(location.search).get('boom') === '1') {
       writeStore({ errorLog: true });
       setTimeout(() => { throw new Error('lỗi thử nghiệm từ ?boom=1'); }, 1200);
+    }
+    if (new URLSearchParams(location.search).get('zipurl') === 'demo') {
+      setTimeout(() => importZipUrl('./test-fixtures/mini-pack.zip'), 700);
     }
     if (new URLSearchParams(location.search).get('gallery') === '1') {
       setTimeout(showGallery, 900);
