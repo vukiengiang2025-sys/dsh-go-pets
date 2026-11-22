@@ -1916,6 +1916,18 @@ function bindSheet() {
   document.addEventListener('pointerdown', ev => {
     if (!el.wheel.hidden && !el.wheel.contains(ev.target) && ev.target !== el.openWheel) closeWheel();
   });
+  const navButtons = [...document.querySelectorAll('.sheet-nav [data-goto]')];
+  const heads = [...document.querySelectorAll('.sheet-h')];
+  if ('IntersectionObserver' in window && heads.length) {
+    const spy = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const btn = navButtons.find(b => b.dataset.goto === entry.target.id);
+        if (btn) navButtons.forEach(b => b.classList.toggle('active', b === btn));
+      }
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    heads.forEach(h => spy.observe(h));
+  }
   document.querySelectorAll('.sheet-nav [data-goto]').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = document.getElementById(btn.dataset.goto);
