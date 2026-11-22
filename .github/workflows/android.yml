@@ -76,6 +76,10 @@ jobs:
           "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "$APK" | head -6
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs "$APK" | head -4
           unzip -l "$APK" | grep -E 'assets/www/(pet-studio/index.html|app/assets/pets/dsh-bot/pack.json)'
+          for meta in app/assets/pets/*/pack.json; do
+            id=$(basename "$(dirname "$meta")")
+            unzip -l "$APK" | grep -q "assets/www/app/assets/pets/$id/pack.json" || { echo "missing pack $id"; exit 1; }
+          done
           cp "$APK" PetStudio.apk
           sha256sum PetStudio.apk
 
