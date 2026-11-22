@@ -62,7 +62,7 @@ jobs:
             adb shell am force-stop io.github.vukiengiang.petstudio
             sleep 2
             adb shell am start -W -n io.github.vukiengiang.petstudio/.MainActivity --ez intro true
-            sleep 4
+            sleep 9
             adb exec-out screencap -p > app-intro.png
             adb shell dumpsys appwidget | grep -i -A4 "io.github.vukiengiang.petstudio" | head -12 || true
             adb logcat -d -s PetWidget | tail -10 || true
