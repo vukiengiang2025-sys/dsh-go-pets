@@ -10,7 +10,7 @@ import { buildZip } from './zip-write.js';
 import { verifyChecksums } from './pack-integrity.js';
 import { applyLanguage, pick, stateText, getLang } from './i18n.js';
 import { upsertHost, removeHost } from './agent-hosts.js';
-import { askAI, PRESETS, friendlyAIError, buildSystemPrompt, PERSONAS, shouldGreet, aiSig, testCacheValid } from './ai.js';
+import { askAI, PRESETS, friendlyAIError, buildSystemPrompt, PERSONAS, shouldGreet, aiSig, testCacheValid, estimateTokens } from './ai.js';
 import { assignVariant, newSeed } from './ab.js';
 import { seasonFor, SEASON_PACK } from './season.js';
 import qrcode from './vendor/qrcode.mjs';
@@ -58,7 +58,7 @@ const DEFAULT_STORE = {
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
   ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi', agentHosts: [], overlayFloat: true,
-  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai', aiPersona: 'gentle', aiGreet: false, lastOpen: 0, userName: '', installId: '',
+  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai', aiPersona: 'gentle', aiGreet: false, lastOpen: 0, userName: '', aiCalls: 0, aiTokens: 0, installId: '',
 };
 
 const el = {
@@ -149,6 +149,7 @@ const el = {
   aiRetest: document.getElementById('aiRetest'),
   aiClearKey: document.getElementById('aiClearKey'),
   aiStatus: document.getElementById('aiStatus'),
+  aiUsage: document.getElementById('aiUsage'),
   agentHosts: document.getElementById('agentHosts'),
   saveHost: document.getElementById('saveHost'),
   batteryChip: document.getElementById('batteryChip'),
@@ -437,6 +438,21 @@ let aiBusy = false;
 let aiIgnore = false;
 let aiSlowTimer = 0;
 
+function renderAiUsage() {
+  if (!el.aiUsage) return;
+  const s = readStore();
+  el.aiUsage.textContent = (s.aiCalls || 0) + pick(' lần gọi · ~', ' calls · ~') + (s.aiTokens || 0) + pick(' token (ước lượng)', ' tokens (approx)');
+}
+
+function bumpAiUsage(promptText, replyText) {
+  const s = readStore();
+  writeStore({
+    aiCalls: (s.aiCalls || 0) + 1,
+    aiTokens: (s.aiTokens || 0) + estimateTokens(promptText) + estimateTokens(replyText),
+  }, { render: false });
+  renderAiUsage();
+}
+
 function aiConfig(s) {
   return { provider: s.aiProvider || 'openai', endpoint: s.aiEndpoint || '', model: s.aiModel || '', key: s.aiKey || '' };
 }
@@ -488,6 +504,7 @@ async function sendChat(text) {
       const reply = await askAI(aiConfig(s), history);
       petSay(reply);
       if (el.aiStatus) el.aiStatus.textContent = 'AI trả lời OK';
+      bumpAiUsage(JSON.stringify(history), reply);
       setStatus(pick('sẵn sàng', 'ready'));
       const mood = moodFor(reply) || moodFor(t);
       if (mood) setTimeout(() => model.setState(mood), 400);
@@ -2273,6 +2290,7 @@ async function main() {
     el.aiEndpoint.value = savedSettings.aiEndpoint || '';
     el.aiModel.value = savedSettings.aiModel || '';
     el.aiKey.value = savedSettings.aiKey || '';
+    renderAiUsage();
     el.aiOn.checked = !!savedSettings.aiOn;
     if (el.aiChip) {
       el.aiChip.hidden = !el.aiOn.checked;

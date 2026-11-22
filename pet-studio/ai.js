@@ -171,3 +171,7 @@ export function aiSig(config = {}) {
 export function testCacheValid(sig, at, now, minutes = 5) {
   return Boolean(sig && at && now - at < minutes * 60000);
 }
+
+export function estimateTokens(text) {
+  return Math.max(1, Math.ceil(String(text || '').length / 4));
+}
