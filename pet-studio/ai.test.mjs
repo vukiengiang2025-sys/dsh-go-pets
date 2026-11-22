@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { chatUrl, buildRequest, parseReply, askAI, PRESETS } from './ai.js';
+import { chatUrl, buildRequest, parseReply, askAI, PRESETS, aiSig, testCacheValid } from './ai.js';
 
 test('chatUrl chuẩn hoá endpoint openai', () => {
   assert.equal(chatUrl('https://api.deepseek.com/'), 'https://api.deepseek.com/chat/completions');
@@ -60,4 +60,20 @@ test('askAI báo lỗi HTTP', async () => {
 
 test('có preset cho các nhà cung cấp', () => {
   for (const k of ['openai', 'deepseek', 'gemini', 'groq', 'ollama']) assert.ok(PRESETS[k].endpoint);
+});
+
+
+test('aiSig ổn định và không lộ key', () => {
+  const a = aiSig({ endpoint: 'https://x', model: 'm', key: 'secret' });
+  const b = aiSig({ endpoint: 'https://x', model: 'm', key: 'secret' });
+  assert.equal(a, b);
+  assert.ok(!a.includes('secret'));
+  assert.notEqual(a, aiSig({ endpoint: 'https://x', model: 'm2', key: 'secret' }));
+});
+
+test('testCacheValid 5 phút', () => {
+  const now = 1_000_000;
+  assert.equal(testCacheValid('s', now - 60_000, now), true);
+  assert.equal(testCacheValid('s', now - 6 * 60_000, now), false);
+  assert.equal(testCacheValid('', now, now), false);
 });

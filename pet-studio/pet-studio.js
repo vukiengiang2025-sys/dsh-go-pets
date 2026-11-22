@@ -10,7 +10,7 @@ import { buildZip } from './zip-write.js';
 import { verifyChecksums } from './pack-integrity.js';
 import { applyLanguage, pick, stateText, getLang } from './i18n.js';
 import { upsertHost, removeHost } from './agent-hosts.js';
-import { askAI, PRESETS, friendlyAIError, buildSystemPrompt, PERSONAS, shouldGreet } from './ai.js';
+import { askAI, PRESETS, friendlyAIError, buildSystemPrompt, PERSONAS, shouldGreet, aiSig, testCacheValid } from './ai.js';
 import { assignVariant, newSeed } from './ab.js';
 import { seasonFor, SEASON_PACK } from './season.js';
 import qrcode from './vendor/qrcode.mjs';
@@ -1747,6 +1747,11 @@ function bindSheet() {
   });
   el.aiTest.addEventListener('click', async () => {
     const s = readStore();
+    const sig = aiSig(aiConfig(s));
+    if (s.aiTestSig === sig && testCacheValid(sig, s.aiTestAt, Date.now())) {
+      el.aiStatus.textContent = 'OK (đã kiểm tra ' + Math.max(1, Math.round((Date.now() - s.aiTestAt) / 60000)) + ' phút trước)';
+      return;
+    }
     if (!s.aiEndpoint || !s.aiModel) {
       el.aiStatus.textContent = 'cần endpoint và model';
       return;
@@ -1756,8 +1761,10 @@ function bindSheet() {
     try {
       const reply = await askAI(aiConfig(s), [{ role: 'user', content: 'Chào bạn, trả lời một câu ngắn.' }]);
       el.aiStatus.textContent = 'OK (' + Math.round(performance.now() - started) + 'ms): ' + reply.slice(0, 60);
+      writeStore({ aiTestSig: sig, aiTestAt: Date.now() });
     } catch (err) {
       el.aiStatus.textContent = 'lỗi: ' + friendlyAIError(err);
+      writeStore({ aiTestSig: sig, aiTestAt: Date.now() });
     }
   });
   el.agentStart.addEventListener('click', () => startAgent((el.agentUrl.value || '').trim()));

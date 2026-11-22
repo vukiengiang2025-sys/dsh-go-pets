@@ -143,3 +143,16 @@ export function shouldGreet(lastOpen, now, hours = 2) {
   if (!lastOpen) return false;
   return now - lastOpen >= hours * 3600 * 1000;
 }
+
+
+export function aiSig(config = {}) {
+  const raw = [config.provider || 'openai', config.endpoint || '', config.model || ''].join('|');
+  let hash = 0;
+  const key = String(config.key || '');
+  for (const ch of raw + '#' + key) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return hash.toString(36);
+}
+
+export function testCacheValid(sig, at, now, minutes = 5) {
+  return Boolean(sig && at && now - at < minutes * 60000);
+}
