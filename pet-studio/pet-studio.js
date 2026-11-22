@@ -646,6 +646,7 @@ function renderImported() {
 }
 
 async function loadPack(id) {
+  const loadStarted = performance.now();
   const entry = packs.find(p => p.id === id) || packs[0];
   document.body.classList.add('loading');
   setTimeout(() => document.body.classList.remove('loading'), 8000);
@@ -701,6 +702,8 @@ async function loadPack(id) {
   renderImported();
   layout();
   document.body.classList.remove('loading');
+  const cost = Math.round(performance.now() - loadStarted);
+  if (cost > 600) logEvent('tải ' + entry.id + ' mất ' + cost + 'ms');
 }
 
 function sheetNames(json) {
@@ -1749,6 +1752,11 @@ function bindSheet() {
   el.aiRetest.addEventListener('click', () => {
     writeStore({ aiTestAt: 0 });
     el.aiTest.click();
+  });
+  [el.chatInput, el.memoryInput, el.petNameInput].filter(Boolean).forEach(node => {
+    node.addEventListener('focus', () => {
+      setTimeout(() => node.scrollIntoView({ block: 'center', behavior: 'smooth' }), 280);
+    });
   });
   el.quickInput.addEventListener('focus', () => {
     setTimeout(() => el.quickInput.scrollIntoView({ block: 'center', behavior: 'smooth' }), 280);
