@@ -228,8 +228,11 @@ function readStore() {
     journal: Array.isArray(raw.journal) ? raw.journal.slice(0, 50) : [],
   };
 }
-function writeStore(patch) {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify({ ...readStore(), ...patch })); renderSheet(); } catch {}
+function writeStore(patch, opts = {}) {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({ ...readStore(), ...patch }));
+    if (opts.render !== false) renderSheet();
+  } catch {}
 }
 
 function bumpStat(key, n = 1) {
@@ -1622,7 +1625,7 @@ function bindSheet() {
   el.petNameInput.addEventListener('input', () => {
     const name = el.petNameInput.value.trim().slice(0, 16);
     applyName(name);
-    writeStore({ name });
+    writeStore({ name }, { render: false });
   });
   el.paletteChips.addEventListener('click', ev => {
     const b = ev.target.closest('button[data-palette]');
@@ -1783,7 +1786,7 @@ function bindSheet() {
   ['aiEndpoint', 'aiModel', 'aiKey'].forEach(key => {
     const node = el[key];
     if (!node) return;
-    node.addEventListener('input', () => writeStore({ [key]: node.value.trim() }));
+    node.addEventListener('input', () => writeStore({ [key]: node.value.trim() }, { render: false }));
   });
   el.aiPersona.addEventListener('change', () => {
     writeStore({ aiPersona: el.aiPersona.value });
