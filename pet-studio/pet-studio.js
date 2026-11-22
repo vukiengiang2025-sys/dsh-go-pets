@@ -414,7 +414,8 @@ function applyStreak() {
 function maybeIntro() {
   const params = new URLSearchParams(location.search);
   const demo = params.has('agent') || params.has('fx') || params.get('chat') === 'demo'
-    || params.get('export') === '1' || params.get('gif') === '1' || params.get('pip') === '1';
+    || params.get('export') === '1' || params.get('gif') === '1' || params.get('pip') === '1'
+    || params.has('pack') || params.get('intro') === '0';
   const force = params.get('intro') === '1';
   const s = readStore();
   if (demo) return;
