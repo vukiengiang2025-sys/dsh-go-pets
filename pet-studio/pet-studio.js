@@ -7,6 +7,7 @@ import { todayKey, bumpStreak, questDone, clock, hostColor, batteryText } from '
 import { shareUrl, pickConfig, decodeConfig } from './share.js';
 import { encodeGif, quantize } from './gif.js';
 import { buildZip } from './zip-write.js';
+import { applyLanguage, pick, stateText, getLang } from './i18n.js';
 import { seasonFor, SEASON_PACK } from './season.js';
 import qrcode from './vendor/qrcode.mjs';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
@@ -23,9 +24,9 @@ const STATE_LABEL = {
 };
 
 const BUBBLES = {
-  attention: { text: 'Xong rồi! Nghỉ chút nhé.' },
-  error: { text: 'Có gì đó hỏng rồi…' },
-  notification: { text: 'Có việc đang chờ bạn.', action: 'Đã xử lý' },
+  attention: { vi: 'Xong rồi! Nghỉ chút nhé.', en: 'All done! Take a break.' },
+  error: { vi: 'Có gì đó hỏng rồi…', en: 'Something went wrong…' },
+  notification: { vi: 'Có việc đang chờ bạn.', en: "There's something waiting for you.", actionVi: 'Đã xử lý', actionEn: 'Mark handled' },
 };
 
 const STORE_KEY = 'pet-studio/v1';
@@ -52,7 +53,7 @@ const DEFAULT_STORE = {
   chat: [], memories: [],
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
-  ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [],
+  ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi',
 };
 
 const el = {
@@ -139,6 +140,7 @@ const el = {
   giftPack: document.getElementById('giftPack'),
   zipUrl: document.getElementById('zipUrl'),
   zipLoad: document.getElementById('zipLoad'),
+  langSel: document.getElementById('lang'),
   overlayStart: document.getElementById('overlayStart'),
   overlayStop: document.getElementById('overlayStop'),
   openMarket: document.getElementById('openMarket'),
@@ -279,9 +281,10 @@ function setStatus(text) { el.status.textContent = text; }
 function showBubble(state) {
   const conf = BUBBLES[state];
   if (!conf || el.quiet.checked) { hideBubble(); return; }
-  el.bubbleText.textContent = conf.text;
-  el.bubbleAction.hidden = !conf.action;
-  el.bubbleAction.textContent = conf.action || '';
+  el.bubbleText.textContent = pick(conf.vi, conf.en);
+  const action = pick(conf.actionVi, conf.actionEn);
+  el.bubbleAction.hidden = !action;
+  el.bubbleAction.textContent = action || '';
   el.bubble.hidden = false;
   speak(conf.text);
   clearTimeout(bubbleTimer);
@@ -847,7 +850,7 @@ function draw(now) {
     if (out) drawFrame(out.anim, frameIndex, fade);
     lastDraw = out ? { anim: out.anim, frame: frameIndex } : null;
     lastDrawKey = key;
-    if (Math.random() < 0.05) setStatus((STATE_LABEL[model.state] || model.state) + ' · ' + out?.name + ' · frame ' + frameIndex);
+    if (Math.random() < 0.05) setStatus(stateText(model.state) + ' · ' + out?.name + ' · frame ' + frameIndex);
   }
   rafId = requestAnimationFrame(draw);
 }
@@ -859,7 +862,7 @@ function onState() {
   showBubble(model.state);
   const st = model.state;
   if (window.AndroidPet && typeof window.AndroidPet.updateWidget === 'function') {
-    try { window.AndroidPet.updateWidget(STATE_LABEL[st] || st); } catch (err) { console.warn(err); }
+    try { window.AndroidPet.updateWidget(stateText(st)); } catch (err) { console.warn(err); }
   }
   const stats = readStore().stats;
   if (!stats.states[st]) {
@@ -1390,6 +1393,12 @@ function bindSheet() {
     const s = readStore();
     petSay(summaryFrom(s.stats, s.memories));
   });
+  el.langSel.addEventListener('change', () => {
+    writeStore({ lang: el.langSel.value });
+    applyLanguage(el.langSel.value);
+    renderSheet();
+    onState();
+  });
   el.ambientMode.addEventListener('change', () => {
     writeStore({ ambientMode: el.ambientMode.value });
     applyAmbient();
@@ -1709,6 +1718,10 @@ async function main() {
     const palParam = new URLSearchParams(location.search).get('palette');
     applyPalette(PALETTES[palParam] ? palParam : (savedSettings.palette || 'goc'));
     el.autoSeason.checked = savedSettings.autoSeason !== false;
+    const urlLang = new URLSearchParams(location.search).get('lang');
+    const lang = urlLang ? urlLang : (savedSettings.lang || 'vi');
+    el.langSel.value = lang === 'en' ? 'en' : 'vi';
+    applyLanguage(el.langSel.value);
     el.ambientMode.value = savedSettings.ambientMode || 'off';
     el.showFps.checked = !!savedSettings.showFps;
     el.errorLog.checked = !!savedSettings.errorLog;
@@ -1805,7 +1818,7 @@ async function main() {
       thrower = new ThrowPhysics({ vx: 480, vy: -320 });
     }
     requestAnimationFrame(draw);
-    setStatus('sẵn sàng');
+    setStatus(pick('sẵn sàng', 'ready'));
   } catch (err) {
     setStatus('lỗi: ' + err.message);
     el.bubbleText.textContent = 'Không tải được pet pack: ' + err.message;
