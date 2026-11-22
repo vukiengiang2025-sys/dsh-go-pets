@@ -192,6 +192,16 @@ public class MainActivity extends Activity {
         } else {
             webView.restoreState(savedInstanceState);
         }
+        if (overlayOf(getIntent())) {
+            webView.postDelayed(() -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+                    Log.d(TAG, "overlay extra: no permission");
+                    return;
+                }
+                startService(new Intent(this, PetOverlayService.class));
+                Log.d(TAG, "overlay extra: service started");
+            }, 900);
+        }
     }
 
     private static String packOf(@Nullable Intent intent) {
