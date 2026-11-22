@@ -460,3 +460,6 @@ body.loading .stage canvas { opacity: .55; transition: opacity .2s; }
   border-left: 3px solid rgba(110,168,255,.5); border-radius: 8px; padding: 7px 9px;
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .last-reply[hidden] { display: none; }
+
+
+.simple .last-reply { display: none; }

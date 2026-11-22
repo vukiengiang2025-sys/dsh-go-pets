@@ -1693,6 +1693,7 @@ function bindSheet() {
     clearArmed = 0;
     el.clearChat.textContent = pick('Xoá chat', 'Clear chat');
     writeStore({ chat: [] });
+    if (el.lastReply) { el.lastReply.hidden = true; el.lastReply.textContent = ''; }
     renderChat();
     petSay(pick('Mình quên hết rồi, bắt đầu lại nhé.', 'I forgot everything, let us start again.'));
   });
