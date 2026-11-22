@@ -2,8 +2,8 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **59 xong** (có trong APK)
-- 🟡 **11 một phần** (có nền tảng, thiếu phần còn lại)
+- ✅ **60 xong** (có trong APK)
+- 🟡 **10 một phần** (có nền tảng, thiếu phần còn lại)
 - ⏸ **30 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
@@ -117,7 +117,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 
 | # | Ý tưởng | Trạng thái |
 |---|---|---|
-| 71 | Chợ pack | 🟡 dán link .zip để nhập; chưa có chợ thật |
+| 71 | Chợ pack | ✅ chợ tĩnh 5 pack + dán link .zip |
 | 72 | Chia sẻ link | ✅ |
 | 73 | Xuất GIF | ✅ |
 | 74 | QR | ✅ |
