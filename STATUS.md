@@ -2,9 +2,9 @@
 
 Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã có trong app.
 
-- ✅ **83 xong** (có trong APK)
+- ✅ **84 xong** (có trong APK)
 - 🟡 **1 một phần** (có nền tảng, thiếu phần còn lại)
-- ⏸ **16 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
+- ⏸ **15 hoãn** (nêu lý do; phần lớn cần backend, quyền hệ thống hoặc tài nguyên mới)
 
 ## A. Nhân vật & pack (12 ý tưởng)
 
@@ -138,7 +138,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 86 | Kiểm chữ ký pack | ✅ SHA-256 sheet trong pack.json, kiểm khi nhập |
 | 87 | Quyền tối thiểu | ✅ chỉ INTERNET tuỳ chọn |
 | 88 | Crash opt-in | ✅ log lỗi trên máy, mặc định tắt |
-| 89 | A/B | ⏸ |
+| 89 | A/B | ✅ nhóm ổn định theo máy, đổi kiểu bong bóng |
 | 90 | AAB | ✅ |
 
 ## J. Sản phẩm (10)
@@ -156,7 +156,7 @@ Tổng hợp theo 10 nhóm, đối chiếu từng ý tưởng với thứ đã c
 | 99 | Widget đôi | ✅ pet + đồng hồ, cập nhật mỗi phút |
 | 100 | Roadmap công khai | ✅ nút mở ROADMAP |
 
-## Vì sao 16 ý tưởng còn hoãn
+## Vì sao 15 ý tưởng còn hoãn
 
 1. **Cần backend/tài khoản**: chợ pack, xếp hạng, bình chọn, ủng hộ, crash report.
 2. **Cần quyền hệ thống Android**: overlay, live wallpaper, AOD, notification tuỳ biến — mỗi thứ là một service + luồng xin quyền, dễ bị ROM chặn.

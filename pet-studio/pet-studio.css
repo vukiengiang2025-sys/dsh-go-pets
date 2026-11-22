@@ -334,3 +334,6 @@ html[lang="en"] .error-list:empty::before { content: "no errors yet"; }
   color: var(--text); font-size: 10.5px; line-height: 1.15; padding: 4px;
   box-shadow: 0 6px 18px rgba(0,0,0,.45); }
 .wheel button:active { transform: scale(.94); }
+
+.ab-b .bubble { border-radius: 12px; background: var(--panel); border-color: var(--accent); }
+.ab-b .bubble::after { display: none; }

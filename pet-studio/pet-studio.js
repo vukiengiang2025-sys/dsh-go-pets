@@ -11,6 +11,7 @@ import { verifyChecksums } from './pack-integrity.js';
 import { applyLanguage, pick, stateText, getLang } from './i18n.js';
 import { upsertHost, removeHost } from './agent-hosts.js';
 import { askAI, PRESETS, friendlyAIError } from './ai.js';
+import { assignVariant, newSeed } from './ab.js';
 import { seasonFor, SEASON_PACK } from './season.js';
 import qrcode from './vendor/qrcode.mjs';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
@@ -57,7 +58,7 @@ const DEFAULT_STORE = {
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
   ambientMode: 'off', ambientVolume: 0.35, showFps: false, errorLog: false, errors: [], lang: 'vi', agentHosts: [], overlayFloat: true,
-  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai',
+  aiEndpoint: '', aiModel: '', aiKey: '', aiOn: false, aiProvider: 'openai', installId: '',
 };
 
 const el = {
@@ -146,6 +147,7 @@ const el = {
   showFps: document.getElementById('showFps'),
   errorLog: document.getElementById('errorLog'),
   errorList: document.getElementById('errorList'),
+  experimentLine: document.getElementById('experimentLine'),
   stateCollection: document.getElementById('stateCollection'),
   exportPng: document.getElementById('exportPng'),
   exportGif: document.getElementById('exportGif'),
@@ -1216,6 +1218,18 @@ async function pollAgent() {
   }
 }
 
+function renderExperiment() {
+  const s = readStore();
+  if (!s.installId) {
+    s.installId = newSeed();
+    writeStore({ installId: s.installId });
+  }
+  const variant = assignVariant(s.installId);
+  document.body.classList.remove('ab-a', 'ab-b');
+  document.body.classList.add('ab-' + variant.toLowerCase());
+  if (el.experimentLine) el.experimentLine.textContent = 'Thử nghiệm giao diện: nhóm ' + variant;
+}
+
 function renderCollection() {
   if (!el.stateCollection) return;
   const seen = readStore().stats.states || {};
@@ -2064,6 +2078,7 @@ async function main() {
     buildSettingsUI();
     renderHosts();
     renderCollection();
+    renderExperiment();
     el.aiProvider.value = savedSettings.aiProvider || 'openai';
     el.aiEndpoint.value = savedSettings.aiEndpoint || '';
     el.aiModel.value = savedSettings.aiModel || '';
