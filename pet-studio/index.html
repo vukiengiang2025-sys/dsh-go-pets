@@ -108,6 +108,17 @@
       <button id="testSpeech">Nghe thử</button>
     </div>
 
+    <div class="field">Âm thanh môi trường
+      <div class="row">
+        <select id="ambientMode">
+          <option value="off">Tắt</option>
+          <option value="rain">Mưa</option>
+          <option value="waves">Sóng biển</option>
+        </select>
+        <input type="range" id="ambientVolume" min="0" max="1" step="0.05" value="0.35" aria-label="Âm lượng">
+      </div>
+    </div>
+
     <div class="field">Kết nối agent (tuỳ chọn)
       <input id="agentUrl" placeholder="https://… trả về {\"state\":\"working\"}">
       <div class="row">
@@ -166,6 +177,12 @@
         <button id="exportPng">Xuất ảnh pet</button>
         <button id="exportGif">Xuất GIF</button>
         <button id="shareQr">Mã QR</button>
+      </div>
+    </div>
+
+    <div class="field">Về Pet Studio
+      <div class="row">
+        <button id="openRoadmap">Lộ trình 100 ý tưởng</button>
       </div>
     </div>
 

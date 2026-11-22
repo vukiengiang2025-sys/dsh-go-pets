@@ -279,6 +279,18 @@ public class MainActivity extends Activity {
         public void saveGif(String base64, String name) {
             runOnUiThread(() -> savePngFile(base64, name, "image/gif"));
         }
+
+        @JavascriptInterface
+        public void openUrl(String url) {
+            if (url == null || !url.matches("https?://.*")) return;
+            runOnUiThread(() -> {
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                } catch (Exception err) {
+                    Log.e(TAG, "openUrl failed", err);
+                }
+            });
+        }
     }
 
     private void savePngFile(String base64, String name, String mime) {

@@ -51,6 +51,7 @@ const DEFAULT_STORE = {
   chat: [], memories: [],
   onboarded: false, streak: { count: 0, last: '' }, quest: { date: '', roam: 0 }, autoSeason: true,
   focusMinutes: 25, restMinutes: 5,
+  ambientMode: 'off', ambientVolume: 0.35,
 };
 
 const el = {
@@ -113,6 +114,9 @@ const el = {
   focusStop: document.getElementById('focusStop'),
   timerLine: document.getElementById('timerLine'),
   shareConfig: document.getElementById('shareConfig'),
+  ambientMode: document.getElementById('ambientMode'),
+  ambientVolume: document.getElementById('ambientVolume'),
+  openRoadmap: document.getElementById('openRoadmap'),
   agentUrl: document.getElementById('agentUrl'),
   agentStart: document.getElementById('agentStart'),
   agentStop: document.getElementById('agentStop'),
@@ -876,6 +880,63 @@ function exportGif() {
   }
 }
 
+let ambientCtx = null;
+let ambientNodes = null;
+
+function stopAmbient() {
+  if (ambientNodes) {
+    try {
+      ambientNodes.source.stop();
+      ambientNodes.lfo.stop();
+    } catch {}
+    ambientNodes = null;
+  }
+}
+
+function startAmbient(mode, volume) {
+  stopAmbient();
+  if (!mode || mode === 'off') return;
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    ambientCtx = ambientCtx || new Ctx();
+    if (ambientCtx.state === 'suspended') ambientCtx.resume();
+    const seconds = 2;
+    const buffer = ambientCtx.createBuffer(1, ambientCtx.sampleRate * seconds, ambientCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    const source = ambientCtx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+
+    const filter = ambientCtx.createBiquadFilter();
+    filter.type = mode === 'rain' ? 'highpass' : 'lowpass';
+    filter.frequency.value = mode === 'rain' ? 1400 : 420;
+    filter.Q.value = 0.7;
+
+    const gain = ambientCtx.createGain();
+    gain.gain.value = Math.max(0, Math.min(1, volume)) * 0.5;
+
+    const lfo = ambientCtx.createOscillator();
+    const lfoGain = ambientCtx.createGain();
+    lfo.frequency.value = mode === 'rain' ? 0.25 : 0.08;
+    lfoGain.gain.value = mode === 'rain' ? 0.04 : 0.12;
+    lfo.connect(lfoGain).connect(gain.gain);
+
+    source.connect(filter).connect(gain).connect(ambientCtx.destination);
+    source.start();
+    lfo.start();
+    ambientNodes = { source, lfo, gain };
+  } catch (err) {
+    console.warn('ambient lỗi', err);
+  }
+}
+
+function applyAmbient() {
+  const s = readStore();
+  startAmbient(s.ambientMode || 'off', s.ambientVolume ?? 0.35);
+}
+
 let agentTimer = 0;
 let lastAgentTool = '';
 
@@ -1087,6 +1148,20 @@ function bindSheet() {
   el.summaryBtn.addEventListener('click', () => {
     const s = readStore();
     petSay(summaryFrom(s.stats, s.memories));
+  });
+  el.ambientMode.addEventListener('change', () => {
+    writeStore({ ambientMode: el.ambientMode.value });
+    applyAmbient();
+    logEvent('âm thanh môi trường: ' + el.ambientMode.value);
+  });
+  el.ambientVolume.addEventListener('input', () => {
+    writeStore({ ambientVolume: Number(el.ambientVolume.value) });
+    applyAmbient();
+  });
+  el.openRoadmap.addEventListener('click', () => {
+    const url = 'https://github.com/vukiengiang2025-sys/dsh-go-pets/blob/main/ROADMAP.md';
+    if (window.AndroidPet && window.AndroidPet.openUrl) window.AndroidPet.openUrl(url);
+    else window.open(url, '_blank');
   });
   el.agentStart.addEventListener('click', () => startAgent((el.agentUrl.value || '').trim()));
   el.agentStop.addEventListener('click', stopAgent);
@@ -1305,8 +1380,10 @@ function bindLifecycle() {
       checkBreak();
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(draw);
+      if (ambientNodes) startAmbient(readStore().ambientMode, readStore().ambientVolume ?? 0.35);
     } else {
       cancelAnimationFrame(rafId);
+      stopAmbient();
     }
   });
   window.addEventListener('resize', layout);
@@ -1351,6 +1428,9 @@ async function main() {
     const palParam = new URLSearchParams(location.search).get('palette');
     applyPalette(PALETTES[palParam] ? palParam : (savedSettings.palette || 'goc'));
     el.autoSeason.checked = savedSettings.autoSeason !== false;
+    el.ambientMode.value = savedSettings.ambientMode || 'off';
+    el.ambientVolume.value = savedSettings.ambientVolume ?? 0.35;
+    applyAmbient();
     applySimple(savedSettings.simple);
     applyAutoTheme(savedSettings.autoTheme, savedSettings.palette);
     if ('speechSynthesis' in window) {
