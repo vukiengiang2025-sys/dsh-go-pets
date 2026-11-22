@@ -4,7 +4,7 @@ import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } fro
 import { shouldRemind, breakText } from './reminders.js';
 import { replyTo, storyFor, summaryFrom, moodFor, memoryFrom, greetingFor } from './pet-chat.js';
 import { todayKey, bumpStreak, questDone, clock, hostColor, batteryText } from './care.js';
-import { shareUrl, pickConfig, decodeConfig, backupOf } from './share.js';
+import { shareUrl, pickConfig, decodeConfig, backupOf, importableBackup } from './share.js';
 import { encodeGif, quantize } from './gif.js';
 import { buildZip } from './zip-write.js';
 import { verifyChecksums } from './pack-integrity.js';
@@ -1144,16 +1144,7 @@ async function copyBackup() {
 function importBackup() {
   try {
     const data = JSON.parse(el.backupBox.value);
-    if (!data || typeof data !== 'object') throw new Error('không phải JSON');
-    const allowed = {};
-    const keys = ['pack', 'size', 'quiet', 'palette', 'name', 'userName', 'profile', 'stats', 'journal',
-      'chat', 'memories', 'speech', 'speechRate', 'voiceName', 'breakReminder', 'breakMinutes',
-      'autoTheme', 'autoSeason', 'simple', 'ambientMode', 'ambientVolume', 'overlayFloat',
-      'aiProvider', 'aiEndpoint', 'aiModel', 'aiPersona'];
-    for (const key of keys) {
-      if (key in data) allowed[key] = data[key];
-    }
-    writeStore(allowed);
+    writeStore(importableBackup(data));
     logEvent('khôi phục từ bản sao lưu');
     location.reload();
   } catch (err) {

@@ -41,3 +41,15 @@ export function backupOf(store = {}) {
   delete copy.aiTestAt;
   return copy;
 }
+
+export const BACKUP_KEYS = ['pack', 'size', 'quiet', 'palette', 'name', 'userName', 'profile', 'stats', 'journal',
+  'chat', 'memories', 'speech', 'speechRate', 'voiceName', 'breakReminder', 'breakMinutes',
+  'autoTheme', 'autoSeason', 'simple', 'ambientMode', 'ambientVolume', 'overlayFloat',
+  'aiProvider', 'aiEndpoint', 'aiModel', 'aiPersona'];
+
+export function importableBackup(data) {
+  if (!data || typeof data !== 'object') throw new Error('không phải JSON');
+  const out = {};
+  for (const key of BACKUP_KEYS) if (key in data) out[key] = data[key];
+  return out;
+}
