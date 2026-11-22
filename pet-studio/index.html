@@ -129,7 +129,9 @@
       </div>
     </div>
 
-    <div class="field">Chợ pack (dán link .zip)
+    <div class="field">Chợ pack
+      <div class="row"><button id="openMarket">Mở chợ pack</button></div>
+      <label class="muted-small">hoặc dán link .zip</label>
       <input id="zipUrl" placeholder="https://…/pet.zip">
       <div class="row"><button id="zipLoad">Tải &amp; nhập</button></div>
     </div>
@@ -213,6 +215,14 @@
     </div>
   </div>
 </section>
+
+<div class="qr-modal" id="marketModal" hidden>
+  <div class="qr-card market-card">
+    <h2>Chợ pack</h2>
+    <div class="market-grid" id="marketGrid"></div>
+    <div class="row"><button id="marketClose">Đóng</button></div>
+  </div>
+</div>
 
 <div class="qr-modal" id="galleryModal" hidden>
   <div class="qr-card gallery-card">

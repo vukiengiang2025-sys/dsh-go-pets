@@ -1,0 +1,36 @@
+{
+  "packs": [
+    {
+      "id": "may",
+      "name": "Mây",
+      "author": "Vũ Huỳnh",
+      "license": "CC-BY-4.0",
+      "tags": ["pixel", "cơ bản"],
+      "url": "../app/assets/pets/may/pack.json"
+    },
+    {
+      "id": "may-snow",
+      "name": "Mây Tuyết",
+      "author": "Vũ Huỳnh",
+      "license": "CC-BY-4.0",
+      "tags": ["pixel", "mùa đông"],
+      "url": "../app/assets/pets/may-snow/pack.json"
+    },
+    {
+      "id": "may-tet",
+      "name": "Mây Tết",
+      "author": "Vũ Huỳnh",
+      "license": "CC-BY-4.0",
+      "tags": ["pixel", "Tết"],
+      "url": "../app/assets/pets/may-tet/pack.json"
+    },
+    {
+      "id": "dsh-bot",
+      "name": "DSH Bot",
+      "author": "Vũ Huỳnh",
+      "license": "CC-BY-4.0",
+      "tags": ["robot", "mượt"],
+      "url": "../app/assets/pets/dsh-bot/pack.json"
+    }
+  ]
+}

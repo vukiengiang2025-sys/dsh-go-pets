@@ -139,6 +139,10 @@ const el = {
   giftPack: document.getElementById('giftPack'),
   zipUrl: document.getElementById('zipUrl'),
   zipLoad: document.getElementById('zipLoad'),
+  openMarket: document.getElementById('openMarket'),
+  marketModal: document.getElementById('marketModal'),
+  marketGrid: document.getElementById('marketGrid'),
+  marketClose: document.getElementById('marketClose'),
   openGallery: document.getElementById('openGallery'),
   galleryModal: document.getElementById('galleryModal'),
   galleryGrid: document.getElementById('galleryGrid'),
@@ -1162,6 +1166,76 @@ async function exportGift() {
   }
 }
 
+let marketCache = null;
+
+async function loadMarket() {
+  if (marketCache) return marketCache;
+  const res = await fetch('./market.json', { cache: 'no-cache' });
+  if (!res.ok) throw new Error('không tải được chợ pack');
+  marketCache = await res.json();
+  return marketCache;
+}
+
+async function installMarket(entry) {
+  try {
+    setStatus('đang cài ' + entry.name + '…');
+    const res = await fetch(entry.url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const base = new URL(entry.url, location.href);
+    const files = {};
+    for (const name of sheetNames(json)) {
+      const sheet = await fetch(new URL(name, base));
+      if (!sheet.ok) throw new Error('thiếu ảnh ' + name);
+      files[name] = await sheet.blob();
+    }
+    const packJson = { ...json, id: builtinPacks.some(p => p.id === json.id) ? 'user-' + json.id : json.id };
+    await saveLocalPack({
+      id: packJson.id, created: Date.now(), pack: packJson, files,
+      frames: sheetNames(packJson).length,
+    });
+    logEvent('cài từ chợ: ' + entry.name);
+    await loadPacks();
+    renderPackOptions();
+    el.pack.value = packJson.id;
+    writeStore({ pack: packJson.id });
+    await loadPack(packJson.id);
+    setStatus('đã cài ' + entry.name);
+    haptic(14);
+    await showMarket();
+  } catch (err) {
+    console.error(err);
+    setStatus('cài lỗi: ' + err.message);
+  }
+}
+
+async function showMarket() {
+  try {
+    const data = await loadMarket();
+    const locals = new Set(localPacks.map(p => p.id));
+    const builtins = new Set(builtinPacks.map(p => p.id));
+    el.marketGrid.innerHTML = (data.packs || []).map(entry => {
+      const installed = locals.has(entry.id) || builtins.has(entry.id);
+      return '<div class="market-item"><div><b>' + escapeHtml(entry.name) + '</b>'
+        + '<span>' + escapeHtml(entry.author || '') + ' · ' + escapeHtml(entry.license || '')
+        + (entry.tags ? ' · ' + entry.tags.map(t => escapeHtml(t)).join(', ') : '') + '</span></div>'
+        + '<button data-pack="' + escapeHtml(entry.id) + '"' + (installed ? ' disabled' : '') + '>'
+        + (installed ? 'Đã có' : 'Cài') + '</button></div>';
+    }).join('');
+    el.marketModal.hidden = false;
+    el.marketGrid.querySelectorAll('button[data-pack]:not(:disabled)').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const entry = (marketCache.packs || []).find(p => p.id === btn.dataset.pack);
+        if (entry) await installMarket(entry);
+      });
+    });
+    logEvent('mở chợ pack');
+  } catch (err) {
+    console.error(err);
+    setStatus('chợ lỗi: ' + err.message);
+  }
+}
+
 function showGallery() {
   try {
     const raw = window.AndroidPet && window.AndroidPet.listExports
@@ -1333,6 +1407,8 @@ function bindSheet() {
   el.shareConfig.addEventListener('click', shareConfig);
   el.shareQr.addEventListener('click', showQr);
   el.giftPack.addEventListener('click', exportGift);
+  el.openMarket.addEventListener('click', showMarket);
+  el.marketClose.addEventListener('click', () => { el.marketModal.hidden = true; });
   el.openGallery.addEventListener('click', showGallery);
   el.galleryClose.addEventListener('click', () => { el.galleryModal.hidden = true; });
   el.qrClose.addEventListener('click', () => { el.qrModal.hidden = true; });
@@ -1658,6 +1734,9 @@ async function main() {
     const agentParam = new URLSearchParams(location.search).get('agent');
     if (agentParam === 'demo') startAgent('./agent.json');
     else if (agentParam && /^https?:/.test(agentParam)) startAgent(agentParam);
+    if (new URLSearchParams(location.search).get('market') === '1') {
+      setTimeout(showMarket, 900);
+    }
     if (new URLSearchParams(location.search).get('mood') === '1') {
       setTimeout(() => { el.moodMenu.hidden = false; }, 900);
     }
