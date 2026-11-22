@@ -481,7 +481,6 @@ async function sendChat(text) {
         ...s.chat.slice(-4).map(m => ({ role: m.role === 'pet' ? 'assistant' : 'user', content: m.text })),
       ];
       const reply = await askAI(aiConfig(s), history);
-      pushChat('pet', reply);
       petSay(reply);
       if (el.aiStatus) el.aiStatus.textContent = 'AI trả lời OK';
       setStatus(pick('sẵn sàng', 'ready'));
@@ -510,7 +509,6 @@ async function sendChat(text) {
     memories: s.memories,
     you: 'bạn',
   });
-  pushChat('pet', reply);
   petSay(reply);
   if (el.lastReply) { el.lastReply.textContent = reply; el.lastReply.hidden = false; }
   const mood = moodFor(t);
@@ -1717,7 +1715,6 @@ function bindSheet() {
           { role: 'system', content: aiSystemPrompt(s) },
           { role: 'user', content: 'Kể cho mình một câu chuyện ngắn 2-3 câu, ấm áp và có bài học nhỏ.' },
         ]);
-        pushChat('pet', reply);
         petSay(reply);
         return;
       } catch (err) {
