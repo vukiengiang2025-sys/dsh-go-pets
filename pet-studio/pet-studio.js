@@ -1669,7 +1669,16 @@ function bindSheet() {
   el.chatInput.addEventListener('keydown', ev => {
     if (ev.key === 'Enter') { sendChat(el.chatInput.value); el.chatInput.value = ''; }
   });
+  let clearArmed = 0;
   el.clearChat.addEventListener('click', () => {
+    if (Date.now() - clearArmed > 3000) {
+      clearArmed = Date.now();
+      el.clearChat.textContent = pick('Chắc chắn?', 'Sure?');
+      setTimeout(() => { el.clearChat.textContent = pick('Xoá chat', 'Clear chat'); }, 3000);
+      return;
+    }
+    clearArmed = 0;
+    el.clearChat.textContent = pick('Xoá chat', 'Clear chat');
     writeStore({ chat: [] });
     renderChat();
     petSay(pick('Mình quên hết rồi, bắt đầu lại nhé.', 'I forgot everything, let us start again.'));
