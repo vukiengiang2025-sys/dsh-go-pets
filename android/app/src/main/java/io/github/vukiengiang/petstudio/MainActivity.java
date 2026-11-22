@@ -155,7 +155,7 @@ public class MainActivity extends Activity {
         });
 
         if (savedInstanceState == null) {
-            webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent()), chatOf(getIntent())));
+            webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent()), chatOf(getIntent()), pipOnLoad));
         } else {
             webView.restoreState(savedInstanceState);
         }
@@ -165,7 +165,7 @@ public class MainActivity extends Activity {
         return intent != null ? intent.getStringExtra("pack") : null;
     }
 
-    private static String startUrl(@Nullable String pack, @Nullable String fx, @Nullable String chat) {
+    private static String startUrl(@Nullable String pack, @Nullable String fx, @Nullable String chat, boolean pip) {
         String url = START_URL;
         if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
             url += "&pack=" + pack;
@@ -175,6 +175,9 @@ public class MainActivity extends Activity {
         }
         if ("demo".equals(chat)) {
             url += "&chat=demo";
+        }
+        if (pip) {
+            url += "&pip=1";
         }
         return url;
     }
@@ -192,7 +195,7 @@ public class MainActivity extends Activity {
         super.onNewIntent(intent);
         setIntent(intent);
         if (webView != null) {
-            webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent)));
+            webView.loadUrl(startUrl(packOf(intent), fxOf(intent), chatOf(intent), false));
         }
     }
 
@@ -239,7 +242,8 @@ public class MainActivity extends Activity {
         super.onPictureInPictureModeChanged(inPip, config);
         if (webView != null) {
             webView.evaluateJavascript(
-                    "document.body.classList.toggle('pip', " + inPip + ");", null);
+                    "(window.__setPip ? window.__setPip(" + inPip + ") : "
+                            + "document.body.classList.toggle('pip', " + inPip + "));", null);
         }
     }
 

@@ -715,7 +715,12 @@ function resetAll() {
   location.reload();
 }
 
+window.__setPip = on => document.body.classList.toggle('pip', !!on);
+
 function bindPip() {
+  if (new URLSearchParams(location.search).get('pip') === '1') {
+    document.body.classList.add('pip');
+  }
   const bridge = window.AndroidPet;
   if (!bridge || typeof bridge.isPipSupported !== 'function' || !bridge.isPipSupported()) return;
   el.pipBtn.hidden = false;
