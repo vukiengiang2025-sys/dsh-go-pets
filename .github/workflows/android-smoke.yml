@@ -128,7 +128,6 @@ jobs:
             adb exec-out screencap -p > app-float.png
             sleep 2
             adb exec-out screencap -p > app-float2.png
-            adb logcat -d -s PetOverlay | grep 'float x=' | tail -3 || true
             adb shell dumpsys window | grep -i "petstudio" | head -5 || true
             adb shell am force-stop io.github.vukiengiang.petstudio
             sleep 2
