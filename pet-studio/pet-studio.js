@@ -663,6 +663,9 @@ function onState() {
   });
   showBubble(model.state);
   const st = model.state;
+  if (window.AndroidPet && typeof window.AndroidPet.updateWidget === 'function') {
+    try { window.AndroidPet.updateWidget(STATE_LABEL[st] || st); } catch (err) { console.warn(err); }
+  }
   const stats = readStore().stats;
   if (!stats.states[st]) {
     stats.states[st] = 1;

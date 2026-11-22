@@ -59,6 +59,8 @@ jobs:
             adb shell am start -W -n io.github.vukiengiang.petstudio/.MainActivity --ez pip true
             sleep 7
             adb exec-out screencap -p > app-pip.png
+            adb shell dumpsys appwidget | grep -i -A4 "io.github.vukiengiang.petstudio" | head -12 || true
+            adb logcat -d -s PetWidget | tail -10 || true
             ls -l app.png app-bot.png app-fx.png app-chat.png app-pip.png
             adb logcat -d -s PetStudio | tail -30 || true
 

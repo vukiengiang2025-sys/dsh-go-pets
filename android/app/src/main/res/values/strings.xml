@@ -6,4 +6,6 @@
     <string name="shortcut_bot">DSH Bot</string>
     <string name="shortcut_bot_long">Mở pet DSH Bot</string>
     <string name="shortcut_disabled">Pet này đang tắt</string>
+    <string name="widget_name">Pet Studio</string>
+    <string name="widget_description">Pet nhỏ trên màn hình chính: chạm để mở Pet Studio.</string>
 </resources>

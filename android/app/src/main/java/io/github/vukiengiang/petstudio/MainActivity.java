@@ -224,6 +224,11 @@ public class MainActivity extends Activity {
         public void enterPip() {
             runOnUiThread(MainActivity.this::enterPip);
         }
+
+        @JavascriptInterface
+        public void updateWidget(String state) {
+            runOnUiThread(() -> PetWidgetProvider.updateAll(MainActivity.this, state));
+        }
     }
 
     private void enterPip() {
