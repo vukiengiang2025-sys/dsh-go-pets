@@ -1,6 +1,7 @@
 import { PetModel, normalizePack, STATES } from './pet-engine.js';
 import { buildPackFromFile, buildPackFromZip } from './pack-import.js';
 import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } from './pet-fx.js';
+import { shouldRemind, breakText } from './reminders.js';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
 
 const FALLBACK_PACKS = [
@@ -40,6 +41,7 @@ const DEFAULT_STORE = {
   pack: null, size: '64', quiet: false, palette: 'goc', name: '',
   stats: { poke: 0, tickle: 0, drag: 0, seconds: 0, states: {} },
   journal: [], simple: false, autoTheme: false,
+  speech: false, speechRate: 1, voiceName: '', breakReminder: false, breakMinutes: 45, lastBreak: 0,
 };
 
 const el = {
@@ -77,6 +79,12 @@ const el = {
   importedList: document.getElementById('importedList'),
   fx: document.getElementById('fx'),
   pet: document.getElementById('pet'),
+  speechOn: document.getElementById('speechOn'),
+  voiceSelect: document.getElementById('voiceSelect'),
+  speechRate: document.getElementById('speechRate'),
+  testSpeech: document.getElementById('testSpeech'),
+  breakOn: document.getElementById('breakOn'),
+  breakMinutes: document.getElementById('breakMinutes'),
 };
 const ctx = el.canvas.getContext('2d');
 
@@ -206,10 +214,63 @@ function showBubble(state) {
   el.bubbleAction.hidden = !conf.action;
   el.bubbleAction.textContent = conf.action || '';
   el.bubble.hidden = false;
+  speak(conf.text);
   clearTimeout(bubbleTimer);
   bubbleTimer = setTimeout(hideBubble, 5000);
 }
 function hideBubble() { el.bubble.hidden = true; }
+
+function voices() {
+  try { return window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }
+  catch { return []; }
+}
+
+function fillVoices() {
+  if (!el.voiceSelect) return;
+  const saved = readStore().voiceName || '';
+  el.voiceSelect.innerHTML = '<option value="">Giọng mặc định</option>'
+    + voices().map(v => '<option value="' + v.name + '">' + v.name + ' (' + v.lang + ')</option>').join('');
+  el.voiceSelect.value = saved;
+}
+
+function speak(text, force = false) {
+  if (!text || !window.speechSynthesis || (!force && !readStore().speech)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const s = readStore();
+    u.rate = Math.max(0.5, Math.min(2, Number(s.speechRate) || 1));
+    const voice = voices().find(v => v.name === s.voiceName);
+    if (voice) { u.voice = voice; u.lang = voice.lang; }
+    window.speechSynthesis.speak(u);
+  } catch (err) { console.warn('speak lỗi', err); }
+}
+
+function applySpeechSettings() {
+  const s = readStore();
+  el.speechOn.checked = !!s.speech;
+  el.speechRate.value = s.speechRate || 1;
+  el.breakOn.checked = !!s.breakReminder;
+  el.breakMinutes.value = s.breakMinutes || 45;
+  if (el.voiceSelect.options.length > 1) el.voiceSelect.value = s.voiceName || '';
+}
+
+function checkBreak() {
+  const s = readStore();
+  if (!s.breakReminder || !s.lastBreak) return;
+  if (!shouldRemind(s.lastBreak, Date.now(), s.breakMinutes)) return;
+  writeStore({ lastBreak: Date.now() });
+  model.setState('attention');
+  el.bubbleText.textContent = breakText(s.breakMinutes);
+  el.bubbleAction.hidden = true;
+  el.bubble.hidden = false;
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(hideBubble, 9000);
+  spawnFx('sparkles');
+  squash = 0.85;
+  speak(el.bubbleText.textContent);
+  logEvent('nhắc đứng dậy');
+}
 
 function haptic(ms = 8) {
   if (navigator.vibrate) navigator.vibrate(ms);
@@ -610,6 +671,20 @@ function bindSheet() {
     applyAutoTheme(on, readStore().palette);
     logEvent(on ? 'bật đổi màu theo giờ' : 'tắt đổi màu theo giờ');
   });
+  el.speechOn.addEventListener('change', () => writeStore({ speech: el.speechOn.checked }));
+  el.speechRate.addEventListener('input', () => writeStore({ speechRate: Number(el.speechRate.value) || 1 }));
+  el.voiceSelect.addEventListener('change', () => writeStore({ voiceName: el.voiceSelect.value }));
+  el.testSpeech.addEventListener('click', () => speak('Xin chào, mình là pet của bạn.', true));
+  el.breakOn.addEventListener('change', () => {
+    const on = el.breakOn.checked;
+    writeStore({ breakReminder: on, lastBreak: on ? Date.now() : 0 });
+    logEvent(on ? 'bật nhắc đứng dậy' : 'tắt nhắc đứng dậy');
+  });
+  el.breakMinutes.addEventListener('change', () => {
+    const minutes = Math.max(5, Math.min(180, Number(el.breakMinutes.value) || 45));
+    el.breakMinutes.value = minutes;
+    writeStore({ breakMinutes: minutes });
+  });
   el.importImage.addEventListener('click', () => el.importFile.click());
   el.importFile.addEventListener('change', async () => {
     const file = el.importFile.files && el.importFile.files[0];
@@ -785,6 +860,7 @@ function bindLifecycle() {
     if (running) {
       model.lastActivity = performance.now();
       lastFrameTime = 0;
+      checkBreak();
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(draw);
     } else {
@@ -809,6 +885,7 @@ async function main() {
   bindControls();
   bindSheet();
   bindLifecycle();
+  setInterval(checkBreak, 60000);
   setInterval(() => {
     if (!document.hidden) {
       const s = readStore();
@@ -827,6 +904,17 @@ async function main() {
     applyPalette(PALETTES[palParam] ? palParam : (savedSettings.palette || 'goc'));
     applySimple(savedSettings.simple);
     applyAutoTheme(savedSettings.autoTheme, savedSettings.palette);
+    if ('speechSynthesis' in window) {
+      fillVoices();
+      window.speechSynthesis.addEventListener?.('voiceschanged', fillVoices);
+    } else {
+      el.speechOn.disabled = true;
+      el.testSpeech.disabled = true;
+    }
+    applySpeechSettings();
+    if (savedSettings.breakReminder && !savedSettings.lastBreak) {
+      writeStore({ lastBreak: Date.now() });
+    }
     setInterval(() => {
       if (readStore().autoTheme) applyPalette(paletteForNow());
     }, 600000);
