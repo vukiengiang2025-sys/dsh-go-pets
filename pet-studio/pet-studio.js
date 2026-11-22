@@ -6,6 +6,7 @@ import { replyTo, storyFor, summaryFrom } from './pet-chat.js';
 import { todayKey, bumpStreak, questDone, clock } from './care.js';
 import { shareUrl, pickConfig, decodeConfig } from './share.js';
 import { encodeGif, quantize } from './gif.js';
+import { buildZip } from './zip-write.js';
 import { seasonFor, SEASON_PACK } from './season.js';
 import qrcode from './vendor/qrcode.mjs';
 import { listPacks as listLocalPacks, getPack as getLocalPack, savePack as saveLocalPack, deletePack as deleteLocalPack } from './pack-store.js';
@@ -129,6 +130,7 @@ const el = {
   qrCanvas: document.getElementById('qrCanvas'),
   qrUrl: document.getElementById('qrUrl'),
   qrSave: document.getElementById('qrSave'),
+  giftPack: document.getElementById('giftPack'),
   qrClose: document.getElementById('qrClose'),
 };
 const ctx = el.canvas.getContext('2d');
@@ -1020,6 +1022,49 @@ function exportPng() {
   }
 }
 
+async function exportGift() {
+  try {
+    const entry = packs.find(p => p.id === (pack && pack.id)) || packs[0];
+    const encoder = new TextEncoder();
+    const files = [];
+    if (entry.local) {
+      const rec = await getLocalPack(entry.id);
+      if (!rec) throw new Error('không đọc được pack đã nhập');
+      files.push({ name: 'pack.json', data: encoder.encode(JSON.stringify(rec.pack, null, 2)) });
+      for (const name of sheetNames(rec.pack)) {
+        const blob = rec.files[name];
+        files.push({ name, data: new Uint8Array(await blob.arrayBuffer()) });
+      }
+    } else {
+      const res = await fetch(entry.url);
+      if (!res.ok) throw new Error('không tải được pack');
+      const json = await res.json();
+      files.push({ name: 'pack.json', data: encoder.encode(JSON.stringify(json, null, 2)) });
+      const base = new URL(entry.url, location.href);
+      for (const name of sheetNames(json)) {
+        const img = await fetch(new URL(name, base));
+        files.push({ name, data: new Uint8Array(await img.arrayBuffer()) });
+      }
+    }
+    const zip = buildZip(files);
+    const b64 = bytesToBase64(zip);
+    const filename = 'pet-' + (pack ? pack.id : 'pack') + '.zip';
+    if (window.AndroidPet && window.AndroidPet.saveZip) {
+      window.AndroidPet.saveZip(b64, filename);
+      setStatus('đã lưu gói pet vào Download/DSH-Go');
+    } else {
+      const link = document.createElement('a');
+      link.href = 'data:application/zip;base64,' + b64;
+      link.download = filename;
+      link.click();
+    }
+    logEvent('tặng pet ' + filename);
+  } catch (err) {
+    console.error(err);
+    setStatus('tặng pet lỗi: ' + err.message);
+  }
+}
+
 function showQr() {
   try {
     const url = shareUrl(location.origin + location.pathname, pickConfig(readStore()));
@@ -1167,6 +1212,7 @@ function bindSheet() {
   el.agentStop.addEventListener('click', stopAgent);
   el.shareConfig.addEventListener('click', shareConfig);
   el.shareQr.addEventListener('click', showQr);
+  el.giftPack.addEventListener('click', exportGift);
   el.qrClose.addEventListener('click', () => { el.qrModal.hidden = true; });
   el.qrSave.addEventListener('click', () => {
     try {
@@ -1459,6 +1505,9 @@ async function main() {
     const agentParam = new URLSearchParams(location.search).get('agent');
     if (agentParam === 'demo') startAgent('./agent.json');
     else if (agentParam && /^https?:/.test(agentParam)) startAgent(agentParam);
+    if (new URLSearchParams(location.search).get('gift') === '1') {
+      setTimeout(exportGift, 900);
+    }
     if (new URLSearchParams(location.search).get('qr') === '1') {
       setTimeout(showQr, 800);
     }

@@ -281,6 +281,11 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void saveZip(String base64, String name) {
+            runOnUiThread(() -> savePngFile(base64, name, "application/zip"));
+        }
+
+        @JavascriptInterface
         public void openUrl(String url) {
             if (url == null || !url.matches("https?://.*")) return;
             runOnUiThread(() -> {
