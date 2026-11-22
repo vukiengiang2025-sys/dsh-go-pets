@@ -137,7 +137,7 @@ public class MainActivity extends Activity {
         });
 
         if (savedInstanceState == null) {
-            webView.loadUrl(startUrl(packOf(getIntent())));
+            webView.loadUrl(startUrl(packOf(getIntent()), fxOf(getIntent())));
         } else {
             webView.restoreState(savedInstanceState);
         }
@@ -147,12 +147,19 @@ public class MainActivity extends Activity {
         return intent != null ? intent.getStringExtra("pack") : null;
     }
 
-    private static String startUrl(@Nullable String pack) {
+    private static String startUrl(@Nullable String pack, @Nullable String fx) {
         String url = START_URL;
         if (pack != null && pack.matches("[a-z0-9-]{1,32}")) {
             url += "&pack=" + pack;
         }
+        if (fx != null && fx.matches("(hearts|zzz|throw)")) {
+            url += "&fx=" + fx;
+        }
         return url;
+    }
+
+    private static String fxOf(@Nullable Intent intent) {
+        return intent != null ? intent.getStringExtra("fx") : null;
     }
 
     @Override
@@ -160,7 +167,7 @@ public class MainActivity extends Activity {
         super.onNewIntent(intent);
         setIntent(intent);
         if (webView != null) {
-            webView.loadUrl(startUrl(packOf(intent)));
+            webView.loadUrl(startUrl(packOf(intent), fxOf(intent)));
         }
     }
 
