@@ -69,6 +69,7 @@ const el = {
   bubbleAction: document.getElementById('bubbleAction'),
   status: document.getElementById('status'),
   packInfo: document.getElementById('packInfo'),
+  brandPet: document.getElementById('brandPet'),
   pack: document.getElementById('pack'),
   size: document.getElementById('size'),
   quiet: document.getElementById('quiet'),
@@ -681,6 +682,7 @@ async function loadPack(id) {
   el.packInfo.textContent = (pack.name || pack.id) + ' · ' + pack.canvas.w + '×' + pack.canvas.h
     + ' · ' + Object.keys(pack.animations).length + ' animation';
   el.pack.value = pack.id;
+  if (el.brandPet) el.brandPet.textContent = (saved.name || pack.name || pack.id);
   renderImported();
   layout();
 }
@@ -1019,7 +1021,6 @@ function draw(now) {
     if (out) drawFrame(out.anim, frameIndex, fade);
     lastDraw = out ? { anim: out.anim, frame: frameIndex } : null;
     lastDrawKey = key;
-    if (Math.random() < 0.05) setStatus(stateText(model.state) + ' · ' + out?.name + ' · frame ' + frameIndex);
   }
   rafId = requestAnimationFrame(draw);
 }
