@@ -4,7 +4,7 @@ import { ThrowPhysics, createStrokeDetector, spawnParticles, stepParticles } fro
 import { shouldRemind, breakText } from './reminders.js';
 import { replyTo, storyFor, summaryFrom, moodFor, memoryFrom, greetingFor } from './pet-chat.js';
 import { todayKey, bumpStreak, questDone, clock, hostColor, batteryText } from './care.js';
-import { shareUrl, pickConfig, decodeConfig } from './share.js';
+import { shareUrl, pickConfig, decodeConfig, backupOf } from './share.js';
 import { encodeGif, quantize } from './gif.js';
 import { buildZip } from './zip-write.js';
 import { verifyChecksums } from './pack-integrity.js';
@@ -1126,7 +1126,7 @@ function buildSettingsUI() {
 }
 
 async function copyBackup() {
-  const text = JSON.stringify(readStore(), null, 2);
+  const text = JSON.stringify(backupOf(readStore()), null, 2);
   try {
     await navigator.clipboard.writeText(text);
     setStatus('đã sao chép bản sao lưu');

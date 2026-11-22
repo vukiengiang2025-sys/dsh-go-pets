@@ -33,3 +33,11 @@ export function pickConfig(store = {}) {
   for (const key of keys) if (key in store) out[key] = store[key];
   return out;
 }
+
+export function backupOf(store = {}) {
+  const copy = { ...store };
+  delete copy.aiKey;
+  delete copy.aiTestSig;
+  delete copy.aiTestAt;
+  return copy;
+}
