@@ -133,6 +133,7 @@ const el = {
   ambientMode: document.getElementById('ambientMode'),
   ambientVolume: document.getElementById('ambientVolume'),
   openRoadmap: document.getElementById('openRoadmap'),
+  openChanges: document.getElementById('openChanges'),
   agentUrl: document.getElementById('agentUrl'),
   agentStart: document.getElementById('agentStart'),
   agentStop: document.getElementById('agentStop'),
@@ -1783,6 +1784,11 @@ function bindSheet() {
   el.ambientVolume.addEventListener('input', () => {
     writeStore({ ambientVolume: Number(el.ambientVolume.value) });
     applyAmbient();
+  });
+  el.openChanges.addEventListener('click', () => {
+    const url = 'https://github.com/vukiengiang2025-sys/dsh-go-pets/blob/main/CHANGELOG.md';
+    if (window.AndroidPet && window.AndroidPet.openUrl) window.AndroidPet.openUrl(url);
+    else window.open(url, '_blank');
   });
   el.openRoadmap.addEventListener('click', () => {
     const url = 'https://github.com/vukiengiang2025-sys/dsh-go-pets/blob/main/ROADMAP.md';
