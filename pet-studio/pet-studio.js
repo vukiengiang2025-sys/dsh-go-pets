@@ -281,6 +281,9 @@ function sheetNames(json) {
 }
 
 async function saveImported(built) {
+  if (builtinPacks.some(p => p.id === built.pack.id)) {
+    built.pack.id = 'user-' + built.pack.id;
+  }
   await saveLocalPack({
     id: built.pack.id, created: Date.now(),
     pack: built.pack, files: built.files, frames: built.frames,
