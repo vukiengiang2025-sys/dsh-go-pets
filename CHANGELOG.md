@@ -1,5 +1,10 @@
 # Thay đổi gần đây
 
+## 4.28.0
+- Header sticky, chip tên pet cạnh logo, bỏ dòng debug frame.
+- Nút trạng thái 3x3 gọn hơn, giữ thấy đủ 9 trạng thái.
+- Sửa lỗi chip tên pet bị ẩn trên mobile.
+
 ## 4.27.0
 - AI chào khi mở app sau 2 giờ (tuỳ chọn), dựa trên giờ + trạng thái + ký ức.
 
