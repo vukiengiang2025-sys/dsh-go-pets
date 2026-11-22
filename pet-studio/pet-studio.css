@@ -479,3 +479,5 @@ button.ai-chip { cursor: pointer; font: inherit; font-size: 11px; }
 
 .sheet-nav button.active { background: rgba(110,168,255,.22); border-color: rgba(110,168,255,.6); color: #dcebff; }
 .sheet-nav button:first-child.active, .sheet-nav button.active { font-weight: 600; }
+
+.ai-chip.warn { color: #ffd7a1; background: rgba(255,180,80,.12); border-color: rgba(255,180,80,.35); }

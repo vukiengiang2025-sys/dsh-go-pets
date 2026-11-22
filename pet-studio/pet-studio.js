@@ -453,6 +453,15 @@ function bumpAiUsage(promptText, replyText) {
   renderAiUsage();
 }
 
+function updateAiChip() {
+  if (!el.aiChip) return;
+  const s = readStore();
+  el.aiChip.hidden = !s.aiOn;
+  const missing = !s.aiKey;
+  el.aiChip.textContent = s.aiOn ? (missing ? 'AI · thiếu key' : 'AI · ' + (s.aiModel || 'bật')) : 'AI';
+  el.aiChip.classList.toggle('warn', missing && !!s.aiOn);
+}
+
 function aiConfig(s) {
   return { provider: s.aiProvider || 'openai', endpoint: s.aiEndpoint || '', model: s.aiModel || '', key: s.aiKey || '' };
 }
@@ -1794,13 +1803,12 @@ function bindSheet() {
     writeStore({ aiKey: '', aiTestAt: 0 });
     if (el.aiStatus) el.aiStatus.textContent = 'đã xoá key';
   });
+  el.aiKey.addEventListener('input', () => updateAiChip());
   el.aiChip.addEventListener('click', () => {
     el.aiOn.checked = !el.aiOn.checked;
     el.aiOn.dispatchEvent(new Event('change'));
   });
-  el.aiModel.addEventListener('input', () => {
-    if (el.aiChip && el.aiOn.checked) el.aiChip.textContent = 'AI · ' + (el.aiModel.value || 'bật');
-  });
+  el.aiModel.addEventListener('input', () => updateAiChip());
   ['aiEndpoint', 'aiModel', 'aiKey'].forEach(key => {
     const node = el[key];
     if (!node) return;
@@ -1827,10 +1835,7 @@ function bindSheet() {
   });
   el.aiOn.addEventListener('change', () => {
     writeStore({ aiOn: el.aiOn.checked });
-    if (el.aiChip) {
-      el.aiChip.hidden = !el.aiOn.checked;
-      el.aiChip.textContent = 'AI · ' + (el.aiModel.value || 'bật');
-    }
+    updateAiChip();
     if (el.aiStatus) el.aiStatus.textContent = el.aiOn.checked ? 'đã bật' : 'đã tắt';
   });
   el.aiRetest.addEventListener('click', () => {
@@ -2306,10 +2311,7 @@ async function main() {
     el.aiKey.value = savedSettings.aiKey || '';
     renderAiUsage();
     el.aiOn.checked = !!savedSettings.aiOn;
-    if (el.aiChip) {
-      el.aiChip.hidden = !el.aiOn.checked;
-      el.aiChip.textContent = 'AI · ' + (savedSettings.aiModel || 'bật');
-    }
+    updateAiChip();
     el.aiGreet.checked = !!savedSettings.aiGreet;
     el.overlayFloat.checked = savedSettings.overlayFloat !== false;
     if (window.AndroidPet && window.AndroidPet.setOverlayFloat) {
